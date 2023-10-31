@@ -109,7 +109,7 @@
     "lodash": "^4.17.21",
     "node-cache": "^5.1.2",
     "punycode": "^2.1.1",
-    "qs": "^6.10.1",
+    "qs": "^6.10.3",
     "source-map-support": "^0.5.19",
     "stats-lite": "^2.2.0",
     "ts-mocha": "^8.0.0",
