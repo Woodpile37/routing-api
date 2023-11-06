@@ -1,5 +1,4 @@
 import { SignerWithAddress } from '@nomiclabs/hardhat-ethers/signers'
-import { AllowanceTransfer, PermitSingle } from '@uniswap/permit2-sdk'
 import { Currency, CurrencyAmount, Ether, Fraction, Token, WETH9 } from '@uniswap/sdk-core'
 import {
   CEUR_CELO,
@@ -11,40 +10,32 @@ import {
   ID_TO_NETWORK_NAME,
   NATIVE_CURRENCY,
   parseAmount,
-  SWAP_ROUTER_02_ADDRESSES,
   USDC_MAINNET,
   USDT_MAINNET,
   WBTC_MAINNET,
 } from '@uniswap/smart-order-router'
-import {
-  PERMIT2_ADDRESS,
-  UNIVERSAL_ROUTER_ADDRESS as UNIVERSAL_ROUTER_ADDRESS_BY_CHAIN,
-} from '@uniswap/universal-router-sdk'
-import { MethodParameters } from '@uniswap/smart-order-router'
+import { MethodParameters } from '@uniswap/v3-sdk'
 import { fail } from 'assert'
 import axiosStatic, { AxiosResponse } from 'axios'
 import axiosRetry from 'axios-retry'
 import chai, { expect } from 'chai'
 import chaiAsPromised from 'chai-as-promised'
 import chaiSubset from 'chai-subset'
-import { BigNumber, providers, Wallet } from 'ethers'
+import { BigNumber, providers } from 'ethers'
 import hre from 'hardhat'
 import _ from 'lodash'
 import qs from 'qs'
 import { SUPPORTED_CHAINS } from '../../lib/handlers/injector-sor'
 import { QuoteQueryParams } from '../../lib/handlers/quote/schema/quote-schema'
 import { QuoteResponse } from '../../lib/handlers/schema'
-import { Permit2__factory } from '../../lib/types/ext'
 import { resetAndFundAtBlock } from '../utils/forkAndFund'
 import { getBalance, getBalanceAndApprove } from '../utils/getBalanceAndApprove'
-import { DAI_ON, getAmount, getAmountFromToken, UNI_MAINNET, USDC_ON, USDT_ON, WNATIVE_ON } from '../utils/tokens'
+import { DAI_ON, getAmount, getAmountFromToken, UNI_MAINNET, USDC_ON, WNATIVE_ON } from '../utils/tokens'
 
 const { ethers } = hre
 
 chai.use(chaiAsPromised)
 chai.use(chaiSubset)
-
-const UNIVERSAL_ROUTER_ADDRESS = UNIVERSAL_ROUTER_ADDRESS_BY_CHAIN(1)
 
 if (!process.env.UNISWAP_ROUTING_API || !process.env.ARCHIVE_NODE_RPC) {
   throw new Error('Must set UNISWAP_ROUTING_API and ARCHIVE_NODE_RPC env variables for integ tests. See README')
@@ -86,68 +77,33 @@ const checkQuoteToken = (
   expect(percentDiff.lessThan(new Fraction(parseInt(SLIPPAGE), 100))).to.be.true
 }
 
-let warnedTesterPK = false
-const isTesterPKEnvironmentSet = (): boolean => {
-  const isSet = !!process.env.TESTER_PK
-  if (!isSet && !warnedTesterPK) {
-    console.log('Skipping tests requiring real PK since env variables for TESTER_PK is not set.')
-    warnedTesterPK = true
-  }
-  return isSet
-}
-
-const MAX_UINT160 = '0xffffffffffffffffffffffffffffffffffffffff'
+const SWAP_ROUTER_V2 = '0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45'
 
 describe('quote', function () {
   // Help with test flakiness by retrying.
-  this.retries(0)
+  this.retries(2)
 
   this.timeout('500s')
 
   let alice: SignerWithAddress
   let block: number
-  let curNonce: number = 0
-  let nextPermitNonce: () => string = () => {
-    const nonce = curNonce.toString()
-    curNonce = curNonce + 1
-    return nonce
-  }
 
   const executeSwap = async (
     methodParameters: MethodParameters,
     currencyIn: Currency,
-    currencyOut: Currency,
-    permit?: boolean,
-    chainId = ChainId.MAINNET
+    currencyOut: Currency
   ): Promise<{
     tokenInAfter: CurrencyAmount<Currency>
     tokenInBefore: CurrencyAmount<Currency>
     tokenOutAfter: CurrencyAmount<Currency>
     tokenOutBefore: CurrencyAmount<Currency>
   }> => {
-    const permit2 = Permit2__factory.connect(PERMIT2_ADDRESS, alice)
-
-    // Approve Permit2
-    const tokenInBefore = await getBalanceAndApprove(alice, PERMIT2_ADDRESS, currencyIn)
+    const tokenInBefore = await getBalanceAndApprove(alice, SWAP_ROUTER_V2, currencyIn)
     const tokenOutBefore = await getBalance(alice, currencyOut)
-
-    // Approve SwapRouter02 in case we request calldata for it instead of Universal Router
-    await getBalanceAndApprove(alice, SWAP_ROUTER_02_ADDRESSES(chainId), currencyIn)
-
-    // If not using permit do a regular approval allowing narwhal max balance.
-    if (!permit) {
-      const approveNarwhal = await permit2.approve(
-        currencyIn.wrapped.address,
-        UNIVERSAL_ROUTER_ADDRESS,
-        MAX_UINT160,
-        100000000000000
-      )
-      await approveNarwhal.wait()
-    }
 
     const transaction = {
       data: methodParameters.calldata,
-      to: methodParameters.to,
+      to: SWAP_ROUTER_V2,
       value: BigNumber.from(methodParameters.value),
       from: alice.address,
       gasPrice: BigNumber.from(2000000000000),
@@ -155,6 +111,7 @@ describe('quote', function () {
     }
 
     const transactionResponse: providers.TransactionResponse = await alice.sendTransaction(transaction)
+
     await transactionResponse.wait()
 
     const tokenInAfter = await getBalance(alice, currencyIn)
@@ -198,10 +155,10 @@ describe('quote', function () {
     ])
   })
 
-  for (const algorithm of ['alpha']) {
+  for (const algorithm of ['alpha', 'legacy']) {
     for (const type of ['exactIn', 'exactOut']) {
       describe(`${ID_TO_NETWORK_NAME(1)} ${algorithm} ${type} 2xx`, () => {
-        describe(`+ Execute Swap`, () => {
+        describe(`+ simulate swap`, () => {
           it(`erc20 -> erc20`, async () => {
             const quoteReq: QuoteQueryParams = {
               tokenInAddress: 'USDC',
@@ -214,7 +171,6 @@ describe('quote', function () {
               slippageTolerance: SLIPPAGE,
               deadline: '360',
               algorithm,
-              enableUniversalRouter: true,
             }
 
             const queryParams = qs.stringify(quoteReq)
@@ -236,7 +192,6 @@ describe('quote', function () {
             }
 
             expect(methodParameters).to.not.be.undefined
-            expect(methodParameters?.to).to.equal(UNIVERSAL_ROUTER_ADDRESS)
 
             const { tokenInBefore, tokenInAfter, tokenOutBefore, tokenOutAfter } = await executeSwap(
               methodParameters!,
@@ -253,7 +208,7 @@ describe('quote', function () {
             }
           })
 
-          it(`erc20 -> erc20 swaprouter02`, async () => {
+          it(`erc20 -> erc20`, async () => {
             const quoteReq: QuoteQueryParams = {
               tokenInAddress: 'USDC',
               tokenInChainId: 1,
@@ -286,7 +241,6 @@ describe('quote', function () {
             }
 
             expect(methodParameters).to.not.be.undefined
-            expect(methodParameters?.to).to.equal(SWAP_ROUTER_02_ADDRESSES(ChainId.MAINNET))
 
             const { tokenInBefore, tokenInAfter, tokenOutBefore, tokenOutAfter } = await executeSwap(
               methodParameters!,
@@ -299,82 +253,6 @@ describe('quote', function () {
               checkQuoteToken(tokenOutBefore, tokenOutAfter, CurrencyAmount.fromRawAmount(USDT_MAINNET, quote))
             } else {
               expect(tokenOutAfter.subtract(tokenOutBefore).toExact()).to.equal('100')
-              checkQuoteToken(tokenInBefore, tokenInAfter, CurrencyAmount.fromRawAmount(USDC_MAINNET, quote))
-            }
-          })
-
-          it(`erc20 -> erc20 with permit`, async () => {
-            const amount = await getAmount(1, type, 'USDC', 'USDT', '10')
-
-            const nonce = nextPermitNonce()
-
-            const permit: PermitSingle = {
-              details: {
-                token: USDC_MAINNET.address,
-                amount: '15000000', // For exact out we don't know the exact amount needed to permit, so just specify a large amount.
-                expiration: Math.floor(new Date().getTime() / 1000 + 10000000).toString(),
-                nonce,
-              },
-              spender: UNIVERSAL_ROUTER_ADDRESS,
-              sigDeadline: Math.floor(new Date().getTime() / 1000 + 10000000).toString(),
-            }
-
-            const { domain, types, values } = AllowanceTransfer.getPermitData(permit, PERMIT2_ADDRESS, 1)
-
-            const signature = await alice._signTypedData(domain, types, values)
-
-            const quoteReq: QuoteQueryParams = {
-              tokenInAddress: 'USDC',
-              tokenInChainId: 1,
-              tokenOutAddress: 'USDT',
-              tokenOutChainId: 1,
-              amount,
-              type,
-              recipient: alice.address,
-              slippageTolerance: SLIPPAGE,
-              deadline: '360',
-              algorithm,
-              permitSignature: signature,
-              permitAmount: permit.details.amount.toString(),
-              permitExpiration: permit.details.expiration.toString(),
-              permitSigDeadline: permit.sigDeadline.toString(),
-              permitNonce: permit.details.nonce.toString(),
-              enableUniversalRouter: true,
-            }
-
-            const queryParams = qs.stringify(quoteReq)
-
-            const response: AxiosResponse<QuoteResponse> = await axios.get<QuoteResponse>(`${API}?${queryParams}`)
-            const {
-              data: { quote, quoteDecimals, quoteGasAdjustedDecimals, methodParameters },
-              status,
-            } = response
-
-            expect(status).to.equal(200)
-            expect(parseFloat(quoteDecimals)).to.be.greaterThan(9)
-            expect(parseFloat(quoteDecimals)).to.be.lessThan(11)
-
-            if (type == 'exactIn') {
-              expect(parseFloat(quoteGasAdjustedDecimals)).to.be.lessThanOrEqual(parseFloat(quoteDecimals))
-            } else {
-              expect(parseFloat(quoteGasAdjustedDecimals)).to.be.greaterThanOrEqual(parseFloat(quoteDecimals))
-            }
-
-            expect(methodParameters).to.not.be.undefined
-            expect(methodParameters?.to).to.equal(UNIVERSAL_ROUTER_ADDRESS)
-
-            const { tokenInBefore, tokenInAfter, tokenOutBefore, tokenOutAfter } = await executeSwap(
-              methodParameters!,
-              USDC_MAINNET,
-              USDT_MAINNET,
-              true
-            )
-
-            if (type == 'exactIn') {
-              expect(tokenInBefore.subtract(tokenInAfter).toExact()).to.equal('10')
-              checkQuoteToken(tokenOutBefore, tokenOutAfter, CurrencyAmount.fromRawAmount(USDT_MAINNET, quote))
-            } else {
-              expect(tokenOutAfter.subtract(tokenOutBefore).toExact()).to.equal('10')
               checkQuoteToken(tokenInBefore, tokenInAfter, CurrencyAmount.fromRawAmount(USDC_MAINNET, quote))
             }
           })
@@ -391,7 +269,6 @@ describe('quote', function () {
               slippageTolerance: SLIPPAGE,
               deadline: '360',
               algorithm,
-              enableUniversalRouter: true,
             }
 
             const queryParams = qs.stringify(quoteReq)
@@ -436,7 +313,6 @@ describe('quote', function () {
               slippageTolerance: SLIPPAGE,
               deadline: '360',
               algorithm,
-              enableUniversalRouter: true,
             }
 
             const queryParams = qs.stringify(quoteReq)
@@ -480,74 +356,6 @@ describe('quote', function () {
             }
           })
 
-          it(`erc20 -> eth large trade with permit`, async () => {
-            const nonce = nextPermitNonce()
-
-            const amount =
-              type == 'exactIn'
-                ? await getAmount(1, type, 'USDC', 'ETH', '1000000')
-                : await getAmount(1, type, 'USDC', 'ETH', '100')
-
-            const permit: PermitSingle = {
-              details: {
-                token: USDC_MAINNET.address,
-                amount: '1500000000000', // For exact out we don't know the exact amount needed to permit, so just specify a large amount.
-                expiration: Math.floor(new Date().getTime() / 1000 + 10000000).toString(),
-                nonce,
-              },
-              spender: UNIVERSAL_ROUTER_ADDRESS,
-              sigDeadline: Math.floor(new Date().getTime() / 1000 + 10000000).toString(),
-            }
-
-            const { domain, types, values } = AllowanceTransfer.getPermitData(permit, PERMIT2_ADDRESS, 1)
-
-            const signature = await alice._signTypedData(domain, types, values)
-
-            // Trade of this size almost always results in splits.
-            const quoteReq: QuoteQueryParams = {
-              tokenInAddress: 'USDC',
-              tokenInChainId: 1,
-              tokenOutAddress: 'ETH',
-              tokenOutChainId: 1,
-              amount,
-              type,
-              recipient: alice.address,
-              slippageTolerance: SLIPPAGE,
-              deadline: '360',
-              algorithm,
-              permitSignature: signature,
-              permitAmount: permit.details.amount.toString(),
-              permitExpiration: permit.details.expiration.toString(),
-              permitSigDeadline: permit.sigDeadline.toString(),
-              permitNonce: permit.details.nonce.toString(),
-              enableUniversalRouter: true,
-            }
-
-            const queryParams = qs.stringify(quoteReq)
-
-            const response = await axios.get<QuoteResponse>(`${API}?${queryParams}`)
-            const { data, status } = response
-
-            expect(status).to.equal(200)
-            expect(data.methodParameters).to.not.be.undefined
-            expect(data.route).to.not.be.undefined
-
-            const { tokenInBefore, tokenInAfter, tokenOutBefore, tokenOutAfter } = await executeSwap(
-              data.methodParameters!,
-              USDC_MAINNET,
-              Ether.onChain(1),
-              true
-            )
-
-            if (type == 'exactIn') {
-              expect(tokenInBefore.subtract(tokenInAfter).toExact()).to.equal('1000000')
-              checkQuoteToken(tokenOutBefore, tokenOutAfter, CurrencyAmount.fromRawAmount(Ether.onChain(1), data.quote))
-            } else {
-              // Hard to test ETH balance due to gas costs for approval and swap. Just check tokenIn changes
-              checkQuoteToken(tokenInBefore, tokenInAfter, CurrencyAmount.fromRawAmount(USDC_MAINNET, data.quote))
-            }
-          })
-
           it(`eth -> erc20`, async () => {
             const quoteReq: QuoteQueryParams = {
               tokenInAddress: 'ETH',
@@ -563,7 +371,6 @@ describe('quote', function () {
               slippageTolerance: SLIPPAGE,
               deadline: '360',
               algorithm,
-              enableUniversalRouter: true,
             }
 
             const queryParams = qs.stringify(quoteReq)
@@ -573,49 +380,6 @@ describe('quote', function () {
 
             expect(status).to.equal(200)
             expect(data.methodParameters).to.not.be.undefined
-
-            const { tokenInBefore, tokenInAfter, tokenOutBefore, tokenOutAfter } = await executeSwap(
-              data.methodParameters!,
-              Ether.onChain(1),
-              UNI_MAINNET
-            )
-
-            if (type == 'exactIn') {
-              // We've swapped 10 ETH + gas costs
-              expect(tokenInBefore.subtract(tokenInAfter).greaterThan(parseAmount('10', Ether.onChain(1)))).to.be.true
-              checkQuoteToken(tokenOutBefore, tokenOutAfter, CurrencyAmount.fromRawAmount(UNI_MAINNET, data.quote))
-            } else {
-              expect(tokenOutAfter.subtract(tokenOutBefore).toExact()).to.equal('10000')
-              // Can't easily check slippage for ETH due to gas costs effecting ETH balance.
-            }
-          })
-
-          it(`eth -> erc20 swaprouter02`, async () => {
-            const quoteReq: QuoteQueryParams = {
-              tokenInAddress: 'ETH',
-              tokenInChainId: 1,
-              tokenOutAddress: 'UNI',
-              tokenOutChainId: 1,
-              amount:
-                type == 'exactIn'
-                  ? await getAmount(1, type, 'ETH', 'UNI', '10')
-                  : await getAmount(1, type, 'ETH', 'UNI', '10000'),
-              type,
-              recipient: alice.address,
-              slippageTolerance: SLIPPAGE,
-              deadline: '360',
-              algorithm,
-              enableUniversalRouter: false,
-            }
-
-            const queryParams = qs.stringify(quoteReq)
-
-            const response = await axios.get<QuoteResponse>(`${API}?${queryParams}`)
-            const { data, status } = response
-
-            expect(status).to.equal(200)
-            expect(data.methodParameters).to.not.be.undefined
-            expect(data.methodParameters?.to).to.equal(SWAP_ROUTER_02_ADDRESSES(ChainId.MAINNET))
 
             const { tokenInBefore, tokenInAfter, tokenOutBefore, tokenOutAfter } = await executeSwap(
               data.methodParameters!,
@@ -645,7 +409,6 @@ describe('quote', function () {
               slippageTolerance: SLIPPAGE,
               deadline: '360',
               algorithm,
-              enableUniversalRouter: true,
             }
 
             const queryParams = qs.stringify(quoteReq)
@@ -683,7 +446,6 @@ describe('quote', function () {
               slippageTolerance: SLIPPAGE,
               deadline: '360',
               algorithm,
-              enableUniversalRouter: true,
             }
 
             const queryParams = qs.stringify(quoteReq)
@@ -723,7 +485,6 @@ describe('quote', function () {
                 deadline: '360',
                 algorithm: 'alpha',
                 protocols: 'v3',
-                enableUniversalRouter: true,
               }
 
               const queryParams = qs.stringify(quoteReq)
@@ -780,7 +541,6 @@ describe('quote', function () {
                 deadline: '360',
                 algorithm: 'alpha',
                 protocols: 'v2',
-                enableUniversalRouter: true,
               }
 
               const queryParams = qs.stringify(quoteReq)
@@ -837,7 +597,6 @@ describe('quote', function () {
                 deadline: '360',
                 algorithm: 'alpha',
                 forceCrossProtocol: true,
-                enableUniversalRouter: true,
               }
 
               const queryParams = qs.stringify(quoteReq)
@@ -905,7 +664,6 @@ describe('quote', function () {
                   deadline: '360',
                   algorithm: 'alpha',
                   protocols: 'v2,v3',
-                  enableUniversalRouter: true,
                 }
 
                 const queryParams = qs.stringify(quoteReq)
@@ -943,7 +701,6 @@ describe('quote', function () {
                   algorithm: 'alpha',
                   forceMixedRoutes: true,
                   protocols: 'v2,v3',
-                  enableUniversalRouter: true,
                 }
 
                 await callAndExpectFail(quoteReq, {
@@ -969,7 +726,6 @@ describe('quote', function () {
                   algorithm: 'alpha',
                   forceMixedRoutes: true,
                   protocols: 'v2,v3,mixed',
-                  enableUniversalRouter: true,
                 }
 
                 const queryParams = qs.stringify(quoteReq)
@@ -997,455 +753,6 @@ describe('quote', function () {
           }
         })
 
-        if (algorithm == 'alpha') {
-          describe(`+ Simulate Swap + Execute Swap`, () => {
-            it(`erc20 -> erc20`, async () => {
-              const quoteReq: QuoteQueryParams = {
-                tokenInAddress: 'USDC',
-                tokenInChainId: 1,
-                tokenOutAddress: 'USDT',
-                tokenOutChainId: 1,
-                amount: await getAmount(1, type, 'USDC', 'USDT', '100'),
-                type,
-                recipient: alice.address,
-                slippageTolerance: SLIPPAGE,
-                deadline: '360',
-                algorithm,
-                simulateFromAddress: '0xf584f8728b874a6a5c7a8d4d387c9aae9172d621',
-                enableUniversalRouter: true,
-              }
-
-              const queryParams = qs.stringify(quoteReq)
-
-              const response: AxiosResponse<QuoteResponse> = await axios.get<QuoteResponse>(`${API}?${queryParams}`)
-              const {
-                data: { quote, quoteDecimals, quoteGasAdjustedDecimals, methodParameters, simulationError },
-                status,
-              } = response
-
-              expect(status).to.equal(200)
-              expect(simulationError).to.equal(false)
-              expect(parseFloat(quoteDecimals)).to.be.greaterThan(90)
-              expect(parseFloat(quoteDecimals)).to.be.lessThan(110)
-
-              if (type == 'exactIn') {
-                expect(parseFloat(quoteGasAdjustedDecimals)).to.be.lessThanOrEqual(parseFloat(quoteDecimals))
-              } else {
-                expect(parseFloat(quoteGasAdjustedDecimals)).to.be.greaterThanOrEqual(parseFloat(quoteDecimals))
-              }
-
-              expect(methodParameters).to.not.be.undefined
-
-              const { tokenInBefore, tokenInAfter, tokenOutBefore, tokenOutAfter } = await executeSwap(
-                methodParameters!,
-                USDC_MAINNET,
-                USDT_MAINNET
-              )
-
-              if (type == 'exactIn') {
-                expect(tokenInBefore.subtract(tokenInAfter).toExact()).to.equal('100')
-                checkQuoteToken(tokenOutBefore, tokenOutAfter, CurrencyAmount.fromRawAmount(USDT_MAINNET, quote))
-              } else {
-                expect(tokenOutAfter.subtract(tokenOutBefore).toExact()).to.equal('100')
-                checkQuoteToken(tokenInBefore, tokenInAfter, CurrencyAmount.fromRawAmount(USDC_MAINNET, quote))
-              }
-            })
-
-            it(`erc20 -> erc20 swaprouter02`, async () => {
-              const quoteReq: QuoteQueryParams = {
-                tokenInAddress: 'USDC',
-                tokenInChainId: 1,
-                tokenOutAddress: 'USDT',
-                tokenOutChainId: 1,
-                amount: await getAmount(1, type, 'USDC', 'USDT', '100'),
-                type,
-                recipient: alice.address,
-                slippageTolerance: SLIPPAGE,
-                deadline: '360',
-                algorithm,
-                simulateFromAddress: '0xf584f8728b874a6a5c7a8d4d387c9aae9172d621',
-              }
-
-              const queryParams = qs.stringify(quoteReq)
-
-              const response: AxiosResponse<QuoteResponse> = await axios.get<QuoteResponse>(`${API}?${queryParams}`)
-              const {
-                data: { quote, quoteDecimals, quoteGasAdjustedDecimals, methodParameters, simulationError },
-                status,
-              } = response
-
-              expect(status).to.equal(200)
-              expect(simulationError).to.equal(false)
-              expect(parseFloat(quoteDecimals)).to.be.greaterThan(90)
-              expect(parseFloat(quoteDecimals)).to.be.lessThan(110)
-
-              if (type == 'exactIn') {
-                expect(parseFloat(quoteGasAdjustedDecimals)).to.be.lessThanOrEqual(parseFloat(quoteDecimals))
-              } else {
-                expect(parseFloat(quoteGasAdjustedDecimals)).to.be.greaterThanOrEqual(parseFloat(quoteDecimals))
-              }
-
-              expect(methodParameters).to.not.be.undefined
-              expect(methodParameters!.to).to.equal(SWAP_ROUTER_02_ADDRESSES(ChainId.MAINNET))
-
-              const { tokenInBefore, tokenInAfter, tokenOutBefore, tokenOutAfter } = await executeSwap(
-                methodParameters!,
-                USDC_MAINNET,
-                USDT_MAINNET
-              )
-
-              if (type == 'exactIn') {
-                expect(tokenInBefore.subtract(tokenInAfter).toExact()).to.equal('100')
-                checkQuoteToken(tokenOutBefore, tokenOutAfter, CurrencyAmount.fromRawAmount(USDT_MAINNET, quote))
-              } else {
-                expect(tokenOutAfter.subtract(tokenOutBefore).toExact()).to.equal('100')
-                checkQuoteToken(tokenInBefore, tokenInAfter, CurrencyAmount.fromRawAmount(USDC_MAINNET, quote))
-              }
-            })
-
-            if (isTesterPKEnvironmentSet()) {
-              it(`erc20 -> erc20 with permit with tester pk`, async () => {
-                // This test requires a private key with at least 10 USDC
-                // at FORK_BLOCK time.
-                const amount = await getAmount(1, type, 'USDC', 'USDT', '10')
-
-                const nonce = '0'
-
-                const permit: PermitSingle = {
-                  details: {
-                    token: USDC_MAINNET.address,
-                    amount: amount,
-                    expiration: Math.floor(new Date().getTime() / 1000 + 10000000).toString(),
-                    nonce,
-                  },
-                  spender: UNIVERSAL_ROUTER_ADDRESS,
-                  sigDeadline: Math.floor(new Date().getTime() / 1000 + 10000000).toString(),
-                }
-
-                const wallet = new Wallet(process.env.TESTER_PK!)
-
-                const { domain, types, values } = AllowanceTransfer.getPermitData(permit, PERMIT2_ADDRESS, 1)
-
-                const signature = await wallet._signTypedData(domain, types, values)
-
-                const quoteReq: QuoteQueryParams = {
-                  tokenInAddress: 'USDC',
-                  tokenInChainId: 1,
-                  tokenOutAddress: 'USDT',
-                  tokenOutChainId: 1,
-                  amount,
-                  type,
-                  recipient: wallet.address,
-                  slippageTolerance: SLIPPAGE,
-                  deadline: '360',
-                  algorithm,
-                  simulateFromAddress: wallet.address,
-                  permitSignature: signature,
-                  permitAmount: permit.details.amount.toString(),
-                  permitExpiration: permit.details.expiration.toString(),
-                  permitSigDeadline: permit.sigDeadline.toString(),
-                  permitNonce: permit.details.nonce.toString(),
-                  enableUniversalRouter: true,
-                }
-
-                const queryParams = qs.stringify(quoteReq)
-
-                const response: AxiosResponse<QuoteResponse> = await axios.get<QuoteResponse>(`${API}?${queryParams}`)
-                const {
-                  data: { quoteDecimals, quoteGasAdjustedDecimals, methodParameters, simulationError },
-                  status,
-                } = response
-                expect(status).to.equal(200)
-
-                expect(simulationError).to.equal(false)
-
-                expect(parseFloat(quoteDecimals)).to.be.greaterThan(9)
-                expect(parseFloat(quoteDecimals)).to.be.lessThan(11)
-
-                if (type == 'exactIn') {
-                  expect(parseFloat(quoteGasAdjustedDecimals)).to.be.lessThanOrEqual(parseFloat(quoteDecimals))
-                } else {
-                  expect(parseFloat(quoteGasAdjustedDecimals)).to.be.greaterThanOrEqual(parseFloat(quoteDecimals))
-                }
-
-                expect(methodParameters).to.not.be.undefined
-              })
-            }
-
-            it(`erc20 -> eth`, async () => {
-              const quoteReq: QuoteQueryParams = {
-                tokenInAddress: 'USDC',
-                tokenInChainId: 1,
-                tokenOutAddress: 'ETH',
-                tokenOutChainId: 1,
-                amount: await getAmount(1, type, 'USDC', 'ETH', type == 'exactIn' ? '1000000' : '10'),
-                type,
-                recipient: alice.address,
-                slippageTolerance: SLIPPAGE,
-                deadline: '360',
-                algorithm,
-                simulateFromAddress: '0xf584f8728b874a6a5c7a8d4d387c9aae9172d621',
-                enableUniversalRouter: true,
-              }
-
-              const queryParams = qs.stringify(quoteReq)
-
-              const response = await axios.get<QuoteResponse>(`${API}?${queryParams}`)
-              const {
-                data: { quote, methodParameters, simulationError },
-                status,
-              } = response
-
-              expect(status).to.equal(200)
-              expect(simulationError).to.equal(false)
-              expect(methodParameters).to.not.be.undefined
-
-              const { tokenInBefore, tokenInAfter, tokenOutBefore, tokenOutAfter } = await executeSwap(
-                methodParameters!,
-                USDC_MAINNET,
-                Ether.onChain(1)
-              )
-
-              if (type == 'exactIn') {
-                expect(tokenInBefore.subtract(tokenInAfter).toExact()).to.equal('1000000')
-                checkQuoteToken(tokenOutBefore, tokenOutAfter, CurrencyAmount.fromRawAmount(Ether.onChain(1), quote))
-              } else {
-                // Hard to test ETH balance due to gas costs for approval and swap. Just check tokenIn changes
-                checkQuoteToken(tokenInBefore, tokenInAfter, CurrencyAmount.fromRawAmount(USDC_MAINNET, quote))
-              }
-            })
-
-            it(`erc20 -> eth large trade`, async () => {
-              // Trade of this size almost always results in splits.
-              const quoteReq: QuoteQueryParams = {
-                tokenInAddress: 'USDC',
-                tokenInChainId: 1,
-                tokenOutAddress: 'ETH',
-                tokenOutChainId: 1,
-                amount:
-                  type == 'exactIn'
-                    ? await getAmount(1, type, 'USDC', 'ETH', '1000000')
-                    : await getAmount(1, type, 'USDC', 'ETH', '100'),
-                type,
-                recipient: alice.address,
-                slippageTolerance: SLIPPAGE,
-                deadline: '360',
-                algorithm,
-                simulateFromAddress: '0xf584f8728b874a6a5c7a8d4d387c9aae9172d621',
-                enableUniversalRouter: true,
-              }
-
-              const queryParams = qs.stringify(quoteReq)
-
-              const response = await axios.get<QuoteResponse>(`${API}?${queryParams}`)
-              const { data, status } = response
-
-              expect(status).to.equal(200)
-              expect(data.simulationError).to.equal(false)
-              expect(data.methodParameters).to.not.be.undefined
-
-              expect(data.route).to.not.be.undefined
-
-              const amountInEdgesTotal = _(data.route)
-                .flatMap((route) => route[0]!)
-                .filter((pool) => !!pool.amountIn)
-                .map((pool) => BigNumber.from(pool.amountIn))
-                .reduce((cur, total) => total.add(cur), BigNumber.from(0))
-              const amountIn = BigNumber.from(data.quote)
-              expect(amountIn.eq(amountInEdgesTotal))
-
-              const amountOutEdgesTotal = _(data.route)
-                .flatMap((route) => route[0]!)
-                .filter((pool) => !!pool.amountOut)
-                .map((pool) => BigNumber.from(pool.amountOut))
-                .reduce((cur, total) => total.add(cur), BigNumber.from(0))
-              const amountOut = BigNumber.from(data.quote)
-              expect(amountOut.eq(amountOutEdgesTotal))
-
-              const { tokenInBefore, tokenInAfter, tokenOutBefore, tokenOutAfter } = await executeSwap(
-                data.methodParameters!,
-                USDC_MAINNET,
-                Ether.onChain(1)
-              )
-
-              if (type == 'exactIn') {
-                expect(tokenInBefore.subtract(tokenInAfter).toExact()).to.equal('1000000')
-                checkQuoteToken(
-                  tokenOutBefore,
-                  tokenOutAfter,
-                  CurrencyAmount.fromRawAmount(Ether.onChain(1), data.quote)
-                )
-              } else {
-                // Hard to test ETH balance due to gas costs for approval and swap. Just check tokenIn changes
-                checkQuoteToken(tokenInBefore, tokenInAfter, CurrencyAmount.fromRawAmount(USDC_MAINNET, data.quote))
-              }
-            })
-
-            it(`eth -> erc20`, async () => {
-              const quoteReq: QuoteQueryParams = {
-                tokenInAddress: 'ETH',
-                tokenInChainId: 1,
-                tokenOutAddress: 'UNI',
-                tokenOutChainId: 1,
-                amount:
-                  type == 'exactIn'
-                    ? await getAmount(1, type, 'ETH', 'UNI', '10')
-                    : await getAmount(1, type, 'ETH', 'UNI', '10000'),
-                type,
-                recipient: alice.address,
-                slippageTolerance: SLIPPAGE,
-                deadline: '360',
-                algorithm,
-                simulateFromAddress: '0x0716a17FBAeE714f1E6aB0f9d59edbC5f09815C0',
-                enableUniversalRouter: true,
-              }
-
-              const queryParams = qs.stringify(quoteReq)
-
-              const response = await axios.get<QuoteResponse>(`${API}?${queryParams}`)
-              const { data, status } = response
-              expect(status).to.equal(200)
-              expect(data.simulationError).to.equal(false)
-              expect(data.methodParameters).to.not.be.undefined
-
-              const { tokenInBefore, tokenInAfter, tokenOutBefore, tokenOutAfter } = await executeSwap(
-                data.methodParameters!,
-                Ether.onChain(1),
-                UNI_MAINNET
-              )
-
-              if (type == 'exactIn') {
-                // We've swapped 10 ETH + gas costs
-                expect(tokenInBefore.subtract(tokenInAfter).greaterThan(parseAmount('10', Ether.onChain(1)))).to.be.true
-                checkQuoteToken(tokenOutBefore, tokenOutAfter, CurrencyAmount.fromRawAmount(UNI_MAINNET, data.quote))
-              } else {
-                expect(tokenOutAfter.subtract(tokenOutBefore).toExact()).to.equal('10000')
-                // Can't easily check slippage for ETH due to gas costs effecting ETH balance.
-              }
-            })
-
-            it(`eth -> erc20 swaprouter02`, async () => {
-              const quoteReq: QuoteQueryParams = {
-                tokenInAddress: 'ETH',
-                tokenInChainId: 1,
-                tokenOutAddress: 'UNI',
-                tokenOutChainId: 1,
-                amount:
-                  type == 'exactIn'
-                    ? await getAmount(1, type, 'ETH', 'UNI', '10')
-                    : await getAmount(1, type, 'ETH', 'UNI', '10000'),
-                type,
-                recipient: alice.address,
-                slippageTolerance: SLIPPAGE,
-                deadline: '360',
-                algorithm,
-                simulateFromAddress: '0x0716a17FBAeE714f1E6aB0f9d59edbC5f09815C0',
-                enableUniversalRouter: false,
-              }
-
-              const queryParams = qs.stringify(quoteReq)
-
-              const response = await axios.get<QuoteResponse>(`${API}?${queryParams}`)
-              const { data, status } = response
-              expect(status).to.equal(200)
-              expect(data.simulationError).to.equal(false)
-              expect(data.methodParameters).to.not.be.undefined
-
-              const { tokenInBefore, tokenInAfter, tokenOutBefore, tokenOutAfter } = await executeSwap(
-                data.methodParameters!,
-                Ether.onChain(1),
-                UNI_MAINNET
-              )
-
-              if (type == 'exactIn') {
-                // We've swapped 10 ETH + gas costs
-                expect(tokenInBefore.subtract(tokenInAfter).greaterThan(parseAmount('10', Ether.onChain(1)))).to.be.true
-                checkQuoteToken(tokenOutBefore, tokenOutAfter, CurrencyAmount.fromRawAmount(UNI_MAINNET, data.quote))
-              } else {
-                expect(tokenOutAfter.subtract(tokenOutBefore).toExact()).to.equal('10000')
-                // Can't easily check slippage for ETH due to gas costs effecting ETH balance.
-              }
-            })
-
-            it(`weth -> erc20`, async () => {
-              const quoteReq: QuoteQueryParams = {
-                tokenInAddress: 'WETH',
-                tokenInChainId: 1,
-                tokenOutAddress: 'DAI',
-                tokenOutChainId: 1,
-                amount: await getAmount(1, type, 'WETH', 'DAI', '100'),
-                type,
-                recipient: alice.address,
-                slippageTolerance: SLIPPAGE,
-                deadline: '360',
-                algorithm,
-                simulateFromAddress: '0xf04a5cc80b1e94c69b48f5ee68a08cd2f09a7c3e',
-                enableUniversalRouter: true,
-              }
-
-              const queryParams = qs.stringify(quoteReq)
-
-              const response = await axios.get<QuoteResponse>(`${API}?${queryParams}`)
-              const { data, status } = response
-              expect(status).to.equal(200)
-              expect(data.simulationError).to.equal(false)
-              expect(data.methodParameters).to.not.be.undefined
-
-              const { tokenInBefore, tokenInAfter, tokenOutBefore, tokenOutAfter } = await executeSwap(
-                data.methodParameters!,
-                WETH9[1]!,
-                DAI_MAINNET
-              )
-
-              if (type == 'exactIn') {
-                expect(tokenInBefore.subtract(tokenInAfter).toExact()).to.equal('100')
-                checkQuoteToken(tokenOutBefore, tokenOutAfter, CurrencyAmount.fromRawAmount(DAI_MAINNET, data.quote))
-              } else {
-                expect(tokenOutAfter.subtract(tokenOutBefore).toExact()).to.equal('100')
-                checkQuoteToken(tokenInBefore, tokenInAfter, CurrencyAmount.fromRawAmount(WETH9[1]!, data.quote))
-              }
-            })
-
-            it(`erc20 -> weth`, async () => {
-              const quoteReq: QuoteQueryParams = {
-                tokenInAddress: 'USDC',
-                tokenInChainId: 1,
-                tokenOutAddress: 'WETH',
-                tokenOutChainId: 1,
-                amount: await getAmount(1, type, 'USDC', 'WETH', '100'),
-                type,
-                recipient: alice.address,
-                slippageTolerance: SLIPPAGE,
-                deadline: '360',
-                algorithm,
-                simulateFromAddress: '0xf584f8728b874a6a5c7a8d4d387c9aae9172d621',
-                enableUniversalRouter: true,
-              }
-
-              const queryParams = qs.stringify(quoteReq)
-
-              const response = await axios.get<QuoteResponse>(`${API}?${queryParams}`)
-              const { data, status } = response
-              expect(status).to.equal(200)
-              expect(data.simulationError).to.equal(false)
-              expect(data.methodParameters).to.not.be.undefined
-
-              const { tokenInBefore, tokenInAfter, tokenOutBefore, tokenOutAfter } = await executeSwap(
-                data.methodParameters!,
-                USDC_MAINNET,
-                WETH9[1]!
-              )
-
-              if (type == 'exactIn') {
-                expect(tokenInBefore.subtract(tokenInAfter).toExact()).to.equal('100')
-                checkQuoteToken(tokenOutBefore, tokenOutAfter, CurrencyAmount.fromRawAmount(WETH9[1], data.quote))
-              } else {
-                expect(tokenOutAfter.subtract(tokenOutBefore).toExact()).to.equal('100')
-                checkQuoteToken(tokenInBefore, tokenInAfter, CurrencyAmount.fromRawAmount(USDC_MAINNET, data.quote))
-              }
-            })
-          })
-        }
         it(`erc20 -> erc20 no recipient/deadline/slippage`, async () => {
           const quoteReq: QuoteQueryParams = {
             tokenInAddress: 'USDC',
@@ -1455,7 +762,6 @@ describe('quote', function () {
             amount: await getAmount(1, type, 'USDC', 'USDT', '100'),
             type,
             algorithm,
-            enableUniversalRouter: true,
           }
 
           const queryParams = qs.stringify(quoteReq)
@@ -1489,7 +795,6 @@ describe('quote', function () {
             type,
             algorithm,
             gasPriceWei: '60000000000',
-            enableUniversalRouter: true,
           }
 
           const queryParams = qs.stringify(quoteReq)
@@ -1530,7 +835,6 @@ describe('quote', function () {
             slippageTolerance: SLIPPAGE,
             deadline: '360',
             algorithm,
-            enableUniversalRouter: true,
           }
 
           const queryParams = qs.stringify(quoteReq)
@@ -1566,7 +870,6 @@ describe('quote', function () {
             slippageTolerance: SLIPPAGE,
             deadline: '360',
             algorithm,
-            enableUniversalRouter: true,
           }
 
           const queryParams = qs.stringify(quoteReq)
@@ -1602,7 +905,6 @@ describe('quote', function () {
             slippageTolerance: SLIPPAGE,
             deadline: '360',
             algorithm,
-            enableUniversalRouter: true,
           }
 
           await callAndExpectFail(quoteReq, {
@@ -1626,7 +928,6 @@ describe('quote', function () {
             slippageTolerance: SLIPPAGE,
             deadline: '360',
             algorithm,
-            enableUniversalRouter: true,
           }
 
           await callAndExpectFail(quoteReq, {
@@ -1679,7 +980,6 @@ describe('quote', function () {
             slippageTolerance: SLIPPAGE,
             deadline: '360',
             algorithm,
-            enableUniversalRouter: true,
           }
 
           await callAndExpectFail(quoteReq, {
@@ -1703,7 +1003,6 @@ describe('quote', function () {
             slippageTolerance: SLIPPAGE,
             deadline: '360',
             algorithm,
-            enableUniversalRouter: true,
           }
 
           await callAndExpectFail(quoteReq, {
@@ -1750,7 +1049,6 @@ describe('quote', function () {
             slippageTolerance: SLIPPAGE,
             deadline: '360',
             algorithm,
-            enableUniversalRouter: true,
           }
 
           await callAndExpectFail(quoteReq, {
@@ -1774,7 +1072,6 @@ describe('quote', function () {
             slippageTolerance: SLIPPAGE,
             deadline: '360',
             algorithm,
-            enableUniversalRouter: true,
           }
 
           await callAndExpectFail(quoteReq, {
@@ -1798,7 +1095,6 @@ describe('quote', function () {
             slippageTolerance: SLIPPAGE,
             deadline: '360',
             algorithm,
-            enableUniversalRouter: true,
           }
           await callAndExpectFail(quoteReq, {
             status: 400,
@@ -1820,7 +1116,6 @@ describe('quote', function () {
             slippageTolerance: SLIPPAGE,
             deadline: '360',
             algorithm,
-            enableUniversalRouter: true,
           }
           await callAndExpectFail(quoteReq, {
             status: 400,
@@ -1843,7 +1138,6 @@ describe('quote', function () {
             slippageTolerance: SLIPPAGE,
             deadline: '360',
             algorithm,
-            enableUniversalRouter: true,
           }
 
           await callAndExpectFail(quoteReq, {
@@ -1868,7 +1162,6 @@ describe('quote', function () {
             slippageTolerance: SLIPPAGE,
             deadline: '360',
             algorithm,
-            enableUniversalRouter: true,
           }
 
           const chains = SUPPORTED_CHAINS.values()
@@ -1902,8 +1195,6 @@ describe('quote', function () {
     [ChainId.CELO_ALFAJORES]: CUSD_CELO_ALFAJORES,
     [ChainId.MOONBEAM]: null,
     [ChainId.GNOSIS]: null,
-    [ChainId.ARBITRUM_GOERLI]: null,
-    [ChainId.BSC]: USDC_ON(ChainId.BSC),
   }
 
   const TEST_ERC20_2: { [chainId in ChainId]: Token | null } = {
@@ -1922,23 +1213,12 @@ describe('quote', function () {
     [ChainId.CELO_ALFAJORES]: CEUR_CELO_ALFAJORES,
     [ChainId.MOONBEAM]: null,
     [ChainId.GNOSIS]: null,
-    [ChainId.ARBITRUM_GOERLI]: null,
-    [ChainId.BSC]: USDT_ON(ChainId.BSC),
   }
 
   // TODO: Find valid pools/tokens on optimistic kovan and polygon mumbai. We skip those tests for now.
   for (const chain of _.filter(
     SUPPORTED_CHAINS,
-    (c) =>
-      c != ChainId.OPTIMISTIC_KOVAN &&
-      c != ChainId.POLYGON_MUMBAI &&
-      c != ChainId.ARBITRUM_RINKEBY &&
-      c != ChainId.ARBITRUM_GOERLI &&
-      c != ChainId.CELO_ALFAJORES &&
-      c != ChainId.KOVAN &&
-      c != ChainId.RINKEBY &&
-      c != ChainId.ROPSTEN &&
-      c != ChainId.GÖRLI
+    (c) => c != ChainId.OPTIMISTIC_KOVAN && c != ChainId.POLYGON_MUMBAI && c != ChainId.ARBITRUM_RINKEBY
   )) {
     for (const type of ['exactIn', 'exactOut']) {
       const erc1 = TEST_ERC20_1[chain]
@@ -1949,7 +1229,7 @@ describe('quote', function () {
 
       describe(`${ID_TO_NETWORK_NAME(chain)} ${type} 2xx`, function () {
         // Help with test flakiness by retrying.
-        this.retries(0)
+        this.retries(1)
         const wrappedNative = WNATIVE_ON(chain)
 
         it(`${wrappedNative.symbol} -> erc20`, async () => {
@@ -1960,7 +1240,6 @@ describe('quote', function () {
             tokenOutChainId: chain,
             amount: await getAmountFromToken(type, wrappedNative, erc1, '10'),
             type,
-            enableUniversalRouter: true,
           }
 
           const queryParams = qs.stringify(quoteReq)
@@ -2005,7 +1284,6 @@ describe('quote', function () {
             tokenOutChainId: chain,
             amount: await getAmountFromToken(type, WNATIVE_ON(chain), erc2, '10'),
             type,
-            enableUniversalRouter: true,
           }
 
           const queryParams = qs.stringify(quoteReq)
