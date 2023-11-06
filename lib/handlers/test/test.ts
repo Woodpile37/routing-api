@@ -1,5 +1,5 @@
-import { default as bunyan, default as Logger } from 'bunyan'
 import { Context } from 'aws-lambda'
+import { default as bunyan, default as Logger } from 'bunyan'
 
 export const testHandler = async (context: Context): Promise<void> => {
   const logger: Logger = bunyan.createLogger({
