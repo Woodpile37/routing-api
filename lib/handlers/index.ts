@@ -1,6 +1,7 @@
 import { default as bunyan, default as Logger } from 'bunyan'
 import { QuoteHandlerInjector } from './quote/injector'
 import { QuoteHandler } from './quote/quote'
+import { testHandler } from './test/test'
 
 const log: Logger = bunyan.createLogger({
   name: 'Root',
@@ -19,4 +20,5 @@ try {
 
 module.exports = {
   quoteHandler: quoteHandler.handler,
+  testHandler: testHandler,
 }

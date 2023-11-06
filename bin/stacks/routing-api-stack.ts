@@ -1,6 +1,6 @@
-import { ChainId } from '@uniswap/sdk-core'
 import { SUPPORTED_CHAINS } from '@uniswap/smart-order-router'
 import * as cdk from 'aws-cdk-lib'
+import { ChainId } from '@uniswap/sdk-core'
 import { CfnOutput, Duration } from 'aws-cdk-lib'
 import * as aws_apigateway from 'aws-cdk-lib/aws-apigateway'
 import { MethodLoggingLevel } from 'aws-cdk-lib/aws-apigateway'
@@ -14,8 +14,9 @@ import { Construct } from 'constructs'
 import { STAGE } from '../../lib/util/stage'
 import { RoutingCachingStack } from './routing-caching-stack'
 import { RoutingDashboardStack } from './routing-dashboard-stack'
-import { RoutingDatabaseStack } from './routing-database-stack'
 import { RoutingLambdaStack } from './routing-lambda-stack'
+import { RoutingDatabaseStack } from './routing-database-stack'
+import { SecondaryRoutingLambdaStack } from './secondary-routing-lambda-stack'
 
 export const CHAINS_NOT_MONITORED: ChainId[] = [ChainId.GOERLI, ChainId.POLYGON_MUMBAI]
 
@@ -40,7 +41,6 @@ export class RoutingAPIStack extends cdk.Stack {
       tenderlyUser: string
       tenderlyProject: string
       tenderlyAccessKey: string
-      unicornSecret: string
     }
   ) {
     super(parent, name, props)
@@ -60,7 +60,6 @@ export class RoutingAPIStack extends cdk.Stack {
       tenderlyUser,
       tenderlyProject,
       tenderlyAccessKey,
-      unicornSecret,
     } = props
 
     const {
@@ -79,15 +78,11 @@ export class RoutingAPIStack extends cdk.Stack {
       hosted_zone,
     })
 
-    const {
-      routesDynamoDb,
-      routesDbCachingRequestFlagDynamoDb,
-      cachedRoutesDynamoDb,
-      cachingRequestFlagDynamoDb,
-      cachedV3PoolsDynamoDb,
-      cachedV2PairsDynamoDb,
-      tokenPropertiesCachingDynamoDb,
-    } = new RoutingDatabaseStack(this, 'RoutingDatabaseStack', {})
+    const { cachedRoutesDynamoDb, cachedV3PoolsDynamoDb } = new RoutingDatabaseStack(this, 'RoutingDatabaseStack', {})
+
+    const { secondaryRoutingLambda } = new SecondaryRoutingLambdaStack(this, 'SecondaryRoutingLambdaStack', {
+      provisionedConcurrency,
+    })
 
     const { routingLambda, routingLambdaAlias } = new RoutingLambdaStack(this, 'RoutingLambdaStack', {
       poolCacheBucket,
@@ -101,14 +96,9 @@ export class RoutingAPIStack extends cdk.Stack {
       tenderlyUser,
       tenderlyProject,
       tenderlyAccessKey,
-      routesDynamoDb,
-      routesDbCachingRequestFlagDynamoDb,
       cachedRoutesDynamoDb,
-      cachingRequestFlagDynamoDb,
       cachedV3PoolsDynamoDb,
-      cachedV2PairsDynamoDb,
-      tokenPropertiesCachingDynamoDb,
-      unicornSecret,
+      SECONDARY_ROUTING_LAMBDA: secondaryRoutingLambda.functionName,
     })
 
     const accessLogGroup = new aws_logs.LogGroup(this, 'RoutingAPIGAccessLogs')

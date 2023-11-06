@@ -1,44 +1,38 @@
 import Joi from '@hapi/joi'
-import { PermitSingle } from '@uniswap/permit2-sdk'
+import { Lambda } from 'aws-sdk'
 import { Protocol } from '@uniswap/router-sdk'
-import { ChainId, Currency, CurrencyAmount, Token, TradeType } from '@uniswap/sdk-core'
+import { UNIVERSAL_ROUTER_ADDRESS } from '@uniswap/universal-router-sdk'
+import { PermitSingle } from '@uniswap/permit2-sdk'
+import { ChainId, Currency, CurrencyAmount, TradeType } from '@uniswap/sdk-core'
 import {
   AlphaRouterConfig,
-  ID_TO_NETWORK_NAME,
-  IMetric,
   IRouter,
   MetricLoggerUnit,
   routeAmountsToString,
-  SimulationStatus,
-  SwapOptions,
   SwapRoute,
+  SwapOptions,
   SwapType,
+  SimulationStatus,
+  IMetric,
+  ID_TO_NETWORK_NAME,
 } from '@uniswap/smart-order-router'
-import { UNIVERSAL_ROUTER_ADDRESS } from '@uniswap/universal-router-sdk'
 import { Pool } from '@uniswap/v3-sdk'
-import { MetricsLogger } from 'aws-embedded-metrics'
-import Logger from 'bunyan'
-import { utils } from 'ethers'
 import JSBI from 'jsbi'
 import _ from 'lodash'
-import { measureDistributionPercentChangeImpact } from '../../util/alpha-config-measurement'
 import { APIGLambdaHandler, ErrorResponse, HandleRequestParams, Response } from '../handler'
 import { ContainerInjected, RequestInjected } from '../injector-sor'
 import { QuoteResponse, QuoteResponseSchemaJoi, V2PoolInRoute, V3PoolInRoute } from '../schema'
 import {
-  computePortionAmount,
   DEFAULT_ROUTING_CONFIG_BY_CHAIN,
-  FEE_ON_TRANSFER_SPECIFIC_CONFIG,
-  INTENT_SPECIFIC_CONFIG,
   parseDeadline,
   parseSlippageTolerance,
-  populateFeeOptions,
-  QUOTE_SPEED_CONFIG,
   tokenStringToCurrency,
 } from '../shared'
 import { QuoteQueryParams, QuoteQueryParamsJoi } from './schema/quote-schema'
-import { PAIRS_TO_TRACK } from './util/pairs-to-track'
+import { utils } from 'ethers'
 import { simulationStatusToString } from './util/simulation'
+import Logger from 'bunyan'
+import { PAIRS_TO_TRACK } from './util/pairs-to-track'
 
 export class QuoteHandler extends APIGLambdaHandler<
   ContainerInjected,
@@ -50,10 +44,32 @@ export class QuoteHandler extends APIGLambdaHandler<
   public async handleRequest(
     params: HandleRequestParams<ContainerInjected, RequestInjected<IRouter<any>>, void, QuoteQueryParams>
   ): Promise<Response<QuoteResponse> | ErrorResponse> {
-    const { chainId, metric, log, quoteSpeed, intent } = params.requestInjected
+    const { chainId, metric, log } = params.requestInjected
     const startTime = Date.now()
+    log.warn('quote request started')
 
     let result: Response<QuoteResponse> | ErrorResponse
+
+    const invokeAsyncLambda = () => {
+      const lambda = new Lambda()
+      log.warn(`secondary_routing_lambda: ${process.env.SECONDARY_ROUTING_LAMBDA}`)
+      const lambdaParams = {
+        FunctionName: process.env.SECONDARY_ROUTING_LAMBDA!,
+        InvocationType: 'Event',
+        Payload: '',
+      }
+      lambda.invoke(lambdaParams, (err, data) => {
+        log.warn('Invoked secondary routing lambda')
+        if (err) {
+          log.warn(`error invoking secondary routing lambda: ${err}`)
+        } else {
+          log.warn(`secondary routing lambda invoked: ${data}`)
+        }
+      })
+    }
+
+    log.warn('Attempting to invoke secondary routing lambda')
+    invokeAsyncLambda()
 
     try {
       result = await this.handleRequestInternal(params)
@@ -92,17 +108,6 @@ export class QuoteHandler extends APIGLambdaHandler<
       // This metric is logged after calling the internal handler to correlate with the status metrics
       metric.putMetric(`GET_QUOTE_REQUESTED_CHAINID: ${chainId}`, 1, MetricLoggerUnit.Count)
       metric.putMetric(`GET_QUOTE_LATENCY_CHAIN_${chainId}`, Date.now() - startTime, MetricLoggerUnit.Milliseconds)
-
-      metric.putMetric(
-        `GET_QUOTE_LATENCY_CHAIN_${chainId}_QUOTE_SPEED_${quoteSpeed ?? 'standard'}`,
-        Date.now() - startTime,
-        MetricLoggerUnit.Milliseconds
-      )
-      metric.putMetric(
-        `GET_QUOTE_LATENCY_CHAIN_${chainId}_INTENT_${intent ?? 'quote'}`,
-        Date.now() - startTime,
-        MetricLoggerUnit.Milliseconds
-      )
     }
 
     return result
@@ -133,14 +138,6 @@ export class QuoteHandler extends APIGLambdaHandler<
         permitAmount,
         permitSigDeadline,
         enableUniversalRouter,
-        quoteSpeed,
-        debugRoutingConfig,
-        unicornSecret,
-        intent,
-        enableFeeOnTransferFeeFetching,
-        portionBips,
-        portionAmount,
-        portionRecipient,
       },
       requestInjected: {
         router,
@@ -234,59 +231,34 @@ export class QuoteHandler extends APIGLambdaHandler<
       protocols = [Protocol.V3]
     }
 
-    let parsedDebugRoutingConfig = {}
-    if (debugRoutingConfig && unicornSecret && unicornSecret === process.env.UNICORN_SECRET) {
-      parsedDebugRoutingConfig = JSON.parse(debugRoutingConfig)
-    }
-
     const routingConfig: AlphaRouterConfig = {
       ...DEFAULT_ROUTING_CONFIG_BY_CHAIN(chainId),
       ...(minSplits ? { minSplits } : {}),
       ...(forceCrossProtocol ? { forceCrossProtocol } : {}),
       ...(forceMixedRoutes ? { forceMixedRoutes } : {}),
       protocols,
-      ...(quoteSpeed ? QUOTE_SPEED_CONFIG[quoteSpeed] : {}),
-      ...parsedDebugRoutingConfig,
-      ...(intent ? INTENT_SPECIFIC_CONFIG[intent] : {}),
-      // Only when enableFeeOnTransferFeeFetching is explicitly set to true, then we
-      // override usedCachedRoutes to false. This is to ensure that we don't use
-      // accidentally override usedCachedRoutes in the normal path.
-      ...(enableFeeOnTransferFeeFetching ? FEE_ON_TRANSFER_SPECIFIC_CONFIG(enableFeeOnTransferFeeFetching) : {}),
     }
-
-    metric.putMetric(`${intent}Intent`, 1, MetricLoggerUnit.Count)
 
     let swapParams: SwapOptions | undefined = undefined
 
     // e.g. Inputs of form "1.25%" with 2dp max. Convert to fractional representation => 1.25 => 125 / 10000
-    if (slippageTolerance) {
+    if (slippageTolerance && deadline && recipient) {
       const slippageTolerancePercent = parseSlippageTolerance(slippageTolerance)
 
       // TODO: Remove once universal router is no longer behind a feature flag.
       if (enableUniversalRouter) {
-        const allFeeOptions = populateFeeOptions(
-          type,
-          portionBips,
-          portionRecipient,
-          portionAmount ??
-            computePortionAmount(CurrencyAmount.fromRawAmount(currencyOut, JSBI.BigInt(amountRaw)), portionBips)
-        )
-
         swapParams = {
           type: SwapType.UNIVERSAL_ROUTER,
-          deadlineOrPreviousBlockhash: deadline ? parseDeadline(deadline) : undefined,
+          deadlineOrPreviousBlockhash: parseDeadline(deadline),
           recipient: recipient,
           slippageTolerance: slippageTolerancePercent,
-          ...allFeeOptions,
         }
       } else {
-        if (deadline && recipient) {
-          swapParams = {
-            type: SwapType.SWAP_ROUTER_02,
-            deadline: parseDeadline(deadline),
-            recipient: recipient,
-            slippageTolerance: slippageTolerancePercent,
-          }
+        swapParams = {
+          type: SwapType.SWAP_ROUTER_02,
+          deadline: parseDeadline(deadline),
+          recipient: recipient,
+          slippageTolerance: slippageTolerancePercent,
         }
       }
 
@@ -309,11 +281,9 @@ export class QuoteHandler extends APIGLambdaHandler<
           sigDeadline: permitSigDeadline,
         }
 
-        if (swapParams) {
-          swapParams.inputTokenPermit = {
-            ...permit,
-            signature: permitSignature,
-          }
+        swapParams.inputTokenPermit = {
+          ...permit,
+          signature: permitSignature,
         }
       } else if (
         !enableUniversalRouter &&
@@ -322,24 +292,19 @@ export class QuoteHandler extends APIGLambdaHandler<
       ) {
         const { v, r, s } = utils.splitSignature(permitSignature)
 
-        if (swapParams) {
-          swapParams.inputTokenPermit = {
-            v: v as 0 | 1 | 27 | 28,
-            r,
-            s,
-            ...(permitNonce && permitExpiration
-              ? { nonce: permitNonce!, expiry: permitExpiration! }
-              : { amount: permitAmount!, deadline: permitSigDeadline! }),
-          }
+        swapParams.inputTokenPermit = {
+          v: v as 0 | 1 | 27 | 28,
+          r,
+          s,
+          ...(permitNonce && permitExpiration
+            ? { nonce: permitNonce!, expiry: permitExpiration! }
+            : { amount: permitAmount!, deadline: permitSigDeadline! }),
         }
       }
 
       if (simulateFromAddress) {
         metric.putMetric('Simulation Requested', 1, MetricLoggerUnit.Count)
-
-        if (swapParams) {
-          swapParams.simulate = { fromAddress: simulateFromAddress }
-        }
+        swapParams.simulate = { fromAddress: simulateFromAddress }
       }
     }
 
@@ -379,7 +344,6 @@ export class QuoteHandler extends APIGLambdaHandler<
             type,
             routingConfig: routingConfig,
             swapParams,
-            intent,
           },
           `Exact In Swap: Give ${amount.toExact()} ${amount.currency.symbol}, Want: ${
             currencyOut.symbol
@@ -438,7 +402,6 @@ export class QuoteHandler extends APIGLambdaHandler<
     const {
       quote,
       quoteGasAdjusted,
-      quoteGasAndPortionAdjusted,
       route,
       estimatedGasUsed,
       estimatedGasUsedQuoteToken,
@@ -447,8 +410,6 @@ export class QuoteHandler extends APIGLambdaHandler<
       methodParameters,
       blockNumber,
       simulationStatus,
-      hitsCachedRoute,
-      portionAmount: outputPortionAmount, // TODO: name it back to portionAmount
     } = swapRoute
 
     if (simulationStatus == SimulationStatus.Failed) {
@@ -520,16 +481,12 @@ export class QuoteHandler extends APIGLambdaHandler<
               decimals: tokenIn.decimals.toString(),
               address: tokenIn.address,
               symbol: tokenIn.symbol!,
-              buyFeeBps: this.deriveBuyFeeBps(tokenIn, reserve0, reserve1, enableFeeOnTransferFeeFetching),
-              sellFeeBps: this.deriveSellFeeBps(tokenIn, reserve0, reserve1, enableFeeOnTransferFeeFetching),
             },
             tokenOut: {
               chainId: tokenOut.chainId,
               decimals: tokenOut.decimals.toString(),
               address: tokenOut.address,
               symbol: tokenOut.symbol!,
-              buyFeeBps: this.deriveBuyFeeBps(tokenOut, reserve0, reserve1, enableFeeOnTransferFeeFetching),
-              sellFeeBps: this.deriveSellFeeBps(tokenOut, reserve0, reserve1, enableFeeOnTransferFeeFetching),
             },
             reserve0: {
               token: {
@@ -537,18 +494,6 @@ export class QuoteHandler extends APIGLambdaHandler<
                 decimals: reserve0.currency.wrapped.decimals.toString(),
                 address: reserve0.currency.wrapped.address,
                 symbol: reserve0.currency.wrapped.symbol!,
-                buyFeeBps: this.deriveBuyFeeBps(
-                  reserve0.currency.wrapped,
-                  reserve0,
-                  undefined,
-                  enableFeeOnTransferFeeFetching
-                ),
-                sellFeeBps: this.deriveSellFeeBps(
-                  reserve0.currency.wrapped,
-                  reserve0,
-                  undefined,
-                  enableFeeOnTransferFeeFetching
-                ),
               },
               quotient: reserve0.quotient.toString(),
             },
@@ -558,18 +503,6 @@ export class QuoteHandler extends APIGLambdaHandler<
                 decimals: reserve1.currency.wrapped.decimals.toString(),
                 address: reserve1.currency.wrapped.address,
                 symbol: reserve1.currency.wrapped.symbol!,
-                buyFeeBps: this.deriveBuyFeeBps(
-                  reserve1.currency.wrapped,
-                  undefined,
-                  reserve1,
-                  enableFeeOnTransferFeeFetching
-                ),
-                sellFeeBps: this.deriveSellFeeBps(
-                  reserve1.currency.wrapped,
-                  undefined,
-                  reserve1,
-                  enableFeeOnTransferFeeFetching
-                ),
               },
               quotient: reserve1.quotient.toString(),
             },
@@ -593,8 +526,6 @@ export class QuoteHandler extends APIGLambdaHandler<
       quoteDecimals: quote.toExact(),
       quoteGasAdjusted: quoteGasAdjusted.quotient.toString(),
       quoteGasAdjustedDecimals: quoteGasAdjusted.toExact(),
-      quoteGasAndPortionAdjusted: quoteGasAndPortionAdjusted?.quotient.toString(),
-      quoteGasAndPortionAdjustedDecimals: quoteGasAndPortionAdjusted?.toExact(),
       gasUseEstimateQuote: estimatedGasUsedQuoteToken.quotient.toString(),
       gasUseEstimateQuoteDecimals: estimatedGasUsedQuoteToken.toExact(),
       gasUseEstimate: estimatedGasUsed.toString(),
@@ -605,11 +536,6 @@ export class QuoteHandler extends APIGLambdaHandler<
       route: routeResponse,
       routeString,
       quoteId,
-      hitsCachedRoutes: hitsCachedRoute,
-      portionBips: portionBips,
-      portionRecipient: portionRecipient,
-      portionAmount: outputPortionAmount?.quotient.toString(),
-      portionAmountDecimals: outputPortionAmount?.toExact(),
     }
 
     this.logRouteMetrics(
@@ -623,56 +549,13 @@ export class QuoteHandler extends APIGLambdaHandler<
       type,
       chainId,
       amount,
-      routeString,
-      swapRoute
+      routeString
     )
 
     return {
       statusCode: 200,
       body: result,
     }
-  }
-
-  private deriveBuyFeeBps(
-    token: Currency,
-    reserve0?: CurrencyAmount<Token>,
-    reserve1?: CurrencyAmount<Token>,
-    enableFeeOnTransferFeeFetching?: boolean
-  ): string | undefined {
-    if (!enableFeeOnTransferFeeFetching) {
-      return undefined
-    }
-
-    if (reserve0?.currency.equals(token)) {
-      return reserve0.currency.buyFeeBps?.toString()
-    }
-
-    if (reserve1?.currency.equals(token)) {
-      return reserve1.currency.buyFeeBps?.toString()
-    }
-
-    return undefined
-  }
-
-  private deriveSellFeeBps(
-    token: Currency,
-    reserve0?: CurrencyAmount<Token>,
-    reserve1?: CurrencyAmount<Token>,
-    enableFeeOnTransferFeeFetching?: boolean
-  ): string | undefined {
-    if (!enableFeeOnTransferFeeFetching) {
-      return undefined
-    }
-
-    if (reserve0?.currency.equals(token)) {
-      return reserve0.currency.sellFeeBps?.toString()
-    }
-
-    if (reserve1?.currency.equals(token)) {
-      return reserve1.currency.sellFeeBps?.toString()
-    }
-
-    return undefined
   }
 
   private logRouteMetrics(
@@ -686,16 +569,13 @@ export class QuoteHandler extends APIGLambdaHandler<
     tradeType: 'exactIn' | 'exactOut',
     chainId: ChainId,
     amount: CurrencyAmount<Currency>,
-    routeString: string,
-    swapRoute: SwapRoute
+    routeString: string
   ): void {
     const tradingPair = `${currencyIn.wrapped.symbol}/${currencyOut.wrapped.symbol}`
     const wildcardInPair = `${currencyIn.wrapped.symbol}/*`
     const wildcardOutPair = `*/${currencyOut.wrapped.symbol}`
     const tradeTypeEnumValue = tradeType == 'exactIn' ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT
     const pairsTracked = PAIRS_TO_TRACK.get(chainId)?.get(tradeTypeEnumValue)
-
-    measureDistributionPercentChangeImpact(5, 10, swapRoute, currencyIn, currencyOut, tradeType, chainId, amount)
 
     if (
       pairsTracked?.includes(tradingPair) ||
@@ -719,7 +599,6 @@ export class QuoteHandler extends APIGLambdaHandler<
         Date.now() - startTime,
         MetricLoggerUnit.Milliseconds
       )
-
       // Create a hashcode from the routeString, this will indicate that a different route is being used
       // hashcode function copied from: https://gist.github.com/hyamamoto/fd435505d29ebfa3d9716fd2be8d42f0?permalink_comment_id=4261728#gistcomment-4261728
       const routeStringHash = Math.abs(
@@ -752,13 +631,5 @@ export class QuoteHandler extends APIGLambdaHandler<
 
   protected responseBodySchema(): Joi.ObjectSchema | null {
     return QuoteResponseSchemaJoi
-  }
-
-  protected afterHandler(metric: MetricsLogger, response: QuoteResponse, requestStart: number): void {
-    metric.putMetric(
-      `GET_QUOTE_LATENCY_TOP_LEVEL_${response.hitsCachedRoutes ? 'CACHED_ROUTES_HIT' : 'CACHED_ROUTES_MISS'}`,
-      Date.now() - requestStart,
-      MetricLoggerUnit.Milliseconds
-    )
   }
 }
