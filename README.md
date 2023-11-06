@@ -16,7 +16,7 @@ The best way to develop and test the API is to deploy your own instance to AWS.
 2. Create .env file in the root directory of the project with :
    ```
    THROTTLE_PER_FIVE_MINS = '' # Optional
-   JSON_RPC_PROVIDER_{CHAIN ID} = { RPC Provider}
+   WEB_RPC_{CHAIN ID} = { RPC Provider}
    # RPC Providers must be set for the following CHAIN IDs:
    # MAINNET = 1
    # ROPSTEN = 3
@@ -29,10 +29,6 @@ The best way to develop and test the API is to deploy your own instance to AWS.
    # ARBITRUM_RINKEBY = 421611
    # POLYGON = 137
    # POLYGON_MUMBAI = 80001
-   # BSC = 56
-   TENDERLY_USER = '' # For enabling Tenderly simulations
-   TENDERLY_PROJECT = '' # For enabling Tenderly simulations
-   TENDERLY_ACCESS_KEY = '' # For enabling Tenderly simulations
    ```
 3. Install and build the package
    ```
@@ -50,30 +46,6 @@ The best way to develop and test the API is to deploy your own instance to AWS.
    ```
    curl --request GET '<INSERT_YOUR_URL_HERE>/quote?tokenInAddress=0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2&tokenInChainId=1&tokenOutAddress=0x1f9840a85d5af5bf1d1762f925bdaddc4201f984&tokenOutChainId=1&amount=100&type=exactIn'
    ```
-
-### Tenderly Simulation
-
-1. To get a more accurate estimate of the transaction's gas cost, request a tenderly simulation along with the swap. This is done by setting the optional query param "simulateFromAddress". For example:
-
-```
-curl --request GET '<INSERT_YOUR_URL_HERE>/quote?tokenInAddress=<0x...>&simulateFromAddress=<FROM_ADDRESS>&...'
-```
-
-2. Tenderly simulates the transaction and returns to us the simulated gasLimit as 'gasUseEstimate'. We use this gasLimit to update all our gas estimate heuristics. In the response body, the
-
-```
-{'gasUseEstimate':string, 'gasUseEstimateQuote':string, 'quoteGasAdjusted':string, and 'gasUseEstimateUSD':string}
-```
-
-fields will be updated/calculated using tenderly gasLimit estimate. These fields are already present even without Tenderly simulation, however in that case they are simply heuristics. The Tenderly gas estimates will be more accurate.
-
-3. If the simulation fails, there will be one more field present in the response body: 'simulationError'. If this field is set and it is set to true, that means the Tenderly Simulation failed. The
-
-```
-{'gasUseEstimate':string, 'gasUseEstimateQuote':string, 'quoteGasAdjusted':string, and 'gasUseEstimateUSD':string}
-```
-
-fields will still be included, however they will be heuristics rather then Tenderly estimates. These heuristic values are not reliable for sending transactions on chain.
 
 ### Integration Tests
 

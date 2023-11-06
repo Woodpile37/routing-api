@@ -30,9 +30,6 @@ export class RoutingAPIStage extends Stage {
       pinata_key?: string
       pinata_secret?: string
       hosted_zone?: string
-      tenderlyUser: string
-      tenderlyProject: string
-      tenderlyAccessKey: string
     }
   ) {
     super(scope, id, props)
@@ -46,9 +43,6 @@ export class RoutingAPIStage extends Stage {
       pinata_key,
       pinata_secret,
       hosted_zone,
-      tenderlyUser,
-      tenderlyProject,
-      tenderlyAccessKey,
     } = props
 
     const { url } = new RoutingAPIStack(this, 'RoutingAPI', {
@@ -61,9 +55,6 @@ export class RoutingAPIStage extends Stage {
       pinata_key,
       pinata_secret,
       hosted_zone,
-      tenderlyUser,
-      tenderlyProject,
-      tenderlyAccessKey,
     })
     this.url = url
   }
@@ -106,8 +97,8 @@ export class RoutingAPIPipeline extends Stack {
 
     const jsonRpcProvidersSecret = sm.Secret.fromSecretAttributes(this, 'RPCProviderUrls', {
       // The main secrets use our Infura RPC urls
-      secretCompleteArn: 'arn:aws:secretsmanager:us-east-2:644039819003:secret:routing-api-rpc-urls-quicknode-2-iOyNvg',
-
+      secretCompleteArn:
+        'arn:aws:secretsmanager:us-east-2:644039819003:secret:routing-api-rpc-urls-json-primary-ixS8mw',
       /*
       The backup secrets mostly use our Alchemy RPC urls
       However Alchemy does not support Rinkeby, Ropsten, and Kovan
@@ -117,10 +108,6 @@ export class RoutingAPIPipeline extends Stack {
       does not bug out on Alchemy's end
       */
       //secretCompleteArn: arn:aws:secretsmanager:us-east-2:644039819003:secret:routing-api-rpc-urls-json-backup-D2sWoe
-    })
-
-    const tenderlyCreds = sm.Secret.fromSecretAttributes(this, 'TenderlyCreds', {
-      secretCompleteArn: 'arn:aws:secretsmanager:us-east-2:644039819003:secret:tenderly-api-wQaI2R',
     })
 
     const ethGasStationInfoUrl = sm.Secret.fromSecretAttributes(this, 'ETHGasStationUrl', {
@@ -145,7 +132,6 @@ export class RoutingAPIPipeline extends Stack {
     // Parse AWS Secret
     let jsonRpcProviders = {} as { [chainId: string]: string }
     SUPPORTED_CHAINS.forEach((chainId: ChainId) => {
-      // TODO: Change this to `JSON_RPC_PROVIDER_${}` to be consistent with SOR
       const key = `WEB3_RPC_${chainId}`
       jsonRpcProviders[key] = jsonRpcProvidersSecret.secretValueFromJson(key).toString()
     })
@@ -154,16 +140,13 @@ export class RoutingAPIPipeline extends Stack {
     const betaUsEast2Stage = new RoutingAPIStage(this, 'beta-us-east-2', {
       env: { account: '145079444317', region: 'us-east-2' },
       jsonRpcProviders: jsonRpcProviders,
-      provisionedConcurrency: 100,
+      provisionedConcurrency: 20,
       ethGasStationInfoUrl: ethGasStationInfoUrl.secretValue.toString(),
       stage: STAGE.BETA,
       route53Arn: route53Arn.secretValueFromJson('arn').toString(),
       pinata_key: pinataApi.secretValueFromJson('pinata-api-key').toString(),
       pinata_secret: pinataSecret.secretValueFromJson('secret').toString(),
       hosted_zone: hostedZone.secretValueFromJson('zone').toString(),
-      tenderlyUser: tenderlyCreds.secretValueFromJson('tenderly-user').toString(),
-      tenderlyProject: tenderlyCreds.secretValueFromJson('tenderly-project').toString(),
-      tenderlyAccessKey: tenderlyCreds.secretValueFromJson('tenderly-access-key').toString(),
     })
 
     const betaUsEast2AppStage = pipeline.addStage(betaUsEast2Stage)
@@ -182,9 +165,6 @@ export class RoutingAPIPipeline extends Stack {
       pinata_key: pinataApi.secretValueFromJson('pinata-api-key').toString(),
       pinata_secret: pinataSecret.secretValueFromJson('secret').toString(),
       hosted_zone: hostedZone.secretValueFromJson('zone').toString(),
-      tenderlyUser: tenderlyCreds.secretValueFromJson('tenderly-user').toString(),
-      tenderlyProject: tenderlyCreds.secretValueFromJson('tenderly-project').toString(),
-      tenderlyAccessKey: tenderlyCreds.secretValueFromJson('tenderly-access-key').toString(),
     })
 
     const prodUsEast2AppStage = pipeline.addStage(prodUsEast2Stage)
@@ -242,27 +222,21 @@ export class RoutingAPIPipeline extends Stack {
 
 const app = new cdk.App()
 
-const jsonRpcProviders = {
-  WEB3_RPC_1: process.env.JSON_RPC_PROVIDER_1!,
-  WEB3_RPC_3: process.env.JSON_RPC_PROVIDER_3!,
-  WEB3_RPC_4: process.env.JSON_RPC_PROVIDER_4!,
-  WEB3_RPC_5: process.env.JSON_RPC_PROVIDER_5!,
-  WEB3_RPC_42: process.env.JSON_RPC_PROVIDER_42!,
-  WEB3_RPC_10: process.env.JSON_RPC_PROVIDER_10!,
-  WEB3_RPC_69: process.env.JSON_RPC_PROVIDER_69!,
-  WEB3_RPC_42161: process.env.JSON_RPC_PROVIDER_42161!,
-  WEB3_RPC_421611: process.env.JSON_RPC_PROVIDER_421611!,
-  WEB3_RPC_421613: process.env.JSON_RPC_PROVIDER_421613!,
-  WEB3_RPC_137: process.env.JSON_RPC_PROVIDER_137!,
-  WEB3_RPC_80001: process.env.JSON_RPC_PROVIDER_80001!,
-  WEB3_RPC_42220: process.env.JSON_RPC_PROVIDER_42220!,
-  WEB3_RPC_44787: process.env.JSON_RPC_PROVIDER_44787!,
-  WEB3_RPC_56: process.env.JSON_RPC_PROVIDER_56!,
-}
-
 // Local dev stack
 new RoutingAPIStack(app, 'RoutingAPIStack', {
-  jsonRpcProviders: jsonRpcProviders,
+  jsonRpcProviders: {
+    WEB3_RPC_1: process.env.WEB3_RPC_1!,
+    WEB3_RPC_3: process.env.WEB3_RPC_3!,
+    WEB3_RPC_4: process.env.WEB3_RPC_4!,
+    WEB3_RPC_5: process.env.WEB3_RPC_5!,
+    WEB3_RPC_42: process.env.WEB3_RPC_42!,
+    WEB3_RPC_10: process.env.WEB3_RPC_10!,
+    WEB3_RPC_69: process.env.WEB3_RPC_69!,
+    WEB3_RPC_42161: process.env.WEB3_RPC_42161!,
+    WEB3_RPC_421611: process.env.WEB3_RPC_421611!,
+    WEB3_RPC_137: process.env.WEB3_RPC_137!,
+    WEB3_RPC_80001: process.env.WEB3_RPC_80001!,
+  },
   provisionedConcurrency: process.env.PROVISION_CONCURRENCY ? parseInt(process.env.PROVISION_CONCURRENCY) : 0,
   throttlingOverride: process.env.THROTTLE_PER_FIVE_MINS,
   ethGasStationInfoUrl: process.env.ETH_GAS_STATION_INFO_URL!,
@@ -272,9 +246,6 @@ new RoutingAPIStack(app, 'RoutingAPIStack', {
   pinata_key: process.env.PINATA_API_KEY!,
   pinata_secret: process.env.PINATA_API_SECRET!,
   hosted_zone: process.env.HOSTED_ZONE!,
-  tenderlyUser: process.env.TENDERLY_USER!,
-  tenderlyProject: process.env.TENDERLY_PROJECT!,
-  tenderlyAccessKey: process.env.TENDERLY_ACCESS_KEY!,
 })
 
 new RoutingAPIPipeline(app, 'RoutingAPIPipelineStack', {
