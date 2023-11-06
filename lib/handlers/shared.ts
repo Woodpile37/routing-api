@@ -1,11 +1,11 @@
-import { Currency } from '@uniswap/sdk-core'
+import { Currency, Percent } from '@uniswap/sdk-core'
 import {
   AlphaRouterConfig,
   ChainId,
   ITokenListProvider,
   ITokenProvider,
-  NativeCurrencyName,
   nativeOnChain,
+  NATIVE_NAMES_BY_ID,
 } from '@uniswap/smart-order-router'
 import Logger from 'bunyan'
 
@@ -102,11 +102,7 @@ export async function tokenStringToCurrency(
 
   let token: Currency | undefined = undefined
 
-  if (
-    tokenRaw == NativeCurrencyName.ETHER ||
-    tokenRaw == NativeCurrencyName.MATIC ||
-    tokenRaw.toLowerCase() == '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee'
-  ) {
+  if (NATIVE_NAMES_BY_ID[chainId]!.includes(tokenRaw)) {
     token = nativeOnChain(chainId)
   } else if (isAddress(tokenRaw)) {
     token = await tokenListProvider.getTokenByAddress(tokenRaw)
@@ -133,4 +129,13 @@ export async function tokenStringToCurrency(
   }
 
   return undefined
+}
+
+export function parseSlippageTolerance(slippageTolerance: string): Percent {
+  const slippagePer10k = Math.round(parseFloat(slippageTolerance) * 100)
+  return new Percent(slippagePer10k, 10_000)
+}
+
+export function parseDeadline(deadline: string): number {
+  return Math.floor(Date.now() / 1000) + parseInt(deadline)
 }
