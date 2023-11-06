@@ -6,27 +6,31 @@ import {
   CachingV3PoolProvider,
   ChainId,
   EIP1559GasPriceProvider,
-  ID_TO_NETWORK_NAME,
+  FallbackTenderlySimulator,
+  TenderlySimulator,
+  EthEstimateGasSimulator,
   IGasPriceProvider,
   IMetric,
+  Simulator,
   ITokenListProvider,
   ITokenProvider,
+  IV2PoolProvider,
   IV2SubgraphProvider,
   IV3PoolProvider,
   IV3SubgraphProvider,
   LegacyGasPriceProvider,
   NodeJSCache,
   OnChainGasPriceProvider,
+  OnChainQuoteProvider,
   setGlobalLogger,
   StaticV2SubgraphProvider,
   StaticV3SubgraphProvider,
   TokenProvider,
   UniswapMulticallProvider,
+  V2PoolProvider,
   V2QuoteProvider,
   V3PoolProvider,
-  V3QuoteProvider,
 } from '@uniswap/smart-order-router'
-import { IV2PoolProvider, V2PoolProvider } from '@uniswap/smart-order-router/build/main/src/providers/v2/pool-provider'
 import { TokenList } from '@uniswap/token-lists'
 import { default as bunyan, default as Logger } from 'bunyan'
 import { ethers } from 'ethers'
@@ -46,9 +50,13 @@ export const SUPPORTED_CHAINS: ChainId[] = [
   ChainId.OPTIMISTIC_KOVAN,
   ChainId.ARBITRUM_ONE,
   ChainId.ARBITRUM_RINKEBY,
+  ChainId.ARBITRUM_GOERLI,
   ChainId.POLYGON,
   ChainId.POLYGON_MUMBAI,
-  // leaving goerli out for now
+  ChainId.GÖRLI,
+  ChainId.CELO,
+  ChainId.CELO_ALFAJORES,
+  ChainId.BSC,
 ]
 const DEFAULT_TOKEN_LIST = 'https://gateway.ipfs.io/ipns/tokens.uniswap.org'
 
@@ -63,7 +71,7 @@ export interface RequestInjected<Router> extends BaseRInj {
 }
 
 export type ContainerDependencies = {
-  provider: ethers.providers.StaticJsonRpcProvider
+  provider: ethers.providers.JsonRpcProvider
   v3SubgraphProvider: IV3SubgraphProvider
   v2SubgraphProvider: IV2SubgraphProvider
   tokenListProvider: ITokenListProvider
@@ -74,8 +82,9 @@ export type ContainerDependencies = {
   v2PoolProvider: IV2PoolProvider
   tokenProvider: ITokenProvider
   multicallProvider: UniswapMulticallProvider
-  v3QuoteProvider: V3QuoteProvider
+  onChainQuoteProvider?: OnChainQuoteProvider
   v2QuoteProvider: V2QuoteProvider
+  simulator: Simulator
 }
 
 export interface ContainerInjected {
@@ -106,10 +115,16 @@ export abstract class InjectorSOR<Router, QueryParams> extends Injector<
 
     const dependenciesByChainArray = await Promise.all(
       _.map(SUPPORTED_CHAINS, async (chainId: ChainId) => {
-        const chainName = ID_TO_NETWORK_NAME(chainId)
-        // updated chainNames to match infura strings
-        const projectId = process.env.PROJECT_ID
-        const url = `https://${chainName}.infura.io/v3/${projectId}`
+        const url = process.env[`WEB3_RPC_${chainId.toString()}`]!
+
+        if (!url) {
+          log.fatal({ chainId: chainId }, `Fatal: No Web3 RPC endpoint set for chain`)
+          return { chainId, dependencies: {} as ContainerDependencies }
+          // This router instance will not be able to route through any chain
+          // for which RPC URL is not set
+          // For now, if RPC URL is not set for a chain, a request to route
+          // on the chain will return Err 500
+        }
 
         let timeout: number
         switch (chainId) {
@@ -149,11 +164,11 @@ export abstract class InjectorSOR<Router, QueryParams> extends Injector<
 
         // Some providers like Infura set a gas limit per call of 10x block gas which is approx 150m
         // 200*725k < 150m
-        let quoteProvider: V3QuoteProvider
+        let quoteProvider: OnChainQuoteProvider | undefined = undefined
         switch (chainId) {
           case ChainId.OPTIMISM:
           case ChainId.OPTIMISTIC_KOVAN:
-            quoteProvider = new V3QuoteProvider(
+            quoteProvider = new OnChainQuoteProvider(
               chainId,
               provider,
               multicall2Provider,
@@ -176,18 +191,18 @@ export abstract class InjectorSOR<Router, QueryParams> extends Injector<
                 multicallChunk: 45,
               },
               {
-                baseBlockOffset: -15,
+                baseBlockOffset: -25,
                 rollback: {
                   enabled: true,
                   attemptsBeforeRollback: 1,
-                  rollbackBlockOffset: -10,
+                  rollbackBlockOffset: -20,
                 },
               }
             )
             break
           case ChainId.ARBITRUM_ONE:
           case ChainId.ARBITRUM_RINKEBY:
-            quoteProvider = new V3QuoteProvider(
+            quoteProvider = new OnChainQuoteProvider(
               chainId,
               provider,
               multicall2Provider,
@@ -219,27 +234,6 @@ export abstract class InjectorSOR<Router, QueryParams> extends Injector<
               }
             )
             break
-          default:
-            quoteProvider = new V3QuoteProvider(
-              chainId,
-              provider,
-              multicall2Provider,
-              {
-                retries: 2,
-                minTimeout: 100,
-                maxTimeout: 1000,
-              },
-              {
-                multicallChunk: 210,
-                gasLimitPerCall: 705_000,
-                quoteMinSuccessRate: 0.15,
-              },
-              {
-                gasLimitOverride: 2_000_000,
-                multicallChunk: 70,
-              }
-            )
-            break
         }
 
         const v3PoolProvider = new CachingV3PoolProvider(
@@ -249,6 +243,22 @@ export abstract class InjectorSOR<Router, QueryParams> extends Injector<
         )
 
         const v2PoolProvider = new V2PoolProvider(chainId, multicall2Provider)
+
+        const tenderlySimulator = new TenderlySimulator(
+          chainId,
+          'http://api.tenderly.co',
+          process.env.TENDERLY_USER!,
+          process.env.TENDERLY_PROJECT!,
+          process.env.TENDERLY_ACCESS_KEY!,
+          v2PoolProvider,
+          v3PoolProvider,
+          provider,
+          { [ChainId.ARBITRUM_ONE]: 2.5 }
+        )
+
+        const ethEstimateGasSimulator = new EthEstimateGasSimulator(chainId, provider, v2PoolProvider, v3PoolProvider)
+
+        const simulator = new FallbackTenderlySimulator(chainId, provider, tenderlySimulator, ethEstimateGasSimulator)
 
         const [v3SubgraphProvider, v2SubgraphProvider] = await Promise.all([
           (async () => {
@@ -260,6 +270,7 @@ export abstract class InjectorSOR<Router, QueryParams> extends Injector<
               )
               return subgraphProvider
             } catch (err) {
+              log.error({ err }, 'AWS Subgraph Provider unavailable, defaulting to Static Subgraph Provider')
               return new StaticV3SubgraphProvider(chainId, v3PoolProvider)
             }
           })(),
@@ -304,11 +315,12 @@ export abstract class InjectorSOR<Router, QueryParams> extends Injector<
               new NodeJSCache(new NodeCache({ stdTTL: 15, useClones: false }))
             ),
             v3SubgraphProvider,
-            v3QuoteProvider: quoteProvider,
+            onChainQuoteProvider: quoteProvider,
             v3PoolProvider,
             v2PoolProvider,
             v2QuoteProvider: new V2QuoteProvider(),
             v2SubgraphProvider,
+            simulator,
           },
         }
       })

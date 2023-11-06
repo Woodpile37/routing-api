@@ -26,7 +26,6 @@ export class RoutingAPIStage extends Stage {
       ethGasStationInfoUrl: string
       chatbotSNSArn?: string
       stage: string
-      internalApiKey?: string
       route53Arn?: string
       pinata_key?: string
       pinata_secret?: string
@@ -43,7 +42,6 @@ export class RoutingAPIStage extends Stage {
       ethGasStationInfoUrl,
       chatbotSNSArn,
       stage,
-      internalApiKey,
       route53Arn,
       pinata_key,
       pinata_secret,
@@ -59,7 +57,6 @@ export class RoutingAPIStage extends Stage {
       ethGasStationInfoUrl,
       chatbotSNSArn,
       stage,
-      internalApiKey,
       route53Arn,
       pinata_key,
       pinata_secret,
@@ -109,8 +106,7 @@ export class RoutingAPIPipeline extends Stack {
 
     const jsonRpcProvidersSecret = sm.Secret.fromSecretAttributes(this, 'RPCProviderUrls', {
       // The main secrets use our Infura RPC urls
-      secretCompleteArn:
-        'arn:aws:secretsmanager:us-east-2:644039819003:secret:routing-api-rpc-urls-json-primary-ixS8mw',
+      secretCompleteArn: 'arn:aws:secretsmanager:us-east-2:644039819003:secret:routing-api-rpc-urls-quicknode-2-iOyNvg',
 
       /*
       The backup secrets mostly use our Alchemy RPC urls
@@ -146,10 +142,6 @@ export class RoutingAPIPipeline extends Stack {
       secretCompleteArn: 'arn:aws:secretsmanager:us-east-2:644039819003:secret:hosted-zone-JmPDNV',
     })
 
-    const internalApiKey = sm.Secret.fromSecretAttributes(this, 'internal-api-key', {
-      secretCompleteArn: 'arn:aws:secretsmanager:us-east-2:644039819003:secret:routing-api-internal-api-key-Z68NmB',
-    })
-
     // Parse AWS Secret
     let jsonRpcProviders = {} as { [chainId: string]: string }
     SUPPORTED_CHAINS.forEach((chainId: ChainId) => {
@@ -162,7 +154,6 @@ export class RoutingAPIPipeline extends Stack {
     const betaUsEast2Stage = new RoutingAPIStage(this, 'beta-us-east-2', {
       env: { account: '145079444317', region: 'us-east-2' },
       jsonRpcProviders: jsonRpcProviders,
-      internalApiKey: internalApiKey.secretValue.toString(),
       provisionedConcurrency: 100,
       ethGasStationInfoUrl: ethGasStationInfoUrl.secretValue.toString(),
       stage: STAGE.BETA,
@@ -261,7 +252,6 @@ const jsonRpcProviders = {
   WEB3_RPC_69: process.env.JSON_RPC_PROVIDER_69!,
   WEB3_RPC_42161: process.env.JSON_RPC_PROVIDER_42161!,
   WEB3_RPC_421611: process.env.JSON_RPC_PROVIDER_421611!,
-  WEB3_RPC_11155111: process.env.JSON_RPC_PROVIDER_11155111!,
   WEB3_RPC_421613: process.env.JSON_RPC_PROVIDER_421613!,
   WEB3_RPC_137: process.env.JSON_RPC_PROVIDER_137!,
   WEB3_RPC_80001: process.env.JSON_RPC_PROVIDER_80001!,
@@ -278,7 +268,6 @@ new RoutingAPIStack(app, 'RoutingAPIStack', {
   ethGasStationInfoUrl: process.env.ETH_GAS_STATION_INFO_URL!,
   chatbotSNSArn: process.env.CHATBOT_SNS_ARN,
   stage: STAGE.LOCAL,
-  internalApiKey: 'test-api-key',
   route53Arn: process.env.ROLE_ARN,
   pinata_key: process.env.PINATA_API_KEY!,
   pinata_secret: process.env.PINATA_API_SECRET!,
