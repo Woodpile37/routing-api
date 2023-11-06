@@ -1,14 +1,19 @@
 import Joi from '@hapi/joi'
 import { Protocol } from '@uniswap/router-sdk'
-import { Currency, CurrencyAmount, TradeType } from '@uniswap/sdk-core'
+import { UNIVERSAL_ROUTER_ADDRESS } from '@uniswap/universal-router-sdk'
+import { PermitSingle } from '@uniswap/permit2-sdk'
+import { ChainId, Currency, CurrencyAmount, TradeType } from '@uniswap/sdk-core'
 import {
   AlphaRouterConfig,
   IRouter,
-  LegacyRoutingConfig,
   MetricLoggerUnit,
   routeAmountsToString,
-  SwapOptions,
   SwapRoute,
+  SwapOptions,
+  SwapType,
+  SimulationStatus,
+  IMetric,
+  ID_TO_NETWORK_NAME,
 } from '@uniswap/smart-order-router'
 import { Pool } from '@uniswap/v3-sdk'
 import JSBI from 'jsbi'
@@ -21,17 +26,73 @@ import {
   parseDeadline,
   parseSlippageTolerance,
   tokenStringToCurrency,
+  QUOTE_SPEED_CONFIG,
+  INTENT_SPECIFIC_CONFIG,
 } from '../shared'
 import { QuoteQueryParams, QuoteQueryParamsJoi } from './schema/quote-schema'
+import { utils } from 'ethers'
+import { simulationStatusToString } from './util/simulation'
+import Logger from 'bunyan'
+import { PAIRS_TO_TRACK } from './util/pairs-to-track'
 
 export class QuoteHandler extends APIGLambdaHandler<
   ContainerInjected,
-  RequestInjected<IRouter<AlphaRouterConfig | LegacyRoutingConfig>>,
+  RequestInjected<IRouter<AlphaRouterConfig>>,
   void,
   QuoteQueryParams,
   QuoteResponse
 > {
   public async handleRequest(
+    params: HandleRequestParams<ContainerInjected, RequestInjected<IRouter<any>>, void, QuoteQueryParams>
+  ): Promise<Response<QuoteResponse> | ErrorResponse> {
+    const { chainId, metric, log } = params.requestInjected
+    const startTime = Date.now()
+
+    let result: Response<QuoteResponse> | ErrorResponse
+
+    try {
+      result = await this.handleRequestInternal(params)
+
+      switch (result.statusCode) {
+        case 200:
+        case 202:
+          metric.putMetric(`GET_QUOTE_200_CHAINID: ${chainId}`, 1, MetricLoggerUnit.Count)
+          break
+        case 400:
+        case 403:
+        case 404:
+        case 408:
+        case 409:
+          metric.putMetric(`GET_QUOTE_400_CHAINID: ${chainId}`, 1, MetricLoggerUnit.Count)
+          log.error(
+            {
+              statusCode: result?.statusCode,
+              errorCode: result?.errorCode,
+              detail: result?.detail,
+            },
+            `Quote 4XX Error [${result?.statusCode}] on ${ID_TO_NETWORK_NAME(chainId)} with errorCode '${
+              result?.errorCode
+            }': ${result?.detail}`
+          )
+          break
+        case 500:
+          metric.putMetric(`GET_QUOTE_500_CHAINID: ${chainId}`, 1, MetricLoggerUnit.Count)
+          break
+      }
+    } catch (err) {
+      metric.putMetric(`GET_QUOTE_500_CHAINID: ${chainId}`, 1, MetricLoggerUnit.Count)
+
+      throw err
+    } finally {
+      // This metric is logged after calling the internal handler to correlate with the status metrics
+      metric.putMetric(`GET_QUOTE_REQUESTED_CHAINID: ${chainId}`, 1, MetricLoggerUnit.Count)
+      metric.putMetric(`GET_QUOTE_LATENCY_CHAIN_${chainId}`, Date.now() - startTime, MetricLoggerUnit.Milliseconds)
+    }
+
+    return result
+  }
+
+  private async handleRequestInternal(
     params: HandleRequestParams<ContainerInjected, RequestInjected<IRouter<any>>, void, QuoteQueryParams>
   ): Promise<Response<QuoteResponse> | ErrorResponse> {
     const {
@@ -49,6 +110,15 @@ export class QuoteHandler extends APIGLambdaHandler<
         forceCrossProtocol,
         forceMixedRoutes,
         protocols: protocolsStr,
+        simulateFromAddress,
+        permitSignature,
+        permitNonce,
+        permitExpiration,
+        permitAmount,
+        permitSigDeadline,
+        enableUniversalRouter,
+        quoteSpeed,
+        intent,
       },
       requestInjected: {
         router,
@@ -64,7 +134,8 @@ export class QuoteHandler extends APIGLambdaHandler<
     } = params
 
     // Parse user provided token address/symbol to Currency object.
-    const before = Date.now()
+    let before = Date.now()
+    const startTime = Date.now()
 
     const currencyIn = await tokenStringToCurrency(
       tokenListProvider,
@@ -147,19 +218,82 @@ export class QuoteHandler extends APIGLambdaHandler<
       ...(forceCrossProtocol ? { forceCrossProtocol } : {}),
       ...(forceMixedRoutes ? { forceMixedRoutes } : {}),
       protocols,
+      ...(quoteSpeed ? QUOTE_SPEED_CONFIG[quoteSpeed] : {}),
+      ...(intent ? INTENT_SPECIFIC_CONFIG[intent] : {}),
     }
+
+    metric.putMetric(`${intent}Intent`, 1, MetricLoggerUnit.Count)
 
     let swapParams: SwapOptions | undefined = undefined
 
     // e.g. Inputs of form "1.25%" with 2dp max. Convert to fractional representation => 1.25 => 125 / 10000
     if (slippageTolerance && deadline && recipient) {
       const slippageTolerancePercent = parseSlippageTolerance(slippageTolerance)
-      swapParams = {
-        deadline: parseDeadline(deadline),
-        recipient: recipient,
-        slippageTolerance: slippageTolerancePercent,
+
+      // TODO: Remove once universal router is no longer behind a feature flag.
+      if (enableUniversalRouter) {
+        swapParams = {
+          type: SwapType.UNIVERSAL_ROUTER,
+          deadlineOrPreviousBlockhash: parseDeadline(deadline),
+          recipient: recipient,
+          slippageTolerance: slippageTolerancePercent,
+        }
+      } else {
+        swapParams = {
+          type: SwapType.SWAP_ROUTER_02,
+          deadline: parseDeadline(deadline),
+          recipient: recipient,
+          slippageTolerance: slippageTolerancePercent,
+        }
+      }
+
+      if (
+        enableUniversalRouter &&
+        permitSignature &&
+        permitNonce &&
+        permitExpiration &&
+        permitAmount &&
+        permitSigDeadline
+      ) {
+        const permit: PermitSingle = {
+          details: {
+            token: currencyIn.wrapped.address,
+            amount: permitAmount,
+            expiration: permitExpiration,
+            nonce: permitNonce,
+          },
+          spender: UNIVERSAL_ROUTER_ADDRESS(chainId),
+          sigDeadline: permitSigDeadline,
+        }
+
+        swapParams.inputTokenPermit = {
+          ...permit,
+          signature: permitSignature,
+        }
+      } else if (
+        !enableUniversalRouter &&
+        permitSignature &&
+        ((permitNonce && permitExpiration) || (permitAmount && permitSigDeadline))
+      ) {
+        const { v, r, s } = utils.splitSignature(permitSignature)
+
+        swapParams.inputTokenPermit = {
+          v: v as 0 | 1 | 27 | 28,
+          r,
+          s,
+          ...(permitNonce && permitExpiration
+            ? { nonce: permitNonce!, expiry: permitExpiration! }
+            : { amount: permitAmount!, deadline: permitSigDeadline! }),
+        }
+      }
+
+      if (simulateFromAddress) {
+        metric.putMetric('Simulation Requested', 1, MetricLoggerUnit.Count)
+        swapParams.simulate = { fromAddress: simulateFromAddress }
       }
     }
+
+    before = Date.now()
 
     let swapRoute: SwapRoute | null
     let amount: CurrencyAmount<Currency>
@@ -194,6 +328,8 @@ export class QuoteHandler extends APIGLambdaHandler<
             tokenPairSymbolChain,
             type,
             routingConfig: routingConfig,
+            swapParams,
+            intent,
           },
           `Exact In Swap: Give ${amount.toExact()} ${amount.currency.symbol}, Want: ${
             currencyOut.symbol
@@ -218,6 +354,7 @@ export class QuoteHandler extends APIGLambdaHandler<
             tokenPairSymbolChain,
             type,
             routingConfig: routingConfig,
+            swapParams,
           },
           `Exact Out Swap: Want ${amount.toExact()} ${amount.currency.symbol} Give: ${
             currencyIn.symbol
@@ -258,7 +395,20 @@ export class QuoteHandler extends APIGLambdaHandler<
       gasPriceWei,
       methodParameters,
       blockNumber,
+      simulationStatus,
     } = swapRoute
+
+    if (simulationStatus == SimulationStatus.Failed) {
+      metric.putMetric('SimulationFailed', 1, MetricLoggerUnit.Count)
+    } else if (simulationStatus == SimulationStatus.Succeeded) {
+      metric.putMetric('SimulationSuccessful', 1, MetricLoggerUnit.Count)
+    } else if (simulationStatus == SimulationStatus.InsufficientBalance) {
+      metric.putMetric('SimulationInsufficientBalance', 1, MetricLoggerUnit.Count)
+    } else if (simulationStatus == SimulationStatus.NotApproved) {
+      metric.putMetric('SimulationNotApproved', 1, MetricLoggerUnit.Count)
+    } else if (simulationStatus == SimulationStatus.NotSupported) {
+      metric.putMetric('SimulationNotSupported', 1, MetricLoggerUnit.Count)
+    }
 
     const routeResponse: Array<(V3PoolInRoute | V2PoolInRoute)[]> = []
 
@@ -351,6 +501,8 @@ export class QuoteHandler extends APIGLambdaHandler<
       routeResponse.push(curRoute)
     }
 
+    const routeString = routeAmountsToString(route)
+
     const result: QuoteResponse = {
       methodParameters,
       blockNumber: blockNumber.toString(),
@@ -364,15 +516,94 @@ export class QuoteHandler extends APIGLambdaHandler<
       gasUseEstimateQuoteDecimals: estimatedGasUsedQuoteToken.toExact(),
       gasUseEstimate: estimatedGasUsed.toString(),
       gasUseEstimateUSD: estimatedGasUsedUSD.toExact(),
+      simulationStatus: simulationStatusToString(simulationStatus, log),
+      simulationError: simulationStatus == SimulationStatus.Failed,
       gasPriceWei: gasPriceWei.toString(),
       route: routeResponse,
-      routeString: routeAmountsToString(route),
+      routeString,
       quoteId,
     }
+
+    this.logRouteMetrics(
+      log,
+      metric,
+      startTime,
+      currencyIn,
+      currencyOut,
+      tokenInAddress,
+      tokenOutAddress,
+      type,
+      chainId,
+      amount,
+      routeString
+    )
 
     return {
       statusCode: 200,
       body: result,
+    }
+  }
+
+  private logRouteMetrics(
+    log: Logger,
+    metric: IMetric,
+    startTime: number,
+    currencyIn: Currency,
+    currencyOut: Currency,
+    tokenInAddress: string,
+    tokenOutAddress: string,
+    tradeType: 'exactIn' | 'exactOut',
+    chainId: ChainId,
+    amount: CurrencyAmount<Currency>,
+    routeString: string
+  ): void {
+    const tradingPair = `${currencyIn.wrapped.symbol}/${currencyOut.wrapped.symbol}`
+    const wildcardInPair = `${currencyIn.wrapped.symbol}/*`
+    const wildcardOutPair = `*/${currencyOut.wrapped.symbol}`
+    const tradeTypeEnumValue = tradeType == 'exactIn' ? TradeType.EXACT_INPUT : TradeType.EXACT_OUTPUT
+    const pairsTracked = PAIRS_TO_TRACK.get(chainId)?.get(tradeTypeEnumValue)
+
+    if (
+      pairsTracked?.includes(tradingPair) ||
+      pairsTracked?.includes(wildcardInPair) ||
+      pairsTracked?.includes(wildcardOutPair)
+    ) {
+      const metricPair = pairsTracked?.includes(tradingPair)
+        ? tradingPair
+        : pairsTracked?.includes(wildcardInPair)
+        ? wildcardInPair
+        : wildcardOutPair
+
+      metric.putMetric(
+        `GET_QUOTE_AMOUNT_${metricPair}_${tradeType.toUpperCase()}_CHAIN_${chainId}`,
+        Number(amount.toExact()),
+        MetricLoggerUnit.None
+      )
+
+      metric.putMetric(
+        `GET_QUOTE_LATENCY_${metricPair}_${tradeType.toUpperCase()}_CHAIN_${chainId}`,
+        Date.now() - startTime,
+        MetricLoggerUnit.Milliseconds
+      )
+      // Create a hashcode from the routeString, this will indicate that a different route is being used
+      // hashcode function copied from: https://gist.github.com/hyamamoto/fd435505d29ebfa3d9716fd2be8d42f0?permalink_comment_id=4261728#gistcomment-4261728
+      const routeStringHash = Math.abs(
+        routeString.split('').reduce((s, c) => (Math.imul(31, s) + c.charCodeAt(0)) | 0, 0)
+      )
+      // Log the chose route
+      log.info(
+        {
+          tradingPair,
+          tokenInAddress,
+          tokenOutAddress,
+          tradeType,
+          amount: amount.toExact(),
+          routeString,
+          routeStringHash,
+          chainId,
+        },
+        `Tracked Route for pair [${tradingPair}/${tradeType.toUpperCase()}] on chain [${chainId}] with route hash [${routeStringHash}] for amount [${amount.toExact()}]`
+      )
     }
   }
 

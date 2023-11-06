@@ -1,5 +1,6 @@
 import * as cdk from 'aws-cdk-lib'
 import { Duration } from 'aws-cdk-lib'
+import * as aws_dynamodb from 'aws-cdk-lib/aws-dynamodb'
 import * as asg from 'aws-cdk-lib/aws-applicationautoscaling'
 import * as aws_cloudwatch from 'aws-cdk-lib/aws-cloudwatch'
 import * as aws_cloudwatch_actions from 'aws-cdk-lib/aws-cloudwatch-actions'
@@ -10,6 +11,8 @@ import * as aws_s3 from 'aws-cdk-lib/aws-s3'
 import * as aws_sns from 'aws-cdk-lib/aws-sns'
 import { Construct } from 'constructs'
 import * as path from 'path'
+import { DynamoDBTableProps } from './routing-database-stack'
+import { RetentionDays } from 'aws-cdk-lib/aws-logs'
 
 export interface RoutingLambdaStackProps extends cdk.NestedStackProps {
   poolCacheBucket: aws_s3.Bucket
@@ -19,11 +22,16 @@ export interface RoutingLambdaStackProps extends cdk.NestedStackProps {
   tokenListCacheBucket: aws_s3.Bucket
   provisionedConcurrency: number
   ethGasStationInfoUrl: string
+  tenderlyUser: string
+  tenderlyProject: string
+  tenderlyAccessKey: string
   chatbotSNSArn?: string
+  cachedRoutesDynamoDb?: aws_dynamodb.Table
+  cachingRequestFlagDynamoDb?: aws_dynamodb.Table
+  cachedV3PoolsDynamoDb?: aws_dynamodb.Table
 }
 export class RoutingLambdaStack extends cdk.NestedStack {
   public readonly routingLambda: aws_lambda_nodejs.NodejsFunction
-  public readonly routeToRatioLambda: aws_lambda_nodejs.NodejsFunction
   public readonly routingLambdaAlias: aws_lambda.Alias
 
   constructor(scope: Construct, name: string, props: RoutingLambdaStackProps) {
@@ -37,12 +45,19 @@ export class RoutingLambdaStack extends cdk.NestedStack {
       provisionedConcurrency,
       ethGasStationInfoUrl,
       chatbotSNSArn,
+      tenderlyUser,
+      tenderlyProject,
+      tenderlyAccessKey,
+      cachedRoutesDynamoDb,
+      cachingRequestFlagDynamoDb,
+      cachedV3PoolsDynamoDb,
     } = props
 
     const lambdaRole = new aws_iam.Role(this, 'RoutingLambdaRole', {
       assumedBy: new aws_iam.ServicePrincipal('lambda.amazonaws.com'),
       managedPolicies: [
         aws_iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaBasicExecutionRole'),
+        aws_iam.ManagedPolicy.fromAwsManagedPolicyName('service-role/AWSLambdaRole'),
         aws_iam.ManagedPolicy.fromAwsManagedPolicyName('CloudWatchLambdaInsightsExecutionRolePolicy'),
         aws_iam.ManagedPolicy.fromAwsManagedPolicyName('AWSXRayDaemonWriteAccess'),
       ],
@@ -50,6 +65,9 @@ export class RoutingLambdaStack extends cdk.NestedStack {
     poolCacheBucket.grantRead(lambdaRole)
     poolCacheBucket2.grantRead(lambdaRole)
     tokenListCacheBucket.grantRead(lambdaRole)
+    cachedRoutesDynamoDb?.grantReadWriteData(lambdaRole)
+    cachingRequestFlagDynamoDb?.grantReadWriteData(lambdaRole)
+    cachedV3PoolsDynamoDb?.grantReadWriteData(lambdaRole)
 
     const region = cdk.Stack.of(this).region
 
@@ -66,13 +84,19 @@ export class RoutingLambdaStack extends cdk.NestedStack {
       },
       description: 'Routing Lambda',
       environment: {
-        VERSION: '2',
+        VERSION: '5',
         NODE_OPTIONS: '--enable-source-maps',
         POOL_CACHE_BUCKET: poolCacheBucket.bucketName,
         POOL_CACHE_BUCKET_2: poolCacheBucket2.bucketName,
         POOL_CACHE_KEY: poolCacheKey,
         TOKEN_LIST_CACHE_BUCKET: tokenListCacheBucket.bucketName,
         ETH_GAS_STATION_INFO_URL: ethGasStationInfoUrl,
+        TENDERLY_USER: tenderlyUser,
+        TENDERLY_PROJECT: tenderlyProject,
+        TENDERLY_ACCESS_KEY: tenderlyAccessKey,
+        CACHED_ROUTES_TABLE_NAME: DynamoDBTableProps.CacheRouteDynamoDbTable.Name,
+        CACHING_REQUEST_FLAG_TABLE_NAME: DynamoDBTableProps.CachingRequestFlagDynamoDbTable.Name,
+        CACHED_V3_POOLS_TABLE_NAME: DynamoDBTableProps.V3PoolsDynamoDbTable.Name,
         ...jsonRpcProviders,
       },
       layers: [
@@ -83,38 +107,7 @@ export class RoutingLambdaStack extends cdk.NestedStack {
         ),
       ],
       tracing: aws_lambda.Tracing.ACTIVE,
-    })
-
-    this.routeToRatioLambda = new aws_lambda_nodejs.NodejsFunction(this, 'RouteToRatioLambda2', {
-      role: lambdaRole,
-      runtime: aws_lambda.Runtime.NODEJS_14_X,
-      entry: path.join(__dirname, '../../lib/handlers/index.ts'),
-      handler: 'quoteToRatioHandler',
-      timeout: cdk.Duration.seconds(29),
-      memorySize: 1024,
-      bundling: {
-        minify: true,
-        sourceMap: true,
-      },
-      description: 'Route to Ratio Lambda',
-      environment: {
-        VERSION: '2',
-        NODE_OPTIONS: '--enable-source-maps',
-        POOL_CACHE_BUCKET: poolCacheBucket.bucketName,
-        POOL_CACHE_BUCKET_2: poolCacheBucket2.bucketName,
-        POOL_CACHE_KEY: poolCacheKey,
-        TOKEN_LIST_CACHE_BUCKET: tokenListCacheBucket.bucketName,
-        ETH_GAS_STATION_INFO_URL: ethGasStationInfoUrl,
-        ...jsonRpcProviders,
-      },
-      layers: [
-        aws_lambda.LayerVersion.fromLayerVersionArn(
-          this,
-          'InsightsLayerSwapAndAdd',
-          `arn:aws:lambda:${region}:580247275435:layer:LambdaInsightsExtension:14`
-        ),
-      ],
-      tracing: aws_lambda.Tracing.ACTIVE,
+      logRetention: RetentionDays.TWO_WEEKS,
     })
 
     const lambdaAlarmErrorRate = new aws_cloudwatch.Alarm(this, 'RoutingAPI-LambdaErrorRate', {

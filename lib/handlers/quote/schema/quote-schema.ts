@@ -47,6 +47,18 @@ export const QuoteQueryParamsJoi = Joi.object({
   forceCrossProtocol: Joi.boolean().optional(),
   forceMixedRoutes: Joi.boolean().optional(),
   protocols: Joi.stringArray().items(Joi.string().valid('v2', 'v3', 'mixed')).optional(),
+  simulateFromAddress: Joi.string().alphanum().max(42).optional(),
+  permitSignature: Joi.string().optional(),
+  permitNonce: Joi.string().optional(),
+  permitExpiration: Joi.number().optional(),
+  permitAmount: Joi.string()
+    .pattern(/^[0-9]+$/)
+    .max(77),
+  permitSigDeadline: Joi.number().optional(),
+  // TODO: Remove once universal router is no longer behind a feature flag.
+  enableUniversalRouter: Joi.boolean().optional().default(false),
+  quoteSpeed: Joi.string().valid('fast', 'standard').optional().default('standard'),
+  intent: Joi.string().valid('quote', 'swap', 'caching').optional().default('quote'),
 }).and('recipient', 'slippageTolerance', 'deadline')
 
 export type QuoteQueryParams = {
@@ -65,4 +77,13 @@ export type QuoteQueryParams = {
   forceCrossProtocol?: boolean
   forceMixedRoutes?: boolean
   protocols?: string[] | string
+  simulateFromAddress?: string
+  permitSignature?: string
+  permitNonce?: string
+  permitExpiration?: string
+  permitAmount?: string
+  permitSigDeadline?: string
+  enableUniversalRouter?: boolean
+  quoteSpeed?: string
+  intent?: string
 }
