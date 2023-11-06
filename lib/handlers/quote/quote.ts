@@ -10,6 +10,7 @@ import {
   SwapOptions,
   SwapRoute,
 } from '@uniswap/smart-order-router'
+import { Pool } from '@uniswap/v3-sdk'
 import JSBI from 'jsbi'
 import _ from 'lodash'
 import { APIGLambdaHandler, ErrorResponse, HandleRequestParams, Response } from '../handler'
@@ -46,7 +47,9 @@ export class QuoteHandler extends APIGLambdaHandler<
         deadline,
         minSplits,
         forceCrossProtocol,
+        forceMixedRoutes,
         protocols: protocolsStr,
+        simulateFromAddress,
       },
       requestInjected: {
         router,
@@ -62,7 +65,7 @@ export class QuoteHandler extends APIGLambdaHandler<
     } = params
 
     // Parse user provided token address/symbol to Currency object.
-    const before = Date.now()
+    let before = Date.now()
 
     const currencyIn = await tokenStringToCurrency(
       tokenListProvider,
@@ -124,6 +127,9 @@ export class QuoteHandler extends APIGLambdaHandler<
           case 'v3':
             protocols.push(Protocol.V3)
             break
+          case 'mixed':
+            protocols.push(Protocol.MIXED)
+            break
           default:
             return {
               statusCode: 400,
@@ -140,6 +146,7 @@ export class QuoteHandler extends APIGLambdaHandler<
       ...DEFAULT_ROUTING_CONFIG_BY_CHAIN(chainId),
       ...(minSplits ? { minSplits } : {}),
       ...(forceCrossProtocol ? { forceCrossProtocol } : {}),
+      ...(forceMixedRoutes ? { forceMixedRoutes } : {}),
       protocols,
     }
 
@@ -153,7 +160,13 @@ export class QuoteHandler extends APIGLambdaHandler<
         recipient: recipient,
         slippageTolerance: slippageTolerancePercent,
       }
+      if (simulateFromAddress) {
+        metric.putMetric('Simulation Requested', 1, MetricLoggerUnit.Count)
+        swapParams.simulate = { fromAddress: simulateFromAddress }
+      }
     }
+
+    before = Date.now()
 
     let swapRoute: SwapRoute | null
     let amount: CurrencyAmount<Currency>
@@ -252,31 +265,38 @@ export class QuoteHandler extends APIGLambdaHandler<
       gasPriceWei,
       methodParameters,
       blockNumber,
+      simulationError,
     } = swapRoute
 
-    const routeResponse: Array<V3PoolInRoute[] | V2PoolInRoute[]> = []
+    if (simulationError) {
+      metric.putMetric('SimulationFailed', 1, MetricLoggerUnit.Count)
+    } else if (simulateFromAddress) {
+      metric.putMetric('SimulationSuccessful', 1, MetricLoggerUnit.Count)
+    }
+
+    const routeResponse: Array<(V3PoolInRoute | V2PoolInRoute)[]> = []
 
     for (const subRoute of route) {
       const { amount, quote, tokenPath } = subRoute
 
-      if (subRoute.protocol == Protocol.V3) {
-        const pools = subRoute.route.pools
-        const curRoute: V3PoolInRoute[] = []
-        for (let i = 0; i < pools.length; i++) {
-          const nextPool = pools[i]
-          const tokenIn = tokenPath[i]
-          const tokenOut = tokenPath[i + 1]
+      const pools = subRoute.protocol == Protocol.V2 ? subRoute.route.pairs : subRoute.route.pools
+      const curRoute: (V3PoolInRoute | V2PoolInRoute)[] = []
+      for (let i = 0; i < pools.length; i++) {
+        const nextPool = pools[i]
+        const tokenIn = tokenPath[i]
+        const tokenOut = tokenPath[i + 1]
 
-          let edgeAmountIn = undefined
-          if (i == 0) {
-            edgeAmountIn = type == 'exactIn' ? amount.quotient.toString() : quote.quotient.toString()
-          }
+        let edgeAmountIn = undefined
+        if (i == 0) {
+          edgeAmountIn = type == 'exactIn' ? amount.quotient.toString() : quote.quotient.toString()
+        }
 
-          let edgeAmountOut = undefined
-          if (i == pools.length - 1) {
-            edgeAmountOut = type == 'exactIn' ? quote.quotient.toString() : amount.quotient.toString()
-          }
+        let edgeAmountOut = undefined
+        if (i == pools.length - 1) {
+          edgeAmountOut = type == 'exactIn' ? quote.quotient.toString() : amount.quotient.toString()
+        }
 
+        if (nextPool instanceof Pool) {
           curRoute.push({
             type: 'v3-pool',
             address: v3PoolProvider.getPoolAddress(nextPool.token0, nextPool.token1, nextPool.fee).poolAddress,
@@ -299,27 +319,7 @@ export class QuoteHandler extends APIGLambdaHandler<
             amountIn: edgeAmountIn,
             amountOut: edgeAmountOut,
           })
-        }
-
-        routeResponse.push(curRoute)
-      } else if (subRoute.protocol == Protocol.V2) {
-        const pools = subRoute.route.pairs
-        const curRoute: V2PoolInRoute[] = []
-        for (let i = 0; i < pools.length; i++) {
-          const nextPool = pools[i]
-          const tokenIn = tokenPath[i]
-          const tokenOut = tokenPath[i + 1]
-
-          let edgeAmountIn = undefined
-          if (i == 0) {
-            edgeAmountIn = type == 'exactIn' ? amount.quotient.toString() : quote.quotient.toString()
-          }
-
-          let edgeAmountOut = undefined
-          if (i == pools.length - 1) {
-            edgeAmountOut = type == 'exactIn' ? quote.quotient.toString() : amount.quotient.toString()
-          }
-
+        } else {
           const reserve0 = nextPool.reserve0
           const reserve1 = nextPool.reserve1
 
@@ -360,9 +360,9 @@ export class QuoteHandler extends APIGLambdaHandler<
             amountOut: edgeAmountOut,
           })
         }
-
-        routeResponse.push(curRoute)
       }
+
+      routeResponse.push(curRoute)
     }
 
     const result: QuoteResponse = {
@@ -378,6 +378,7 @@ export class QuoteHandler extends APIGLambdaHandler<
       gasUseEstimateQuoteDecimals: estimatedGasUsedQuoteToken.toExact(),
       gasUseEstimate: estimatedGasUsed.toString(),
       gasUseEstimateUSD: estimatedGasUsedUSD.toExact(),
+      simulationError,
       gasPriceWei: gasPriceWei.toString(),
       route: routeResponse,
       routeString: routeAmountsToString(route),

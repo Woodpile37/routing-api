@@ -1,11 +1,14 @@
 import Joi from '@hapi/joi'
-import { MethodParameters } from '@uniswap/v3-sdk'
+import { MethodParameters } from '@uniswap/smart-order-router'
+import { BigNumber } from 'ethers'
 
 export type TokenInRoute = {
   address: string
   chainId: number
   symbol: string
   decimals: string
+  buyFeeBps?: BigNumber
+  sellFeeBps?: BigNumber
 }
 
 export type V3PoolInRoute = {
@@ -49,6 +52,8 @@ export const QuoteResponseSchemaJoi = Joi.object().keys({
   gasUseEstimateQuoteDecimals: Joi.string().required(),
   gasUseEstimate: Joi.string().required(),
   gasUseEstimateUSD: Joi.string().required(),
+  simulationError: Joi.boolean().optional(),
+  simulationStatus: Joi.string().required(),
   gasPriceWei: Joi.string().required(),
   blockNumber: Joi.string().required(),
   route: Joi.array().items(Joi.any()).required(),
@@ -56,7 +61,9 @@ export const QuoteResponseSchemaJoi = Joi.object().keys({
   methodParameters: Joi.object({
     calldata: Joi.string().required(),
     value: Joi.string().required(),
+    to: Joi.string().required(),
   }).optional(),
+  hitsCachedRoutes: Joi.boolean().optional(),
 })
 
 export type QuoteResponse = {
@@ -71,9 +78,12 @@ export type QuoteResponse = {
   gasUseEstimateQuote: string
   gasUseEstimateQuoteDecimals: string
   gasUseEstimateUSD: string
+  simulationError?: boolean
+  simulationStatus: string
   gasPriceWei: string
   blockNumber: string
-  route: Array<V3PoolInRoute[] | V2PoolInRoute[]>
+  route: Array<(V3PoolInRoute | V2PoolInRoute)[]>
   routeString: string
   methodParameters?: MethodParameters
+  hitsCachedRoutes?: boolean
 }

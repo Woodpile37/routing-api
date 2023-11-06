@@ -30,6 +30,9 @@ export class RoutingAPIStack extends cdk.Stack {
       pinata_key?: string
       pinata_secret?: string
       hosted_zone?: string
+      tenderlyUser: string
+      tenderlyProject: string
+      tenderlyAccessKey: string
     }
   ) {
     super(parent, name, props)
@@ -45,6 +48,9 @@ export class RoutingAPIStack extends cdk.Stack {
       pinata_key,
       pinata_secret,
       hosted_zone,
+      tenderlyUser,
+      tenderlyProject,
+      tenderlyAccessKey,
     } = props
 
     const {
@@ -75,6 +81,9 @@ export class RoutingAPIStack extends cdk.Stack {
         provisionedConcurrency,
         ethGasStationInfoUrl,
         chatbotSNSArn,
+        tenderlyUser,
+        tenderlyProject,
+        tenderlyAccessKey,
       }
     )
 
@@ -254,6 +263,20 @@ export class RoutingAPIStack extends cdk.Stack {
       evaluationPeriods: 3,
     })
 
+    const simulationAlarmSev2 = new aws_cloudwatch.Alarm(this, 'RoutingAPI-SEV3-Simulation', {
+      alarmName: 'RoutingAPI-SEV3-Simulation',
+      metric: api.metric('SimulationFailed'),
+      threshold: 0.95,
+      evaluationPeriods: 3,
+    })
+
+    const simulationAlarmSev3 = new aws_cloudwatch.Alarm(this, 'RoutingAPI-SEV3-Simulation', {
+      alarmName: 'RoutingAPI-SEV3-Simulation',
+      metric: api.metric('SimulationFailed'),
+      threshold: 0.8,
+      evaluationPeriods: 3,
+    })
+
     if (chatbotSNSArn) {
       const chatBotTopic = aws_sns.Topic.fromTopicArn(this, 'ChatbotTopic', chatbotSNSArn)
       apiAlarm5xxSev2.addAlarmAction(new aws_cloudwatch_actions.SnsAction(chatBotTopic))
@@ -262,6 +285,8 @@ export class RoutingAPIStack extends cdk.Stack {
       apiAlarm5xxSev3.addAlarmAction(new aws_cloudwatch_actions.SnsAction(chatBotTopic))
       apiAlarm4xxSev3.addAlarmAction(new aws_cloudwatch_actions.SnsAction(chatBotTopic))
       apiAlarmLatencySev3.addAlarmAction(new aws_cloudwatch_actions.SnsAction(chatBotTopic))
+      simulationAlarmSev2.addAlarmAction(new aws_cloudwatch_actions.SnsAction(chatBotTopic))
+      simulationAlarmSev3.addAlarmAction(new aws_cloudwatch_actions.SnsAction(chatBotTopic))
     }
 
     this.url = new CfnOutput(this, 'Url', {
