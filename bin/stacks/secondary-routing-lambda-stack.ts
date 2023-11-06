@@ -3,10 +3,10 @@ import * as asg from 'aws-cdk-lib/aws-applicationautoscaling'
 import * as aws_iam from 'aws-cdk-lib/aws-iam'
 import * as aws_lambda from 'aws-cdk-lib/aws-lambda'
 import * as aws_lambda_nodejs from 'aws-cdk-lib/aws-lambda-nodejs'
+import { RetentionDays } from 'aws-cdk-lib/aws-logs'
 import { Construct } from 'constructs'
 import * as path from 'path'
 import { DynamoDBTableProps } from './routing-database-stack'
-import { RetentionDays } from 'aws-cdk-lib/aws-logs'
 
 export interface SecondaryRoutingLambdaStackProps extends cdk.NestedStackProps {
   provisionedConcurrency: number
