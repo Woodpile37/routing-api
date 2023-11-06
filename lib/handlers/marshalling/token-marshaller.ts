@@ -7,8 +7,8 @@ export interface MarshalledToken {
   decimals: number
   symbol?: string
   name?: string
-  buyFeeBps?: string
-  sellFeeBps?: string
+  buyFeeBps?: BigNumber
+  sellFeeBps?: BigNumber
 }
 
 export class TokenMarshaller {
@@ -19,8 +19,8 @@ export class TokenMarshaller {
       decimals: token.decimals,
       symbol: token.symbol,
       name: token.name,
-      buyFeeBps: token.buyFeeBps?.toString(),
-      sellFeeBps: token.sellFeeBps?.toString(),
+      buyFeeBps: token.buyFeeBps,
+      sellFeeBps: token.sellFeeBps,
     }
   }
 
@@ -32,8 +32,8 @@ export class TokenMarshaller {
       marshalledToken.symbol,
       marshalledToken.name,
       true, // at this point we know it's valid token address
-      marshalledToken.buyFeeBps ? BigNumber.from(marshalledToken.buyFeeBps) : undefined,
-      marshalledToken.sellFeeBps ? BigNumber.from(marshalledToken.sellFeeBps) : undefined
+      marshalledToken.buyFeeBps,
+      marshalledToken.sellFeeBps
     )
   }
 }
