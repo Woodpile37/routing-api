@@ -1,6 +1,6 @@
-import Logger from 'bunyan';
+import Logger from 'bunyan'
 
-import { log } from './log';
+import { log } from './log'
 
 export enum MetricLoggerUnit {
   Seconds = 'Seconds',
@@ -33,44 +33,41 @@ export enum MetricLoggerUnit {
 }
 
 export abstract class IMetric {
-  abstract setProperty(key: string, value: unknown): void;
+  abstract setProperty(key: string, value: unknown): void
 
-  abstract putDimensions(dimensions: Record<string, string>): void;
+  abstract putDimensions(dimensions: Record<string, string>): void
 
-  abstract putMetric(key: string, value: number, unit?: MetricLoggerUnit): void;
+  abstract putMetric(key: string, value: number, unit?: MetricLoggerUnit): void
 }
 
 interface MetricContext {
-  chainId: number;
-  networkName: string;
+  chainId: number
+  networkName: string
 }
 
 export class MetricLogger extends IMetric {
-  private log: Logger;
+  private log: Logger
 
   constructor(context?: MetricContext) {
-    super();
-    this.log = log.child(context || {});
+    super()
+    this.log = log.child(context || {})
   }
 
   public setProperty(key: string, value: unknown): void {
-    this.log = this.log.child({ [key]: value });
+    this.log = this.log.child({ [key]: value })
   }
 
   public putDimensions(dimensions: Record<string, string>): void {
-    this.log = this.log.child(dimensions);
+    this.log = this.log.child(dimensions)
   }
 
   public putMetric(key: string, value: number, unit?: MetricLoggerUnit): void {
-    this.log.info(
-      { key, value, unit },
-      `[Metric]: ${key}: ${value} | ${unit ? unit : ''}`
-    );
+    this.log.info({ key, value, unit }, `[Metric]: ${key}: ${value} | ${unit ? unit : ''}`)
   }
 }
 
-export let metric: IMetric = new MetricLogger();
+export let metric: IMetric = new MetricLogger()
 
 export const setGlobalMetric = (_metric: IMetric) => {
-  metric = _metric;
-};
+  metric = _metric
+}

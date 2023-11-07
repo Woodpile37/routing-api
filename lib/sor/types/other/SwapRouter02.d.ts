@@ -2,9 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { FunctionFragment, Result } from "@ethersproject/abi";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
+import { FunctionFragment, Result } from '@ethersproject/abi'
+import { BytesLike } from '@ethersproject/bytes'
+import { Listener, Provider } from '@ethersproject/providers'
 import {
   BaseContract,
   BigNumber,
@@ -16,531 +16,405 @@ import {
   PayableOverrides,
   PopulatedTransaction,
   Signer,
-} from "ethers";
-import { TypedEvent, TypedEventFilter, TypedListener } from "./commons";
+} from 'ethers'
+import { TypedEvent, TypedEventFilter, TypedListener } from './commons'
 
 interface SwapRouter02Interface extends ethers.utils.Interface {
   functions: {
-    "WETH9()": FunctionFragment;
-    "approveMax(address)": FunctionFragment;
-    "approveMaxMinusOne(address)": FunctionFragment;
-    "approveZeroThenMax(address)": FunctionFragment;
-    "approveZeroThenMaxMinusOne(address)": FunctionFragment;
-    "callPositionManager(bytes)": FunctionFragment;
-    "checkOracleSlippage(bytes[],uint128[],uint24,uint32)": FunctionFragment;
-    "exactInput(tuple)": FunctionFragment;
-    "exactInputSingle(tuple)": FunctionFragment;
-    "exactOutput(tuple)": FunctionFragment;
-    "exactOutputSingle(tuple)": FunctionFragment;
-    "factory()": FunctionFragment;
-    "factoryV2()": FunctionFragment;
-    "getApprovalType(address,uint256)": FunctionFragment;
-    "increaseLiquidity(tuple)": FunctionFragment;
-    "mint(tuple)": FunctionFragment;
-    "multicall(bytes32,bytes[])": FunctionFragment;
-    "positionManager()": FunctionFragment;
-    "pull(address,uint256)": FunctionFragment;
-    "refundETH()": FunctionFragment;
-    "selfPermit(address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;
-    "selfPermitAllowed(address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;
-    "selfPermitAllowedIfNecessary(address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;
-    "selfPermitIfNecessary(address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;
-    "swapExactTokensForTokens(uint256,uint256,address[],address)": FunctionFragment;
-    "swapTokensForExactTokens(uint256,uint256,address[],address)": FunctionFragment;
-    "sweepToken(address,uint256,address)": FunctionFragment;
-    "sweepTokenWithFee(address,uint256,uint256,address)": FunctionFragment;
-    "uniswapV3SwapCallback(int256,int256,bytes)": FunctionFragment;
-    "unwrapWETH9(uint256,address)": FunctionFragment;
-    "unwrapWETH9WithFee(uint256,address,uint256,address)": FunctionFragment;
-    "wrapETH(uint256)": FunctionFragment;
-  };
+    'WETH9()': FunctionFragment
+    'approveMax(address)': FunctionFragment
+    'approveMaxMinusOne(address)': FunctionFragment
+    'approveZeroThenMax(address)': FunctionFragment
+    'approveZeroThenMaxMinusOne(address)': FunctionFragment
+    'callPositionManager(bytes)': FunctionFragment
+    'checkOracleSlippage(bytes[],uint128[],uint24,uint32)': FunctionFragment
+    'exactInput(tuple)': FunctionFragment
+    'exactInputSingle(tuple)': FunctionFragment
+    'exactOutput(tuple)': FunctionFragment
+    'exactOutputSingle(tuple)': FunctionFragment
+    'factory()': FunctionFragment
+    'factoryV2()': FunctionFragment
+    'getApprovalType(address,uint256)': FunctionFragment
+    'increaseLiquidity(tuple)': FunctionFragment
+    'mint(tuple)': FunctionFragment
+    'multicall(bytes32,bytes[])': FunctionFragment
+    'positionManager()': FunctionFragment
+    'pull(address,uint256)': FunctionFragment
+    'refundETH()': FunctionFragment
+    'selfPermit(address,uint256,uint256,uint8,bytes32,bytes32)': FunctionFragment
+    'selfPermitAllowed(address,uint256,uint256,uint8,bytes32,bytes32)': FunctionFragment
+    'selfPermitAllowedIfNecessary(address,uint256,uint256,uint8,bytes32,bytes32)': FunctionFragment
+    'selfPermitIfNecessary(address,uint256,uint256,uint8,bytes32,bytes32)': FunctionFragment
+    'swapExactTokensForTokens(uint256,uint256,address[],address)': FunctionFragment
+    'swapTokensForExactTokens(uint256,uint256,address[],address)': FunctionFragment
+    'sweepToken(address,uint256,address)': FunctionFragment
+    'sweepTokenWithFee(address,uint256,uint256,address)': FunctionFragment
+    'uniswapV3SwapCallback(int256,int256,bytes)': FunctionFragment
+    'unwrapWETH9(uint256,address)': FunctionFragment
+    'unwrapWETH9WithFee(uint256,address,uint256,address)': FunctionFragment
+    'wrapETH(uint256)': FunctionFragment
+  }
 
-  encodeFunctionData(functionFragment: "WETH9", values?: undefined): string;
-  encodeFunctionData(functionFragment: "approveMax", values: [string]): string;
+  encodeFunctionData(functionFragment: 'WETH9', values?: undefined): string
+  encodeFunctionData(functionFragment: 'approveMax', values: [string]): string
+  encodeFunctionData(functionFragment: 'approveMaxMinusOne', values: [string]): string
+  encodeFunctionData(functionFragment: 'approveZeroThenMax', values: [string]): string
+  encodeFunctionData(functionFragment: 'approveZeroThenMaxMinusOne', values: [string]): string
+  encodeFunctionData(functionFragment: 'callPositionManager', values: [BytesLike]): string
   encodeFunctionData(
-    functionFragment: "approveMaxMinusOne",
-    values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "approveZeroThenMax",
-    values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "approveZeroThenMaxMinusOne",
-    values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "callPositionManager",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "checkOracleSlippage",
+    functionFragment: 'checkOracleSlippage',
     values: [BytesLike[], BigNumberish[], BigNumberish, BigNumberish]
-  ): string;
+  ): string
   encodeFunctionData(
-    functionFragment: "exactInput",
+    functionFragment: 'exactInput',
     values: [
       {
-        path: BytesLike;
-        recipient: string;
-        amountIn: BigNumberish;
-        amountOutMinimum: BigNumberish;
+        path: BytesLike
+        recipient: string
+        amountIn: BigNumberish
+        amountOutMinimum: BigNumberish
       }
     ]
-  ): string;
+  ): string
   encodeFunctionData(
-    functionFragment: "exactInputSingle",
+    functionFragment: 'exactInputSingle',
     values: [
       {
-        tokenIn: string;
-        tokenOut: string;
-        fee: BigNumberish;
-        recipient: string;
-        amountIn: BigNumberish;
-        amountOutMinimum: BigNumberish;
-        sqrtPriceLimitX96: BigNumberish;
+        tokenIn: string
+        tokenOut: string
+        fee: BigNumberish
+        recipient: string
+        amountIn: BigNumberish
+        amountOutMinimum: BigNumberish
+        sqrtPriceLimitX96: BigNumberish
       }
     ]
-  ): string;
+  ): string
   encodeFunctionData(
-    functionFragment: "exactOutput",
+    functionFragment: 'exactOutput',
     values: [
       {
-        path: BytesLike;
-        recipient: string;
-        amountOut: BigNumberish;
-        amountInMaximum: BigNumberish;
+        path: BytesLike
+        recipient: string
+        amountOut: BigNumberish
+        amountInMaximum: BigNumberish
       }
     ]
-  ): string;
+  ): string
   encodeFunctionData(
-    functionFragment: "exactOutputSingle",
+    functionFragment: 'exactOutputSingle',
     values: [
       {
-        tokenIn: string;
-        tokenOut: string;
-        fee: BigNumberish;
-        recipient: string;
-        amountOut: BigNumberish;
-        amountInMaximum: BigNumberish;
-        sqrtPriceLimitX96: BigNumberish;
+        tokenIn: string
+        tokenOut: string
+        fee: BigNumberish
+        recipient: string
+        amountOut: BigNumberish
+        amountInMaximum: BigNumberish
+        sqrtPriceLimitX96: BigNumberish
       }
     ]
-  ): string;
-  encodeFunctionData(functionFragment: "factory", values?: undefined): string;
-  encodeFunctionData(functionFragment: "factoryV2", values?: undefined): string;
+  ): string
+  encodeFunctionData(functionFragment: 'factory', values?: undefined): string
+  encodeFunctionData(functionFragment: 'factoryV2', values?: undefined): string
+  encodeFunctionData(functionFragment: 'getApprovalType', values: [string, BigNumberish]): string
   encodeFunctionData(
-    functionFragment: "getApprovalType",
-    values: [string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "increaseLiquidity",
+    functionFragment: 'increaseLiquidity',
     values: [
       {
-        token0: string;
-        token1: string;
-        tokenId: BigNumberish;
-        amount0Min: BigNumberish;
-        amount1Min: BigNumberish;
+        token0: string
+        token1: string
+        tokenId: BigNumberish
+        amount0Min: BigNumberish
+        amount1Min: BigNumberish
       }
     ]
-  ): string;
+  ): string
   encodeFunctionData(
-    functionFragment: "mint",
+    functionFragment: 'mint',
     values: [
       {
-        token0: string;
-        token1: string;
-        fee: BigNumberish;
-        tickLower: BigNumberish;
-        tickUpper: BigNumberish;
-        amount0Min: BigNumberish;
-        amount1Min: BigNumberish;
-        recipient: string;
+        token0: string
+        token1: string
+        fee: BigNumberish
+        tickLower: BigNumberish
+        tickUpper: BigNumberish
+        amount0Min: BigNumberish
+        amount1Min: BigNumberish
+        recipient: string
       }
     ]
-  ): string;
+  ): string
+  encodeFunctionData(functionFragment: 'multicall', values: [BytesLike, BytesLike[]]): string
+  encodeFunctionData(functionFragment: 'positionManager', values?: undefined): string
+  encodeFunctionData(functionFragment: 'pull', values: [string, BigNumberish]): string
+  encodeFunctionData(functionFragment: 'refundETH', values?: undefined): string
   encodeFunctionData(
-    functionFragment: "multicall",
-    values: [BytesLike, BytesLike[]]
-  ): string;
+    functionFragment: 'selfPermit',
+    values: [string, BigNumberish, BigNumberish, BigNumberish, BytesLike, BytesLike]
+  ): string
   encodeFunctionData(
-    functionFragment: "positionManager",
-    values?: undefined
-  ): string;
+    functionFragment: 'selfPermitAllowed',
+    values: [string, BigNumberish, BigNumberish, BigNumberish, BytesLike, BytesLike]
+  ): string
   encodeFunctionData(
-    functionFragment: "pull",
-    values: [string, BigNumberish]
-  ): string;
-  encodeFunctionData(functionFragment: "refundETH", values?: undefined): string;
+    functionFragment: 'selfPermitAllowedIfNecessary',
+    values: [string, BigNumberish, BigNumberish, BigNumberish, BytesLike, BytesLike]
+  ): string
   encodeFunctionData(
-    functionFragment: "selfPermit",
-    values: [
-      string,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BytesLike,
-      BytesLike
-    ]
-  ): string;
+    functionFragment: 'selfPermitIfNecessary',
+    values: [string, BigNumberish, BigNumberish, BigNumberish, BytesLike, BytesLike]
+  ): string
   encodeFunctionData(
-    functionFragment: "selfPermitAllowed",
-    values: [
-      string,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BytesLike,
-      BytesLike
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "selfPermitAllowedIfNecessary",
-    values: [
-      string,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BytesLike,
-      BytesLike
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "selfPermitIfNecessary",
-    values: [
-      string,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BytesLike,
-      BytesLike
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "swapExactTokensForTokens",
+    functionFragment: 'swapExactTokensForTokens',
     values: [BigNumberish, BigNumberish, string[], string]
-  ): string;
+  ): string
   encodeFunctionData(
-    functionFragment: "swapTokensForExactTokens",
+    functionFragment: 'swapTokensForExactTokens',
     values: [BigNumberish, BigNumberish, string[], string]
-  ): string;
+  ): string
+  encodeFunctionData(functionFragment: 'sweepToken', values: [string, BigNumberish, string]): string
   encodeFunctionData(
-    functionFragment: "sweepToken",
-    values: [string, BigNumberish, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "sweepTokenWithFee",
+    functionFragment: 'sweepTokenWithFee',
     values: [string, BigNumberish, BigNumberish, string]
-  ): string;
+  ): string
+  encodeFunctionData(functionFragment: 'uniswapV3SwapCallback', values: [BigNumberish, BigNumberish, BytesLike]): string
+  encodeFunctionData(functionFragment: 'unwrapWETH9', values: [BigNumberish, string]): string
   encodeFunctionData(
-    functionFragment: "uniswapV3SwapCallback",
-    values: [BigNumberish, BigNumberish, BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "unwrapWETH9",
-    values: [BigNumberish, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "unwrapWETH9WithFee",
+    functionFragment: 'unwrapWETH9WithFee',
     values: [BigNumberish, string, BigNumberish, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "wrapETH",
-    values: [BigNumberish]
-  ): string;
+  ): string
+  encodeFunctionData(functionFragment: 'wrapETH', values: [BigNumberish]): string
 
-  decodeFunctionResult(functionFragment: "WETH9", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "approveMax", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "approveMaxMinusOne",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "approveZeroThenMax",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "approveZeroThenMaxMinusOne",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "callPositionManager",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "checkOracleSlippage",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "exactInput", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "exactInputSingle",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "exactOutput",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "exactOutputSingle",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "factory", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "factoryV2", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "getApprovalType",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "increaseLiquidity",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "multicall", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "positionManager",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "pull", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "refundETH", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "selfPermit", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "selfPermitAllowed",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "selfPermitAllowedIfNecessary",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "selfPermitIfNecessary",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "swapExactTokensForTokens",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "swapTokensForExactTokens",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "sweepToken", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "sweepTokenWithFee",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "uniswapV3SwapCallback",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "unwrapWETH9",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "unwrapWETH9WithFee",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "wrapETH", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'WETH9', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'approveMax', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'approveMaxMinusOne', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'approveZeroThenMax', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'approveZeroThenMaxMinusOne', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'callPositionManager', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'checkOracleSlippage', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'exactInput', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'exactInputSingle', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'exactOutput', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'exactOutputSingle', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'factory', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'factoryV2', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'getApprovalType', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'increaseLiquidity', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'mint', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'multicall', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'positionManager', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'pull', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'refundETH', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'selfPermit', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'selfPermitAllowed', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'selfPermitAllowedIfNecessary', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'selfPermitIfNecessary', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'swapExactTokensForTokens', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'swapTokensForExactTokens', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'sweepToken', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'sweepTokenWithFee', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'uniswapV3SwapCallback', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'unwrapWETH9', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'unwrapWETH9WithFee', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'wrapETH', data: BytesLike): Result
 
-  events: {};
+  events: {}
 }
 
 export class SwapRouter02 extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this;
-  attach(addressOrName: string): this;
-  deployed(): Promise<this>;
+  connect(signerOrProvider: Signer | Provider | string): this
+  attach(addressOrName: string): this
+  deployed(): Promise<this>
 
   listeners<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter?: TypedEventFilter<EventArgsArray, EventArgsObject>
-  ): Array<TypedListener<EventArgsArray, EventArgsObject>>;
+  ): Array<TypedListener<EventArgsArray, EventArgsObject>>
   off<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   on<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   once<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   removeListener<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   removeAllListeners<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
 
-  listeners(eventName?: string): Array<Listener>;
-  off(eventName: string, listener: Listener): this;
-  on(eventName: string, listener: Listener): this;
-  once(eventName: string, listener: Listener): this;
-  removeListener(eventName: string, listener: Listener): this;
-  removeAllListeners(eventName?: string): this;
+  listeners(eventName?: string): Array<Listener>
+  off(eventName: string, listener: Listener): this
+  on(eventName: string, listener: Listener): this
+  once(eventName: string, listener: Listener): this
+  removeListener(eventName: string, listener: Listener): this
+  removeAllListeners(eventName?: string): this
 
   queryFilter<EventArgsArray extends Array<any>, EventArgsObject>(
     event: TypedEventFilter<EventArgsArray, EventArgsObject>,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
+  ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>
 
-  interface: SwapRouter02Interface;
+  interface: SwapRouter02Interface
 
   functions: {
-    WETH9(overrides?: CallOverrides): Promise<[string]>;
+    WETH9(overrides?: CallOverrides): Promise<[string]>
 
     approveMax(
       token: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     approveMaxMinusOne(
       token: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     approveZeroThenMax(
       token: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     approveZeroThenMaxMinusOne(
       token: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     callPositionManager(
       data: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
-    "checkOracleSlippage(bytes[],uint128[],uint24,uint32)"(
+    'checkOracleSlippage(bytes[],uint128[],uint24,uint32)'(
       paths: BytesLike[],
       amounts: BigNumberish[],
       maximumTickDivergence: BigNumberish,
       secondsAgo: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[void]>;
+    ): Promise<[void]>
 
-    "checkOracleSlippage(bytes,uint24,uint32)"(
+    'checkOracleSlippage(bytes,uint24,uint32)'(
       path: BytesLike,
       maximumTickDivergence: BigNumberish,
       secondsAgo: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[void]>;
+    ): Promise<[void]>
 
     exactInput(
       params: {
-        path: BytesLike;
-        recipient: string;
-        amountIn: BigNumberish;
-        amountOutMinimum: BigNumberish;
+        path: BytesLike
+        recipient: string
+        amountIn: BigNumberish
+        amountOutMinimum: BigNumberish
       },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     exactInputSingle(
       params: {
-        tokenIn: string;
-        tokenOut: string;
-        fee: BigNumberish;
-        recipient: string;
-        amountIn: BigNumberish;
-        amountOutMinimum: BigNumberish;
-        sqrtPriceLimitX96: BigNumberish;
+        tokenIn: string
+        tokenOut: string
+        fee: BigNumberish
+        recipient: string
+        amountIn: BigNumberish
+        amountOutMinimum: BigNumberish
+        sqrtPriceLimitX96: BigNumberish
       },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     exactOutput(
       params: {
-        path: BytesLike;
-        recipient: string;
-        amountOut: BigNumberish;
-        amountInMaximum: BigNumberish;
+        path: BytesLike
+        recipient: string
+        amountOut: BigNumberish
+        amountInMaximum: BigNumberish
       },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     exactOutputSingle(
       params: {
-        tokenIn: string;
-        tokenOut: string;
-        fee: BigNumberish;
-        recipient: string;
-        amountOut: BigNumberish;
-        amountInMaximum: BigNumberish;
-        sqrtPriceLimitX96: BigNumberish;
+        tokenIn: string
+        tokenOut: string
+        fee: BigNumberish
+        recipient: string
+        amountOut: BigNumberish
+        amountInMaximum: BigNumberish
+        sqrtPriceLimitX96: BigNumberish
       },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
-    factory(overrides?: CallOverrides): Promise<[string]>;
+    factory(overrides?: CallOverrides): Promise<[string]>
 
-    factoryV2(overrides?: CallOverrides): Promise<[string]>;
+    factoryV2(overrides?: CallOverrides): Promise<[string]>
 
     getApprovalType(
       token: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     increaseLiquidity(
       params: {
-        token0: string;
-        token1: string;
-        tokenId: BigNumberish;
-        amount0Min: BigNumberish;
-        amount1Min: BigNumberish;
+        token0: string
+        token1: string
+        tokenId: BigNumberish
+        amount0Min: BigNumberish
+        amount1Min: BigNumberish
       },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     mint(
       params: {
-        token0: string;
-        token1: string;
-        fee: BigNumberish;
-        tickLower: BigNumberish;
-        tickUpper: BigNumberish;
-        amount0Min: BigNumberish;
-        amount1Min: BigNumberish;
-        recipient: string;
+        token0: string
+        token1: string
+        fee: BigNumberish
+        tickLower: BigNumberish
+        tickUpper: BigNumberish
+        amount0Min: BigNumberish
+        amount1Min: BigNumberish
+        recipient: string
       },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
-    "multicall(bytes32,bytes[])"(
+    'multicall(bytes32,bytes[])'(
       previousBlockhash: BytesLike,
       data: BytesLike[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
-    "multicall(uint256,bytes[])"(
+    'multicall(uint256,bytes[])'(
       deadline: BigNumberish,
       data: BytesLike[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
-    "multicall(bytes[])"(
+    'multicall(bytes[])'(
       data: BytesLike[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
-    positionManager(overrides?: CallOverrides): Promise<[string]>;
+    positionManager(overrides?: CallOverrides): Promise<[string]>
 
     pull(
       token: string,
       value: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
-    refundETH(
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    refundETH(overrides?: PayableOverrides & { from?: string | Promise<string> }): Promise<ContractTransaction>
 
     selfPermit(
       token: string,
@@ -550,7 +424,7 @@ export class SwapRouter02 extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     selfPermitAllowed(
       token: string,
@@ -560,7 +434,7 @@ export class SwapRouter02 extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     selfPermitAllowedIfNecessary(
       token: string,
@@ -570,7 +444,7 @@ export class SwapRouter02 extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     selfPermitIfNecessary(
       token: string,
@@ -580,7 +454,7 @@ export class SwapRouter02 extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     swapExactTokensForTokens(
       amountIn: BigNumberish,
@@ -588,7 +462,7 @@ export class SwapRouter02 extends BaseContract {
       path: string[],
       to: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     swapTokensForExactTokens(
       amountOut: BigNumberish,
@@ -596,228 +470,226 @@ export class SwapRouter02 extends BaseContract {
       path: string[],
       to: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
-    "sweepToken(address,uint256,address)"(
+    'sweepToken(address,uint256,address)'(
       token: string,
       amountMinimum: BigNumberish,
       recipient: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
-    "sweepToken(address,uint256)"(
+    'sweepToken(address,uint256)'(
       token: string,
       amountMinimum: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
-    "sweepTokenWithFee(address,uint256,uint256,address)"(
+    'sweepTokenWithFee(address,uint256,uint256,address)'(
       token: string,
       amountMinimum: BigNumberish,
       feeBips: BigNumberish,
       feeRecipient: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
-    "sweepTokenWithFee(address,uint256,address,uint256,address)"(
+    'sweepTokenWithFee(address,uint256,address,uint256,address)'(
       token: string,
       amountMinimum: BigNumberish,
       recipient: string,
       feeBips: BigNumberish,
       feeRecipient: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     uniswapV3SwapCallback(
       amount0Delta: BigNumberish,
       amount1Delta: BigNumberish,
       _data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
-    "unwrapWETH9(uint256,address)"(
+    'unwrapWETH9(uint256,address)'(
       amountMinimum: BigNumberish,
       recipient: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
-    "unwrapWETH9(uint256)"(
+    'unwrapWETH9(uint256)'(
       amountMinimum: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
-    "unwrapWETH9WithFee(uint256,address,uint256,address)"(
+    'unwrapWETH9WithFee(uint256,address,uint256,address)'(
       amountMinimum: BigNumberish,
       recipient: string,
       feeBips: BigNumberish,
       feeRecipient: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
-    "unwrapWETH9WithFee(uint256,uint256,address)"(
+    'unwrapWETH9WithFee(uint256,uint256,address)'(
       amountMinimum: BigNumberish,
       feeBips: BigNumberish,
       feeRecipient: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     wrapETH(
       value: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-  };
+    ): Promise<ContractTransaction>
+  }
 
-  WETH9(overrides?: CallOverrides): Promise<string>;
+  WETH9(overrides?: CallOverrides): Promise<string>
 
   approveMax(
     token: string,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   approveMaxMinusOne(
     token: string,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   approveZeroThenMax(
     token: string,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   approveZeroThenMaxMinusOne(
     token: string,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   callPositionManager(
     data: BytesLike,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
-  "checkOracleSlippage(bytes[],uint128[],uint24,uint32)"(
+  'checkOracleSlippage(bytes[],uint128[],uint24,uint32)'(
     paths: BytesLike[],
     amounts: BigNumberish[],
     maximumTickDivergence: BigNumberish,
     secondsAgo: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<void>;
+  ): Promise<void>
 
-  "checkOracleSlippage(bytes,uint24,uint32)"(
+  'checkOracleSlippage(bytes,uint24,uint32)'(
     path: BytesLike,
     maximumTickDivergence: BigNumberish,
     secondsAgo: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<void>;
+  ): Promise<void>
 
   exactInput(
     params: {
-      path: BytesLike;
-      recipient: string;
-      amountIn: BigNumberish;
-      amountOutMinimum: BigNumberish;
+      path: BytesLike
+      recipient: string
+      amountIn: BigNumberish
+      amountOutMinimum: BigNumberish
     },
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   exactInputSingle(
     params: {
-      tokenIn: string;
-      tokenOut: string;
-      fee: BigNumberish;
-      recipient: string;
-      amountIn: BigNumberish;
-      amountOutMinimum: BigNumberish;
-      sqrtPriceLimitX96: BigNumberish;
+      tokenIn: string
+      tokenOut: string
+      fee: BigNumberish
+      recipient: string
+      amountIn: BigNumberish
+      amountOutMinimum: BigNumberish
+      sqrtPriceLimitX96: BigNumberish
     },
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   exactOutput(
     params: {
-      path: BytesLike;
-      recipient: string;
-      amountOut: BigNumberish;
-      amountInMaximum: BigNumberish;
+      path: BytesLike
+      recipient: string
+      amountOut: BigNumberish
+      amountInMaximum: BigNumberish
     },
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   exactOutputSingle(
     params: {
-      tokenIn: string;
-      tokenOut: string;
-      fee: BigNumberish;
-      recipient: string;
-      amountOut: BigNumberish;
-      amountInMaximum: BigNumberish;
-      sqrtPriceLimitX96: BigNumberish;
+      tokenIn: string
+      tokenOut: string
+      fee: BigNumberish
+      recipient: string
+      amountOut: BigNumberish
+      amountInMaximum: BigNumberish
+      sqrtPriceLimitX96: BigNumberish
     },
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
-  factory(overrides?: CallOverrides): Promise<string>;
+  factory(overrides?: CallOverrides): Promise<string>
 
-  factoryV2(overrides?: CallOverrides): Promise<string>;
+  factoryV2(overrides?: CallOverrides): Promise<string>
 
   getApprovalType(
     token: string,
     amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   increaseLiquidity(
     params: {
-      token0: string;
-      token1: string;
-      tokenId: BigNumberish;
-      amount0Min: BigNumberish;
-      amount1Min: BigNumberish;
+      token0: string
+      token1: string
+      tokenId: BigNumberish
+      amount0Min: BigNumberish
+      amount1Min: BigNumberish
     },
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   mint(
     params: {
-      token0: string;
-      token1: string;
-      fee: BigNumberish;
-      tickLower: BigNumberish;
-      tickUpper: BigNumberish;
-      amount0Min: BigNumberish;
-      amount1Min: BigNumberish;
-      recipient: string;
+      token0: string
+      token1: string
+      fee: BigNumberish
+      tickLower: BigNumberish
+      tickUpper: BigNumberish
+      amount0Min: BigNumberish
+      amount1Min: BigNumberish
+      recipient: string
     },
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
-  "multicall(bytes32,bytes[])"(
+  'multicall(bytes32,bytes[])'(
     previousBlockhash: BytesLike,
     data: BytesLike[],
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
-  "multicall(uint256,bytes[])"(
+  'multicall(uint256,bytes[])'(
     deadline: BigNumberish,
     data: BytesLike[],
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
-  "multicall(bytes[])"(
+  'multicall(bytes[])'(
     data: BytesLike[],
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
-  positionManager(overrides?: CallOverrides): Promise<string>;
+  positionManager(overrides?: CallOverrides): Promise<string>
 
   pull(
     token: string,
     value: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
-  refundETH(
-    overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  refundETH(overrides?: PayableOverrides & { from?: string | Promise<string> }): Promise<ContractTransaction>
 
   selfPermit(
     token: string,
@@ -827,7 +699,7 @@ export class SwapRouter02 extends BaseContract {
     r: BytesLike,
     s: BytesLike,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   selfPermitAllowed(
     token: string,
@@ -837,7 +709,7 @@ export class SwapRouter02 extends BaseContract {
     r: BytesLike,
     s: BytesLike,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   selfPermitAllowedIfNecessary(
     token: string,
@@ -847,7 +719,7 @@ export class SwapRouter02 extends BaseContract {
     r: BytesLike,
     s: BytesLike,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   selfPermitIfNecessary(
     token: string,
@@ -857,7 +729,7 @@ export class SwapRouter02 extends BaseContract {
     r: BytesLike,
     s: BytesLike,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   swapExactTokensForTokens(
     amountIn: BigNumberish,
@@ -865,7 +737,7 @@ export class SwapRouter02 extends BaseContract {
     path: string[],
     to: string,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   swapTokensForExactTokens(
     amountOut: BigNumberish,
@@ -873,217 +745,200 @@ export class SwapRouter02 extends BaseContract {
     path: string[],
     to: string,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
-  "sweepToken(address,uint256,address)"(
+  'sweepToken(address,uint256,address)'(
     token: string,
     amountMinimum: BigNumberish,
     recipient: string,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
-  "sweepToken(address,uint256)"(
+  'sweepToken(address,uint256)'(
     token: string,
     amountMinimum: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
-  "sweepTokenWithFee(address,uint256,uint256,address)"(
+  'sweepTokenWithFee(address,uint256,uint256,address)'(
     token: string,
     amountMinimum: BigNumberish,
     feeBips: BigNumberish,
     feeRecipient: string,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
-  "sweepTokenWithFee(address,uint256,address,uint256,address)"(
+  'sweepTokenWithFee(address,uint256,address,uint256,address)'(
     token: string,
     amountMinimum: BigNumberish,
     recipient: string,
     feeBips: BigNumberish,
     feeRecipient: string,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   uniswapV3SwapCallback(
     amount0Delta: BigNumberish,
     amount1Delta: BigNumberish,
     _data: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
-  "unwrapWETH9(uint256,address)"(
+  'unwrapWETH9(uint256,address)'(
     amountMinimum: BigNumberish,
     recipient: string,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
-  "unwrapWETH9(uint256)"(
+  'unwrapWETH9(uint256)'(
     amountMinimum: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
-  "unwrapWETH9WithFee(uint256,address,uint256,address)"(
+  'unwrapWETH9WithFee(uint256,address,uint256,address)'(
     amountMinimum: BigNumberish,
     recipient: string,
     feeBips: BigNumberish,
     feeRecipient: string,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
-  "unwrapWETH9WithFee(uint256,uint256,address)"(
+  'unwrapWETH9WithFee(uint256,uint256,address)'(
     amountMinimum: BigNumberish,
     feeBips: BigNumberish,
     feeRecipient: string,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   wrapETH(
     value: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   callStatic: {
-    WETH9(overrides?: CallOverrides): Promise<string>;
+    WETH9(overrides?: CallOverrides): Promise<string>
 
-    approveMax(token: string, overrides?: CallOverrides): Promise<void>;
+    approveMax(token: string, overrides?: CallOverrides): Promise<void>
 
-    approveMaxMinusOne(token: string, overrides?: CallOverrides): Promise<void>;
+    approveMaxMinusOne(token: string, overrides?: CallOverrides): Promise<void>
 
-    approveZeroThenMax(token: string, overrides?: CallOverrides): Promise<void>;
+    approveZeroThenMax(token: string, overrides?: CallOverrides): Promise<void>
 
-    approveZeroThenMaxMinusOne(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    approveZeroThenMaxMinusOne(token: string, overrides?: CallOverrides): Promise<void>
 
-    callPositionManager(
-      data: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<string>;
+    callPositionManager(data: BytesLike, overrides?: CallOverrides): Promise<string>
 
-    "checkOracleSlippage(bytes[],uint128[],uint24,uint32)"(
+    'checkOracleSlippage(bytes[],uint128[],uint24,uint32)'(
       paths: BytesLike[],
       amounts: BigNumberish[],
       maximumTickDivergence: BigNumberish,
       secondsAgo: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
-    "checkOracleSlippage(bytes,uint24,uint32)"(
+    'checkOracleSlippage(bytes,uint24,uint32)'(
       path: BytesLike,
       maximumTickDivergence: BigNumberish,
       secondsAgo: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
     exactInput(
       params: {
-        path: BytesLike;
-        recipient: string;
-        amountIn: BigNumberish;
-        amountOutMinimum: BigNumberish;
+        path: BytesLike
+        recipient: string
+        amountIn: BigNumberish
+        amountOutMinimum: BigNumberish
       },
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     exactInputSingle(
       params: {
-        tokenIn: string;
-        tokenOut: string;
-        fee: BigNumberish;
-        recipient: string;
-        amountIn: BigNumberish;
-        amountOutMinimum: BigNumberish;
-        sqrtPriceLimitX96: BigNumberish;
+        tokenIn: string
+        tokenOut: string
+        fee: BigNumberish
+        recipient: string
+        amountIn: BigNumberish
+        amountOutMinimum: BigNumberish
+        sqrtPriceLimitX96: BigNumberish
       },
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     exactOutput(
       params: {
-        path: BytesLike;
-        recipient: string;
-        amountOut: BigNumberish;
-        amountInMaximum: BigNumberish;
+        path: BytesLike
+        recipient: string
+        amountOut: BigNumberish
+        amountInMaximum: BigNumberish
       },
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     exactOutputSingle(
       params: {
-        tokenIn: string;
-        tokenOut: string;
-        fee: BigNumberish;
-        recipient: string;
-        amountOut: BigNumberish;
-        amountInMaximum: BigNumberish;
-        sqrtPriceLimitX96: BigNumberish;
+        tokenIn: string
+        tokenOut: string
+        fee: BigNumberish
+        recipient: string
+        amountOut: BigNumberish
+        amountInMaximum: BigNumberish
+        sqrtPriceLimitX96: BigNumberish
       },
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    factory(overrides?: CallOverrides): Promise<string>;
+    factory(overrides?: CallOverrides): Promise<string>
 
-    factoryV2(overrides?: CallOverrides): Promise<string>;
+    factoryV2(overrides?: CallOverrides): Promise<string>
 
-    getApprovalType(
-      token: string,
-      amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<number>;
+    getApprovalType(token: string, amount: BigNumberish, overrides?: CallOverrides): Promise<number>
 
     increaseLiquidity(
       params: {
-        token0: string;
-        token1: string;
-        tokenId: BigNumberish;
-        amount0Min: BigNumberish;
-        amount1Min: BigNumberish;
+        token0: string
+        token1: string
+        tokenId: BigNumberish
+        amount0Min: BigNumberish
+        amount1Min: BigNumberish
       },
       overrides?: CallOverrides
-    ): Promise<string>;
+    ): Promise<string>
 
     mint(
       params: {
-        token0: string;
-        token1: string;
-        fee: BigNumberish;
-        tickLower: BigNumberish;
-        tickUpper: BigNumberish;
-        amount0Min: BigNumberish;
-        amount1Min: BigNumberish;
-        recipient: string;
+        token0: string
+        token1: string
+        fee: BigNumberish
+        tickLower: BigNumberish
+        tickUpper: BigNumberish
+        amount0Min: BigNumberish
+        amount1Min: BigNumberish
+        recipient: string
       },
       overrides?: CallOverrides
-    ): Promise<string>;
+    ): Promise<string>
 
-    "multicall(bytes32,bytes[])"(
+    'multicall(bytes32,bytes[])'(
       previousBlockhash: BytesLike,
       data: BytesLike[],
       overrides?: CallOverrides
-    ): Promise<string[]>;
+    ): Promise<string[]>
 
-    "multicall(uint256,bytes[])"(
+    'multicall(uint256,bytes[])'(
       deadline: BigNumberish,
       data: BytesLike[],
       overrides?: CallOverrides
-    ): Promise<string[]>;
+    ): Promise<string[]>
 
-    "multicall(bytes[])"(
-      data: BytesLike[],
-      overrides?: CallOverrides
-    ): Promise<string[]>;
+    'multicall(bytes[])'(data: BytesLike[], overrides?: CallOverrides): Promise<string[]>
 
-    positionManager(overrides?: CallOverrides): Promise<string>;
+    positionManager(overrides?: CallOverrides): Promise<string>
 
-    pull(
-      token: string,
-      value: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    pull(token: string, value: BigNumberish, overrides?: CallOverrides): Promise<void>
 
-    refundETH(overrides?: CallOverrides): Promise<void>;
+    refundETH(overrides?: CallOverrides): Promise<void>
 
     selfPermit(
       token: string,
@@ -1093,7 +948,7 @@ export class SwapRouter02 extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
     selfPermitAllowed(
       token: string,
@@ -1103,7 +958,7 @@ export class SwapRouter02 extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
     selfPermitAllowedIfNecessary(
       token: string,
@@ -1113,7 +968,7 @@ export class SwapRouter02 extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
     selfPermitIfNecessary(
       token: string,
@@ -1123,7 +978,7 @@ export class SwapRouter02 extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
     swapExactTokensForTokens(
       amountIn: BigNumberish,
@@ -1131,7 +986,7 @@ export class SwapRouter02 extends BaseContract {
       path: string[],
       to: string,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     swapTokensForExactTokens(
       amountOut: BigNumberish,
@@ -1139,228 +994,216 @@ export class SwapRouter02 extends BaseContract {
       path: string[],
       to: string,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    "sweepToken(address,uint256,address)"(
+    'sweepToken(address,uint256,address)'(
       token: string,
       amountMinimum: BigNumberish,
       recipient: string,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
-    "sweepToken(address,uint256)"(
-      token: string,
-      amountMinimum: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    'sweepToken(address,uint256)'(token: string, amountMinimum: BigNumberish, overrides?: CallOverrides): Promise<void>
 
-    "sweepTokenWithFee(address,uint256,uint256,address)"(
+    'sweepTokenWithFee(address,uint256,uint256,address)'(
       token: string,
       amountMinimum: BigNumberish,
       feeBips: BigNumberish,
       feeRecipient: string,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
-    "sweepTokenWithFee(address,uint256,address,uint256,address)"(
+    'sweepTokenWithFee(address,uint256,address,uint256,address)'(
       token: string,
       amountMinimum: BigNumberish,
       recipient: string,
       feeBips: BigNumberish,
       feeRecipient: string,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
     uniswapV3SwapCallback(
       amount0Delta: BigNumberish,
       amount1Delta: BigNumberish,
       _data: BytesLike,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
-    "unwrapWETH9(uint256,address)"(
+    'unwrapWETH9(uint256,address)'(
       amountMinimum: BigNumberish,
       recipient: string,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
-    "unwrapWETH9(uint256)"(
-      amountMinimum: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    'unwrapWETH9(uint256)'(amountMinimum: BigNumberish, overrides?: CallOverrides): Promise<void>
 
-    "unwrapWETH9WithFee(uint256,address,uint256,address)"(
+    'unwrapWETH9WithFee(uint256,address,uint256,address)'(
       amountMinimum: BigNumberish,
       recipient: string,
       feeBips: BigNumberish,
       feeRecipient: string,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
-    "unwrapWETH9WithFee(uint256,uint256,address)"(
+    'unwrapWETH9WithFee(uint256,uint256,address)'(
       amountMinimum: BigNumberish,
       feeBips: BigNumberish,
       feeRecipient: string,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
-    wrapETH(value: BigNumberish, overrides?: CallOverrides): Promise<void>;
-  };
+    wrapETH(value: BigNumberish, overrides?: CallOverrides): Promise<void>
+  }
 
-  filters: {};
+  filters: {}
 
   estimateGas: {
-    WETH9(overrides?: CallOverrides): Promise<BigNumber>;
+    WETH9(overrides?: CallOverrides): Promise<BigNumber>
 
-    approveMax(
-      token: string,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    approveMax(token: string, overrides?: PayableOverrides & { from?: string | Promise<string> }): Promise<BigNumber>
 
     approveMaxMinusOne(
       token: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     approveZeroThenMax(
       token: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     approveZeroThenMaxMinusOne(
       token: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     callPositionManager(
       data: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    "checkOracleSlippage(bytes[],uint128[],uint24,uint32)"(
+    'checkOracleSlippage(bytes[],uint128[],uint24,uint32)'(
       paths: BytesLike[],
       amounts: BigNumberish[],
       maximumTickDivergence: BigNumberish,
       secondsAgo: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    "checkOracleSlippage(bytes,uint24,uint32)"(
+    'checkOracleSlippage(bytes,uint24,uint32)'(
       path: BytesLike,
       maximumTickDivergence: BigNumberish,
       secondsAgo: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     exactInput(
       params: {
-        path: BytesLike;
-        recipient: string;
-        amountIn: BigNumberish;
-        amountOutMinimum: BigNumberish;
+        path: BytesLike
+        recipient: string
+        amountIn: BigNumberish
+        amountOutMinimum: BigNumberish
       },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     exactInputSingle(
       params: {
-        tokenIn: string;
-        tokenOut: string;
-        fee: BigNumberish;
-        recipient: string;
-        amountIn: BigNumberish;
-        amountOutMinimum: BigNumberish;
-        sqrtPriceLimitX96: BigNumberish;
+        tokenIn: string
+        tokenOut: string
+        fee: BigNumberish
+        recipient: string
+        amountIn: BigNumberish
+        amountOutMinimum: BigNumberish
+        sqrtPriceLimitX96: BigNumberish
       },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     exactOutput(
       params: {
-        path: BytesLike;
-        recipient: string;
-        amountOut: BigNumberish;
-        amountInMaximum: BigNumberish;
+        path: BytesLike
+        recipient: string
+        amountOut: BigNumberish
+        amountInMaximum: BigNumberish
       },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     exactOutputSingle(
       params: {
-        tokenIn: string;
-        tokenOut: string;
-        fee: BigNumberish;
-        recipient: string;
-        amountOut: BigNumberish;
-        amountInMaximum: BigNumberish;
-        sqrtPriceLimitX96: BigNumberish;
+        tokenIn: string
+        tokenOut: string
+        fee: BigNumberish
+        recipient: string
+        amountOut: BigNumberish
+        amountInMaximum: BigNumberish
+        sqrtPriceLimitX96: BigNumberish
       },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    factory(overrides?: CallOverrides): Promise<BigNumber>;
+    factory(overrides?: CallOverrides): Promise<BigNumber>
 
-    factoryV2(overrides?: CallOverrides): Promise<BigNumber>;
+    factoryV2(overrides?: CallOverrides): Promise<BigNumber>
 
     getApprovalType(
       token: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     increaseLiquidity(
       params: {
-        token0: string;
-        token1: string;
-        tokenId: BigNumberish;
-        amount0Min: BigNumberish;
-        amount1Min: BigNumberish;
+        token0: string
+        token1: string
+        tokenId: BigNumberish
+        amount0Min: BigNumberish
+        amount1Min: BigNumberish
       },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     mint(
       params: {
-        token0: string;
-        token1: string;
-        fee: BigNumberish;
-        tickLower: BigNumberish;
-        tickUpper: BigNumberish;
-        amount0Min: BigNumberish;
-        amount1Min: BigNumberish;
-        recipient: string;
+        token0: string
+        token1: string
+        fee: BigNumberish
+        tickLower: BigNumberish
+        tickUpper: BigNumberish
+        amount0Min: BigNumberish
+        amount1Min: BigNumberish
+        recipient: string
       },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    "multicall(bytes32,bytes[])"(
+    'multicall(bytes32,bytes[])'(
       previousBlockhash: BytesLike,
       data: BytesLike[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    "multicall(uint256,bytes[])"(
+    'multicall(uint256,bytes[])'(
       deadline: BigNumberish,
       data: BytesLike[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    "multicall(bytes[])"(
+    'multicall(bytes[])'(
       data: BytesLike[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    positionManager(overrides?: CallOverrides): Promise<BigNumber>;
+    positionManager(overrides?: CallOverrides): Promise<BigNumber>
 
     pull(
       token: string,
       value: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    refundETH(
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    refundETH(overrides?: PayableOverrides & { from?: string | Promise<string> }): Promise<BigNumber>
 
     selfPermit(
       token: string,
@@ -1370,7 +1213,7 @@ export class SwapRouter02 extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     selfPermitAllowed(
       token: string,
@@ -1380,7 +1223,7 @@ export class SwapRouter02 extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     selfPermitAllowedIfNecessary(
       token: string,
@@ -1390,7 +1233,7 @@ export class SwapRouter02 extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     selfPermitIfNecessary(
       token: string,
@@ -1400,7 +1243,7 @@ export class SwapRouter02 extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     swapExactTokensForTokens(
       amountIn: BigNumberish,
@@ -1408,7 +1251,7 @@ export class SwapRouter02 extends BaseContract {
       path: string[],
       to: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     swapTokensForExactTokens(
       amountOut: BigNumberish,
@@ -1416,229 +1259,224 @@ export class SwapRouter02 extends BaseContract {
       path: string[],
       to: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    "sweepToken(address,uint256,address)"(
+    'sweepToken(address,uint256,address)'(
       token: string,
       amountMinimum: BigNumberish,
       recipient: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    "sweepToken(address,uint256)"(
+    'sweepToken(address,uint256)'(
       token: string,
       amountMinimum: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    "sweepTokenWithFee(address,uint256,uint256,address)"(
+    'sweepTokenWithFee(address,uint256,uint256,address)'(
       token: string,
       amountMinimum: BigNumberish,
       feeBips: BigNumberish,
       feeRecipient: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    "sweepTokenWithFee(address,uint256,address,uint256,address)"(
+    'sweepTokenWithFee(address,uint256,address,uint256,address)'(
       token: string,
       amountMinimum: BigNumberish,
       recipient: string,
       feeBips: BigNumberish,
       feeRecipient: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     uniswapV3SwapCallback(
       amount0Delta: BigNumberish,
       amount1Delta: BigNumberish,
       _data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    "unwrapWETH9(uint256,address)"(
+    'unwrapWETH9(uint256,address)'(
       amountMinimum: BigNumberish,
       recipient: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    "unwrapWETH9(uint256)"(
+    'unwrapWETH9(uint256)'(
       amountMinimum: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    "unwrapWETH9WithFee(uint256,address,uint256,address)"(
+    'unwrapWETH9WithFee(uint256,address,uint256,address)'(
       amountMinimum: BigNumberish,
       recipient: string,
       feeBips: BigNumberish,
       feeRecipient: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    "unwrapWETH9WithFee(uint256,uint256,address)"(
+    'unwrapWETH9WithFee(uint256,uint256,address)'(
       amountMinimum: BigNumberish,
       feeBips: BigNumberish,
       feeRecipient: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    wrapETH(
-      value: BigNumberish,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-  };
+    wrapETH(value: BigNumberish, overrides?: PayableOverrides & { from?: string | Promise<string> }): Promise<BigNumber>
+  }
 
   populateTransaction: {
-    WETH9(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    WETH9(overrides?: CallOverrides): Promise<PopulatedTransaction>
 
     approveMax(
       token: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     approveMaxMinusOne(
       token: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     approveZeroThenMax(
       token: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     approveZeroThenMaxMinusOne(
       token: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     callPositionManager(
       data: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    "checkOracleSlippage(bytes[],uint128[],uint24,uint32)"(
+    'checkOracleSlippage(bytes[],uint128[],uint24,uint32)'(
       paths: BytesLike[],
       amounts: BigNumberish[],
       maximumTickDivergence: BigNumberish,
       secondsAgo: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    "checkOracleSlippage(bytes,uint24,uint32)"(
+    'checkOracleSlippage(bytes,uint24,uint32)'(
       path: BytesLike,
       maximumTickDivergence: BigNumberish,
       secondsAgo: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     exactInput(
       params: {
-        path: BytesLike;
-        recipient: string;
-        amountIn: BigNumberish;
-        amountOutMinimum: BigNumberish;
+        path: BytesLike
+        recipient: string
+        amountIn: BigNumberish
+        amountOutMinimum: BigNumberish
       },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     exactInputSingle(
       params: {
-        tokenIn: string;
-        tokenOut: string;
-        fee: BigNumberish;
-        recipient: string;
-        amountIn: BigNumberish;
-        amountOutMinimum: BigNumberish;
-        sqrtPriceLimitX96: BigNumberish;
+        tokenIn: string
+        tokenOut: string
+        fee: BigNumberish
+        recipient: string
+        amountIn: BigNumberish
+        amountOutMinimum: BigNumberish
+        sqrtPriceLimitX96: BigNumberish
       },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     exactOutput(
       params: {
-        path: BytesLike;
-        recipient: string;
-        amountOut: BigNumberish;
-        amountInMaximum: BigNumberish;
+        path: BytesLike
+        recipient: string
+        amountOut: BigNumberish
+        amountInMaximum: BigNumberish
       },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     exactOutputSingle(
       params: {
-        tokenIn: string;
-        tokenOut: string;
-        fee: BigNumberish;
-        recipient: string;
-        amountOut: BigNumberish;
-        amountInMaximum: BigNumberish;
-        sqrtPriceLimitX96: BigNumberish;
+        tokenIn: string
+        tokenOut: string
+        fee: BigNumberish
+        recipient: string
+        amountOut: BigNumberish
+        amountInMaximum: BigNumberish
+        sqrtPriceLimitX96: BigNumberish
       },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    factory(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    factory(overrides?: CallOverrides): Promise<PopulatedTransaction>
 
-    factoryV2(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    factoryV2(overrides?: CallOverrides): Promise<PopulatedTransaction>
 
     getApprovalType(
       token: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     increaseLiquidity(
       params: {
-        token0: string;
-        token1: string;
-        tokenId: BigNumberish;
-        amount0Min: BigNumberish;
-        amount1Min: BigNumberish;
+        token0: string
+        token1: string
+        tokenId: BigNumberish
+        amount0Min: BigNumberish
+        amount1Min: BigNumberish
       },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     mint(
       params: {
-        token0: string;
-        token1: string;
-        fee: BigNumberish;
-        tickLower: BigNumberish;
-        tickUpper: BigNumberish;
-        amount0Min: BigNumberish;
-        amount1Min: BigNumberish;
-        recipient: string;
+        token0: string
+        token1: string
+        fee: BigNumberish
+        tickLower: BigNumberish
+        tickUpper: BigNumberish
+        amount0Min: BigNumberish
+        amount1Min: BigNumberish
+        recipient: string
       },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    "multicall(bytes32,bytes[])"(
+    'multicall(bytes32,bytes[])'(
       previousBlockhash: BytesLike,
       data: BytesLike[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    "multicall(uint256,bytes[])"(
+    'multicall(uint256,bytes[])'(
       deadline: BigNumberish,
       data: BytesLike[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    "multicall(bytes[])"(
+    'multicall(bytes[])'(
       data: BytesLike[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    positionManager(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    positionManager(overrides?: CallOverrides): Promise<PopulatedTransaction>
 
     pull(
       token: string,
       value: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    refundETH(
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    refundETH(overrides?: PayableOverrides & { from?: string | Promise<string> }): Promise<PopulatedTransaction>
 
     selfPermit(
       token: string,
@@ -1648,7 +1486,7 @@ export class SwapRouter02 extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     selfPermitAllowed(
       token: string,
@@ -1658,7 +1496,7 @@ export class SwapRouter02 extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     selfPermitAllowedIfNecessary(
       token: string,
@@ -1668,7 +1506,7 @@ export class SwapRouter02 extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     selfPermitIfNecessary(
       token: string,
@@ -1678,7 +1516,7 @@ export class SwapRouter02 extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     swapExactTokensForTokens(
       amountIn: BigNumberish,
@@ -1686,7 +1524,7 @@ export class SwapRouter02 extends BaseContract {
       path: string[],
       to: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     swapTokensForExactTokens(
       amountOut: BigNumberish,
@@ -1694,74 +1532,74 @@ export class SwapRouter02 extends BaseContract {
       path: string[],
       to: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    "sweepToken(address,uint256,address)"(
+    'sweepToken(address,uint256,address)'(
       token: string,
       amountMinimum: BigNumberish,
       recipient: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    "sweepToken(address,uint256)"(
+    'sweepToken(address,uint256)'(
       token: string,
       amountMinimum: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    "sweepTokenWithFee(address,uint256,uint256,address)"(
+    'sweepTokenWithFee(address,uint256,uint256,address)'(
       token: string,
       amountMinimum: BigNumberish,
       feeBips: BigNumberish,
       feeRecipient: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    "sweepTokenWithFee(address,uint256,address,uint256,address)"(
+    'sweepTokenWithFee(address,uint256,address,uint256,address)'(
       token: string,
       amountMinimum: BigNumberish,
       recipient: string,
       feeBips: BigNumberish,
       feeRecipient: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     uniswapV3SwapCallback(
       amount0Delta: BigNumberish,
       amount1Delta: BigNumberish,
       _data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    "unwrapWETH9(uint256,address)"(
+    'unwrapWETH9(uint256,address)'(
       amountMinimum: BigNumberish,
       recipient: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    "unwrapWETH9(uint256)"(
+    'unwrapWETH9(uint256)'(
       amountMinimum: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    "unwrapWETH9WithFee(uint256,address,uint256,address)"(
+    'unwrapWETH9WithFee(uint256,address,uint256,address)'(
       amountMinimum: BigNumberish,
       recipient: string,
       feeBips: BigNumberish,
       feeRecipient: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    "unwrapWETH9WithFee(uint256,uint256,address)"(
+    'unwrapWETH9WithFee(uint256,uint256,address)'(
       amountMinimum: BigNumberish,
       feeBips: BigNumberish,
       feeRecipient: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     wrapETH(
       value: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-  };
+    ): Promise<PopulatedTransaction>
+  }
 }

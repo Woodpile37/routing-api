@@ -2,9 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { FunctionFragment, Result } from "@ethersproject/abi";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
+import { FunctionFragment, Result } from '@ethersproject/abi'
+import { BytesLike } from '@ethersproject/bytes'
+import { Listener, Provider } from '@ethersproject/providers'
 import {
   BaseContract,
   BigNumber,
@@ -15,69 +15,63 @@ import {
   Overrides,
   PopulatedTransaction,
   Signer,
-} from "ethers";
-import { TypedEvent, TypedEventFilter, TypedListener } from "./commons";
+} from 'ethers'
+import { TypedEvent, TypedEventFilter, TypedListener } from './commons'
 
 interface IUniswapV3MintCallbackInterface extends ethers.utils.Interface {
   functions: {
-    "uniswapV3MintCallback(uint256,uint256,bytes)": FunctionFragment;
-  };
+    'uniswapV3MintCallback(uint256,uint256,bytes)': FunctionFragment
+  }
 
-  encodeFunctionData(
-    functionFragment: "uniswapV3MintCallback",
-    values: [BigNumberish, BigNumberish, BytesLike]
-  ): string;
+  encodeFunctionData(functionFragment: 'uniswapV3MintCallback', values: [BigNumberish, BigNumberish, BytesLike]): string
 
-  decodeFunctionResult(
-    functionFragment: "uniswapV3MintCallback",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: 'uniswapV3MintCallback', data: BytesLike): Result
 
-  events: {};
+  events: {}
 }
 
 export class IUniswapV3MintCallback extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this;
-  attach(addressOrName: string): this;
-  deployed(): Promise<this>;
+  connect(signerOrProvider: Signer | Provider | string): this
+  attach(addressOrName: string): this
+  deployed(): Promise<this>
 
   listeners<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter?: TypedEventFilter<EventArgsArray, EventArgsObject>
-  ): Array<TypedListener<EventArgsArray, EventArgsObject>>;
+  ): Array<TypedListener<EventArgsArray, EventArgsObject>>
   off<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   on<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   once<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   removeListener<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   removeAllListeners<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
 
-  listeners(eventName?: string): Array<Listener>;
-  off(eventName: string, listener: Listener): this;
-  on(eventName: string, listener: Listener): this;
-  once(eventName: string, listener: Listener): this;
-  removeListener(eventName: string, listener: Listener): this;
-  removeAllListeners(eventName?: string): this;
+  listeners(eventName?: string): Array<Listener>
+  off(eventName: string, listener: Listener): this
+  on(eventName: string, listener: Listener): this
+  once(eventName: string, listener: Listener): this
+  removeListener(eventName: string, listener: Listener): this
+  removeAllListeners(eventName?: string): this
 
   queryFilter<EventArgsArray extends Array<any>, EventArgsObject>(
     event: TypedEventFilter<EventArgsArray, EventArgsObject>,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
+  ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>
 
-  interface: IUniswapV3MintCallbackInterface;
+  interface: IUniswapV3MintCallbackInterface
 
   functions: {
     uniswapV3MintCallback(
@@ -85,15 +79,15 @@ export class IUniswapV3MintCallback extends BaseContract {
       amount1Owed: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-  };
+    ): Promise<ContractTransaction>
+  }
 
   uniswapV3MintCallback(
     amount0Owed: BigNumberish,
     amount1Owed: BigNumberish,
     data: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   callStatic: {
     uniswapV3MintCallback(
@@ -101,10 +95,10 @@ export class IUniswapV3MintCallback extends BaseContract {
       amount1Owed: BigNumberish,
       data: BytesLike,
       overrides?: CallOverrides
-    ): Promise<void>;
-  };
+    ): Promise<void>
+  }
 
-  filters: {};
+  filters: {}
 
   estimateGas: {
     uniswapV3MintCallback(
@@ -112,8 +106,8 @@ export class IUniswapV3MintCallback extends BaseContract {
       amount1Owed: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-  };
+    ): Promise<BigNumber>
+  }
 
   populateTransaction: {
     uniswapV3MintCallback(
@@ -121,6 +115,6 @@ export class IUniswapV3MintCallback extends BaseContract {
       amount1Owed: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-  };
+    ): Promise<PopulatedTransaction>
+  }
 }

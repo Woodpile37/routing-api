@@ -2,9 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { FunctionFragment, Result } from "@ethersproject/abi";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
+import { FunctionFragment, Result } from '@ethersproject/abi'
+import { BytesLike } from '@ethersproject/bytes'
+import { Listener, Provider } from '@ethersproject/providers'
 import {
   BaseContract,
   BigNumber,
@@ -16,176 +16,127 @@ import {
   PayableOverrides,
   PopulatedTransaction,
   Signer,
-} from "ethers";
-import { TypedEvent, TypedEventFilter, TypedListener } from "./commons";
+} from 'ethers'
+import { TypedEvent, TypedEventFilter, TypedListener } from './commons'
 
 interface V3MigratorInterface extends ethers.utils.Interface {
   functions: {
-    "WETH9()": FunctionFragment;
-    "createAndInitializePoolIfNecessary(address,address,uint24,uint160)": FunctionFragment;
-    "factory()": FunctionFragment;
-    "migrate(tuple)": FunctionFragment;
-    "multicall(bytes[])": FunctionFragment;
-    "nonfungiblePositionManager()": FunctionFragment;
-    "selfPermit(address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;
-    "selfPermitAllowed(address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;
-    "selfPermitAllowedIfNecessary(address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;
-    "selfPermitIfNecessary(address,uint256,uint256,uint8,bytes32,bytes32)": FunctionFragment;
-  };
+    'WETH9()': FunctionFragment
+    'createAndInitializePoolIfNecessary(address,address,uint24,uint160)': FunctionFragment
+    'factory()': FunctionFragment
+    'migrate(tuple)': FunctionFragment
+    'multicall(bytes[])': FunctionFragment
+    'nonfungiblePositionManager()': FunctionFragment
+    'selfPermit(address,uint256,uint256,uint8,bytes32,bytes32)': FunctionFragment
+    'selfPermitAllowed(address,uint256,uint256,uint8,bytes32,bytes32)': FunctionFragment
+    'selfPermitAllowedIfNecessary(address,uint256,uint256,uint8,bytes32,bytes32)': FunctionFragment
+    'selfPermitIfNecessary(address,uint256,uint256,uint8,bytes32,bytes32)': FunctionFragment
+  }
 
-  encodeFunctionData(functionFragment: "WETH9", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'WETH9', values?: undefined): string
   encodeFunctionData(
-    functionFragment: "createAndInitializePoolIfNecessary",
+    functionFragment: 'createAndInitializePoolIfNecessary',
     values: [string, string, BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(functionFragment: "factory", values?: undefined): string;
+  ): string
+  encodeFunctionData(functionFragment: 'factory', values?: undefined): string
   encodeFunctionData(
-    functionFragment: "migrate",
+    functionFragment: 'migrate',
     values: [
       {
-        pair: string;
-        liquidityToMigrate: BigNumberish;
-        percentageToMigrate: BigNumberish;
-        token0: string;
-        token1: string;
-        fee: BigNumberish;
-        tickLower: BigNumberish;
-        tickUpper: BigNumberish;
-        amount0Min: BigNumberish;
-        amount1Min: BigNumberish;
-        recipient: string;
-        deadline: BigNumberish;
-        refundAsETH: boolean;
+        pair: string
+        liquidityToMigrate: BigNumberish
+        percentageToMigrate: BigNumberish
+        token0: string
+        token1: string
+        fee: BigNumberish
+        tickLower: BigNumberish
+        tickUpper: BigNumberish
+        amount0Min: BigNumberish
+        amount1Min: BigNumberish
+        recipient: string
+        deadline: BigNumberish
+        refundAsETH: boolean
       }
     ]
-  ): string;
+  ): string
+  encodeFunctionData(functionFragment: 'multicall', values: [BytesLike[]]): string
+  encodeFunctionData(functionFragment: 'nonfungiblePositionManager', values?: undefined): string
   encodeFunctionData(
-    functionFragment: "multicall",
-    values: [BytesLike[]]
-  ): string;
+    functionFragment: 'selfPermit',
+    values: [string, BigNumberish, BigNumberish, BigNumberish, BytesLike, BytesLike]
+  ): string
   encodeFunctionData(
-    functionFragment: "nonfungiblePositionManager",
-    values?: undefined
-  ): string;
+    functionFragment: 'selfPermitAllowed',
+    values: [string, BigNumberish, BigNumberish, BigNumberish, BytesLike, BytesLike]
+  ): string
   encodeFunctionData(
-    functionFragment: "selfPermit",
-    values: [
-      string,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BytesLike,
-      BytesLike
-    ]
-  ): string;
+    functionFragment: 'selfPermitAllowedIfNecessary',
+    values: [string, BigNumberish, BigNumberish, BigNumberish, BytesLike, BytesLike]
+  ): string
   encodeFunctionData(
-    functionFragment: "selfPermitAllowed",
-    values: [
-      string,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BytesLike,
-      BytesLike
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "selfPermitAllowedIfNecessary",
-    values: [
-      string,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BytesLike,
-      BytesLike
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "selfPermitIfNecessary",
-    values: [
-      string,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BytesLike,
-      BytesLike
-    ]
-  ): string;
+    functionFragment: 'selfPermitIfNecessary',
+    values: [string, BigNumberish, BigNumberish, BigNumberish, BytesLike, BytesLike]
+  ): string
 
-  decodeFunctionResult(functionFragment: "WETH9", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "createAndInitializePoolIfNecessary",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "factory", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "migrate", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "multicall", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "nonfungiblePositionManager",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "selfPermit", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "selfPermitAllowed",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "selfPermitAllowedIfNecessary",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "selfPermitIfNecessary",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: 'WETH9', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'createAndInitializePoolIfNecessary', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'factory', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'migrate', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'multicall', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'nonfungiblePositionManager', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'selfPermit', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'selfPermitAllowed', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'selfPermitAllowedIfNecessary', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'selfPermitIfNecessary', data: BytesLike): Result
 
-  events: {};
+  events: {}
 }
 
 export class V3Migrator extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this;
-  attach(addressOrName: string): this;
-  deployed(): Promise<this>;
+  connect(signerOrProvider: Signer | Provider | string): this
+  attach(addressOrName: string): this
+  deployed(): Promise<this>
 
   listeners<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter?: TypedEventFilter<EventArgsArray, EventArgsObject>
-  ): Array<TypedListener<EventArgsArray, EventArgsObject>>;
+  ): Array<TypedListener<EventArgsArray, EventArgsObject>>
   off<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   on<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   once<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   removeListener<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   removeAllListeners<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
 
-  listeners(eventName?: string): Array<Listener>;
-  off(eventName: string, listener: Listener): this;
-  on(eventName: string, listener: Listener): this;
-  once(eventName: string, listener: Listener): this;
-  removeListener(eventName: string, listener: Listener): this;
-  removeAllListeners(eventName?: string): this;
+  listeners(eventName?: string): Array<Listener>
+  off(eventName: string, listener: Listener): this
+  on(eventName: string, listener: Listener): this
+  once(eventName: string, listener: Listener): this
+  removeListener(eventName: string, listener: Listener): this
+  removeAllListeners(eventName?: string): this
 
   queryFilter<EventArgsArray extends Array<any>, EventArgsObject>(
     event: TypedEventFilter<EventArgsArray, EventArgsObject>,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
+  ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>
 
-  interface: V3MigratorInterface;
+  interface: V3MigratorInterface
 
   functions: {
-    WETH9(overrides?: CallOverrides): Promise<[string]>;
+    WETH9(overrides?: CallOverrides): Promise<[string]>
 
     createAndInitializePoolIfNecessary(
       token0: string,
@@ -193,35 +144,35 @@ export class V3Migrator extends BaseContract {
       fee: BigNumberish,
       sqrtPriceX96: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
-    factory(overrides?: CallOverrides): Promise<[string]>;
+    factory(overrides?: CallOverrides): Promise<[string]>
 
     migrate(
       params: {
-        pair: string;
-        liquidityToMigrate: BigNumberish;
-        percentageToMigrate: BigNumberish;
-        token0: string;
-        token1: string;
-        fee: BigNumberish;
-        tickLower: BigNumberish;
-        tickUpper: BigNumberish;
-        amount0Min: BigNumberish;
-        amount1Min: BigNumberish;
-        recipient: string;
-        deadline: BigNumberish;
-        refundAsETH: boolean;
+        pair: string
+        liquidityToMigrate: BigNumberish
+        percentageToMigrate: BigNumberish
+        token0: string
+        token1: string
+        fee: BigNumberish
+        tickLower: BigNumberish
+        tickUpper: BigNumberish
+        amount0Min: BigNumberish
+        amount1Min: BigNumberish
+        recipient: string
+        deadline: BigNumberish
+        refundAsETH: boolean
       },
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     multicall(
       data: BytesLike[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
-    nonfungiblePositionManager(overrides?: CallOverrides): Promise<[string]>;
+    nonfungiblePositionManager(overrides?: CallOverrides): Promise<[string]>
 
     selfPermit(
       token: string,
@@ -231,7 +182,7 @@ export class V3Migrator extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     selfPermitAllowed(
       token: string,
@@ -241,7 +192,7 @@ export class V3Migrator extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     selfPermitAllowedIfNecessary(
       token: string,
@@ -251,7 +202,7 @@ export class V3Migrator extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     selfPermitIfNecessary(
       token: string,
@@ -261,10 +212,10 @@ export class V3Migrator extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-  };
+    ): Promise<ContractTransaction>
+  }
 
-  WETH9(overrides?: CallOverrides): Promise<string>;
+  WETH9(overrides?: CallOverrides): Promise<string>
 
   createAndInitializePoolIfNecessary(
     token0: string,
@@ -272,35 +223,35 @@ export class V3Migrator extends BaseContract {
     fee: BigNumberish,
     sqrtPriceX96: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
-  factory(overrides?: CallOverrides): Promise<string>;
+  factory(overrides?: CallOverrides): Promise<string>
 
   migrate(
     params: {
-      pair: string;
-      liquidityToMigrate: BigNumberish;
-      percentageToMigrate: BigNumberish;
-      token0: string;
-      token1: string;
-      fee: BigNumberish;
-      tickLower: BigNumberish;
-      tickUpper: BigNumberish;
-      amount0Min: BigNumberish;
-      amount1Min: BigNumberish;
-      recipient: string;
-      deadline: BigNumberish;
-      refundAsETH: boolean;
+      pair: string
+      liquidityToMigrate: BigNumberish
+      percentageToMigrate: BigNumberish
+      token0: string
+      token1: string
+      fee: BigNumberish
+      tickLower: BigNumberish
+      tickUpper: BigNumberish
+      amount0Min: BigNumberish
+      amount1Min: BigNumberish
+      recipient: string
+      deadline: BigNumberish
+      refundAsETH: boolean
     },
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   multicall(
     data: BytesLike[],
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
-  nonfungiblePositionManager(overrides?: CallOverrides): Promise<string>;
+  nonfungiblePositionManager(overrides?: CallOverrides): Promise<string>
 
   selfPermit(
     token: string,
@@ -310,7 +261,7 @@ export class V3Migrator extends BaseContract {
     r: BytesLike,
     s: BytesLike,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   selfPermitAllowed(
     token: string,
@@ -320,7 +271,7 @@ export class V3Migrator extends BaseContract {
     r: BytesLike,
     s: BytesLike,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   selfPermitAllowedIfNecessary(
     token: string,
@@ -330,7 +281,7 @@ export class V3Migrator extends BaseContract {
     r: BytesLike,
     s: BytesLike,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   selfPermitIfNecessary(
     token: string,
@@ -340,10 +291,10 @@ export class V3Migrator extends BaseContract {
     r: BytesLike,
     s: BytesLike,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   callStatic: {
-    WETH9(overrides?: CallOverrides): Promise<string>;
+    WETH9(overrides?: CallOverrides): Promise<string>
 
     createAndInitializePoolIfNecessary(
       token0: string,
@@ -351,32 +302,32 @@ export class V3Migrator extends BaseContract {
       fee: BigNumberish,
       sqrtPriceX96: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<string>;
+    ): Promise<string>
 
-    factory(overrides?: CallOverrides): Promise<string>;
+    factory(overrides?: CallOverrides): Promise<string>
 
     migrate(
       params: {
-        pair: string;
-        liquidityToMigrate: BigNumberish;
-        percentageToMigrate: BigNumberish;
-        token0: string;
-        token1: string;
-        fee: BigNumberish;
-        tickLower: BigNumberish;
-        tickUpper: BigNumberish;
-        amount0Min: BigNumberish;
-        amount1Min: BigNumberish;
-        recipient: string;
-        deadline: BigNumberish;
-        refundAsETH: boolean;
+        pair: string
+        liquidityToMigrate: BigNumberish
+        percentageToMigrate: BigNumberish
+        token0: string
+        token1: string
+        fee: BigNumberish
+        tickLower: BigNumberish
+        tickUpper: BigNumberish
+        amount0Min: BigNumberish
+        amount1Min: BigNumberish
+        recipient: string
+        deadline: BigNumberish
+        refundAsETH: boolean
       },
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
-    multicall(data: BytesLike[], overrides?: CallOverrides): Promise<string[]>;
+    multicall(data: BytesLike[], overrides?: CallOverrides): Promise<string[]>
 
-    nonfungiblePositionManager(overrides?: CallOverrides): Promise<string>;
+    nonfungiblePositionManager(overrides?: CallOverrides): Promise<string>
 
     selfPermit(
       token: string,
@@ -386,7 +337,7 @@ export class V3Migrator extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
     selfPermitAllowed(
       token: string,
@@ -396,7 +347,7 @@ export class V3Migrator extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
     selfPermitAllowedIfNecessary(
       token: string,
@@ -406,7 +357,7 @@ export class V3Migrator extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
     selfPermitIfNecessary(
       token: string,
@@ -416,13 +367,13 @@ export class V3Migrator extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: CallOverrides
-    ): Promise<void>;
-  };
+    ): Promise<void>
+  }
 
-  filters: {};
+  filters: {}
 
   estimateGas: {
-    WETH9(overrides?: CallOverrides): Promise<BigNumber>;
+    WETH9(overrides?: CallOverrides): Promise<BigNumber>
 
     createAndInitializePoolIfNecessary(
       token0: string,
@@ -430,35 +381,32 @@ export class V3Migrator extends BaseContract {
       fee: BigNumberish,
       sqrtPriceX96: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    factory(overrides?: CallOverrides): Promise<BigNumber>;
+    factory(overrides?: CallOverrides): Promise<BigNumber>
 
     migrate(
       params: {
-        pair: string;
-        liquidityToMigrate: BigNumberish;
-        percentageToMigrate: BigNumberish;
-        token0: string;
-        token1: string;
-        fee: BigNumberish;
-        tickLower: BigNumberish;
-        tickUpper: BigNumberish;
-        amount0Min: BigNumberish;
-        amount1Min: BigNumberish;
-        recipient: string;
-        deadline: BigNumberish;
-        refundAsETH: boolean;
+        pair: string
+        liquidityToMigrate: BigNumberish
+        percentageToMigrate: BigNumberish
+        token0: string
+        token1: string
+        fee: BigNumberish
+        tickLower: BigNumberish
+        tickUpper: BigNumberish
+        amount0Min: BigNumberish
+        amount1Min: BigNumberish
+        recipient: string
+        deadline: BigNumberish
+        refundAsETH: boolean
       },
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    multicall(
-      data: BytesLike[],
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    multicall(data: BytesLike[], overrides?: PayableOverrides & { from?: string | Promise<string> }): Promise<BigNumber>
 
-    nonfungiblePositionManager(overrides?: CallOverrides): Promise<BigNumber>;
+    nonfungiblePositionManager(overrides?: CallOverrides): Promise<BigNumber>
 
     selfPermit(
       token: string,
@@ -468,7 +416,7 @@ export class V3Migrator extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     selfPermitAllowed(
       token: string,
@@ -478,7 +426,7 @@ export class V3Migrator extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     selfPermitAllowedIfNecessary(
       token: string,
@@ -488,7 +436,7 @@ export class V3Migrator extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     selfPermitIfNecessary(
       token: string,
@@ -498,11 +446,11 @@ export class V3Migrator extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-  };
+    ): Promise<BigNumber>
+  }
 
   populateTransaction: {
-    WETH9(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    WETH9(overrides?: CallOverrides): Promise<PopulatedTransaction>
 
     createAndInitializePoolIfNecessary(
       token0: string,
@@ -510,37 +458,35 @@ export class V3Migrator extends BaseContract {
       fee: BigNumberish,
       sqrtPriceX96: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    factory(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    factory(overrides?: CallOverrides): Promise<PopulatedTransaction>
 
     migrate(
       params: {
-        pair: string;
-        liquidityToMigrate: BigNumberish;
-        percentageToMigrate: BigNumberish;
-        token0: string;
-        token1: string;
-        fee: BigNumberish;
-        tickLower: BigNumberish;
-        tickUpper: BigNumberish;
-        amount0Min: BigNumberish;
-        amount1Min: BigNumberish;
-        recipient: string;
-        deadline: BigNumberish;
-        refundAsETH: boolean;
+        pair: string
+        liquidityToMigrate: BigNumberish
+        percentageToMigrate: BigNumberish
+        token0: string
+        token1: string
+        fee: BigNumberish
+        tickLower: BigNumberish
+        tickUpper: BigNumberish
+        amount0Min: BigNumberish
+        amount1Min: BigNumberish
+        recipient: string
+        deadline: BigNumberish
+        refundAsETH: boolean
       },
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     multicall(
       data: BytesLike[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    nonfungiblePositionManager(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    nonfungiblePositionManager(overrides?: CallOverrides): Promise<PopulatedTransaction>
 
     selfPermit(
       token: string,
@@ -550,7 +496,7 @@ export class V3Migrator extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     selfPermitAllowed(
       token: string,
@@ -560,7 +506,7 @@ export class V3Migrator extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     selfPermitAllowedIfNecessary(
       token: string,
@@ -570,7 +516,7 @@ export class V3Migrator extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     selfPermitIfNecessary(
       token: string,
@@ -580,6 +526,6 @@ export class V3Migrator extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-  };
+    ): Promise<PopulatedTransaction>
+  }
 }

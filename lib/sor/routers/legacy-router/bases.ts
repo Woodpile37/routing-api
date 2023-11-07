@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { ChainId, Token } from '@uniswap/sdk-core';
+import { ChainId, Token } from '@uniswap/sdk-core'
 
 import {
   BTC_BNB,
@@ -17,17 +17,14 @@ import {
   WBTC_MAINNET,
   WMATIC_POLYGON,
   WMATIC_POLYGON_MUMBAI,
-
-} from '../../providers/token-provider';
-import { WRAPPED_NATIVE_CURRENCY } from '../../util/chains';
+} from '../../providers/token-provider'
+import { WRAPPED_NATIVE_CURRENCY } from '../../util/chains'
 
 type ChainTokenList = {
-  readonly [chainId in ChainId]: Token[];
-};
+  readonly [chainId in ChainId]: Token[]
+}
 
-export const BASES_TO_CHECK_TRADES_AGAINST = (
-  _tokenProvider: ITokenProvider
-): ChainTokenList => {
+export const BASES_TO_CHECK_TRADES_AGAINST = (_tokenProvider: ITokenProvider): ChainTokenList => {
   return {
     [ChainId.MAINNET]: [
       WRAPPED_NATIVE_CURRENCY[ChainId.MAINNET]!,
@@ -39,32 +36,21 @@ export const BASES_TO_CHECK_TRADES_AGAINST = (
     [ChainId.GOERLI]: [WRAPPED_NATIVE_CURRENCY[ChainId.GOERLI]!],
     [ChainId.SEPOLIA]: [WRAPPED_NATIVE_CURRENCY[ChainId.SEPOLIA]!],
     [ChainId.OPTIMISM]: [WRAPPED_NATIVE_CURRENCY[ChainId.OPTIMISM]!],
-    [ChainId.OPTIMISM_GOERLI]: [
-      WRAPPED_NATIVE_CURRENCY[ChainId.OPTIMISM_GOERLI]!,
-    ],
+    [ChainId.OPTIMISM_GOERLI]: [WRAPPED_NATIVE_CURRENCY[ChainId.OPTIMISM_GOERLI]!],
     [ChainId.ARBITRUM_ONE]: [WRAPPED_NATIVE_CURRENCY[ChainId.ARBITRUM_ONE]!],
-    [ChainId.ARBITRUM_GOERLI]: [
-      WRAPPED_NATIVE_CURRENCY[ChainId.ARBITRUM_GOERLI]!,
-    ],
+    [ChainId.ARBITRUM_GOERLI]: [WRAPPED_NATIVE_CURRENCY[ChainId.ARBITRUM_GOERLI]!],
     [ChainId.POLYGON]: [WMATIC_POLYGON],
     [ChainId.POLYGON_MUMBAI]: [WMATIC_POLYGON_MUMBAI],
     [ChainId.CELO]: [WRAPPED_NATIVE_CURRENCY[ChainId.CELO]],
     [ChainId.CELO_ALFAJORES]: [WRAPPED_NATIVE_CURRENCY[ChainId.CELO_ALFAJORES]],
     [ChainId.GNOSIS]: [WRAPPED_NATIVE_CURRENCY[ChainId.GNOSIS]],
     [ChainId.MOONBEAM]: [WRAPPED_NATIVE_CURRENCY[ChainId.MOONBEAM]],
-    [ChainId.BNB]: [
-      WRAPPED_NATIVE_CURRENCY[ChainId.BNB]!,
-      BUSD_BNB,
-      DAI_BNB,
-      USDC_BNB,
-      USDT_BNB,
-      BTC_BNB,
-    ],
+    [ChainId.BNB]: [WRAPPED_NATIVE_CURRENCY[ChainId.BNB]!, BUSD_BNB, DAI_BNB, USDC_BNB, USDT_BNB, BTC_BNB],
     [ChainId.AVALANCHE]: [WRAPPED_NATIVE_CURRENCY[ChainId.AVALANCHE]!, USDC_AVAX, DAI_AVAX],
     [ChainId.BASE]: [WRAPPED_NATIVE_CURRENCY[ChainId.BASE]!, USDC_BASE],
     [ChainId.BASE_GOERLI]: [WRAPPED_NATIVE_CURRENCY[ChainId.BASE_GOERLI]!],
-  };
-};
+  }
+}
 
 const getBasePairByAddress = async (
   tokenProvider: ITokenProvider,
@@ -72,20 +58,20 @@ const getBasePairByAddress = async (
   fromAddress: string,
   toAddress: string
 ): Promise<{ [tokenAddress: string]: Token[] }> => {
-  const accessor = await tokenProvider.getTokens([toAddress]);
-  const toToken: Token | undefined = accessor.getTokenByAddress(toAddress);
+  const accessor = await tokenProvider.getTokens([toAddress])
+  const toToken: Token | undefined = accessor.getTokenByAddress(toAddress)
 
-  if (!toToken) return {};
+  if (!toToken) return {}
 
   return {
     [fromAddress]: [toToken],
-  };
-};
+  }
+}
 
 export const ADDITIONAL_BASES = async (
   tokenProvider: ITokenProvider
 ): Promise<{
-  [chainId in ChainId]?: { [tokenAddress: string]: Token[] };
+  [chainId in ChainId]?: { [tokenAddress: string]: Token[] }
 }> => {
   return {
     [ChainId.MAINNET]: {
@@ -138,8 +124,8 @@ export const ADDITIONAL_BASES = async (
         '0x2260fac5e5542a773aa44fbcfedf7c193bc2c599'
       )),
     },
-  };
-};
+  }
+}
 
 /**
  * Some tokens can only be swapped via certain pairs, so we override the list of bases that are considered for these
@@ -148,7 +134,7 @@ export const ADDITIONAL_BASES = async (
 export const CUSTOM_BASES = async (
   tokenProvider: ITokenProvider
 ): Promise<{
-  [chainId in ChainId]?: { [tokenAddress: string]: Token[] };
+  [chainId in ChainId]?: { [tokenAddress: string]: Token[] }
 }> => {
   return {
     [ChainId.MAINNET]: {
@@ -165,5 +151,5 @@ export const CUSTOM_BASES = async (
         WRAPPED_NATIVE_CURRENCY[1]!.address
       )),
     },
-  };
-};
+  }
+}

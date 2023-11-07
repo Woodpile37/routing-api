@@ -2,9 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { FunctionFragment, Result } from "@ethersproject/abi";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
+import { FunctionFragment, Result } from '@ethersproject/abi'
+import { BytesLike } from '@ethersproject/bytes'
+import { Listener, Provider } from '@ethersproject/providers'
 import {
   BaseContract,
   BigNumber,
@@ -15,69 +15,63 @@ import {
   Overrides,
   PopulatedTransaction,
   Signer,
-} from "ethers";
-import { TypedEvent, TypedEventFilter, TypedListener } from "./commons";
+} from 'ethers'
+import { TypedEvent, TypedEventFilter, TypedListener } from './commons'
 
 interface IUniswapV2CalleeInterface extends ethers.utils.Interface {
   functions: {
-    "uniswapV2Call(address,uint256,uint256,bytes)": FunctionFragment;
-  };
+    'uniswapV2Call(address,uint256,uint256,bytes)': FunctionFragment
+  }
 
-  encodeFunctionData(
-    functionFragment: "uniswapV2Call",
-    values: [string, BigNumberish, BigNumberish, BytesLike]
-  ): string;
+  encodeFunctionData(functionFragment: 'uniswapV2Call', values: [string, BigNumberish, BigNumberish, BytesLike]): string
 
-  decodeFunctionResult(
-    functionFragment: "uniswapV2Call",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: 'uniswapV2Call', data: BytesLike): Result
 
-  events: {};
+  events: {}
 }
 
 export class IUniswapV2Callee extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this;
-  attach(addressOrName: string): this;
-  deployed(): Promise<this>;
+  connect(signerOrProvider: Signer | Provider | string): this
+  attach(addressOrName: string): this
+  deployed(): Promise<this>
 
   listeners<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter?: TypedEventFilter<EventArgsArray, EventArgsObject>
-  ): Array<TypedListener<EventArgsArray, EventArgsObject>>;
+  ): Array<TypedListener<EventArgsArray, EventArgsObject>>
   off<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   on<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   once<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   removeListener<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   removeAllListeners<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
 
-  listeners(eventName?: string): Array<Listener>;
-  off(eventName: string, listener: Listener): this;
-  on(eventName: string, listener: Listener): this;
-  once(eventName: string, listener: Listener): this;
-  removeListener(eventName: string, listener: Listener): this;
-  removeAllListeners(eventName?: string): this;
+  listeners(eventName?: string): Array<Listener>
+  off(eventName: string, listener: Listener): this
+  on(eventName: string, listener: Listener): this
+  once(eventName: string, listener: Listener): this
+  removeListener(eventName: string, listener: Listener): this
+  removeAllListeners(eventName?: string): this
 
   queryFilter<EventArgsArray extends Array<any>, EventArgsObject>(
     event: TypedEventFilter<EventArgsArray, EventArgsObject>,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
+  ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>
 
-  interface: IUniswapV2CalleeInterface;
+  interface: IUniswapV2CalleeInterface
 
   functions: {
     uniswapV2Call(
@@ -86,8 +80,8 @@ export class IUniswapV2Callee extends BaseContract {
       amount1: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-  };
+    ): Promise<ContractTransaction>
+  }
 
   uniswapV2Call(
     sender: string,
@@ -95,7 +89,7 @@ export class IUniswapV2Callee extends BaseContract {
     amount1: BigNumberish,
     data: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   callStatic: {
     uniswapV2Call(
@@ -104,10 +98,10 @@ export class IUniswapV2Callee extends BaseContract {
       amount1: BigNumberish,
       data: BytesLike,
       overrides?: CallOverrides
-    ): Promise<void>;
-  };
+    ): Promise<void>
+  }
 
-  filters: {};
+  filters: {}
 
   estimateGas: {
     uniswapV2Call(
@@ -116,8 +110,8 @@ export class IUniswapV2Callee extends BaseContract {
       amount1: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-  };
+    ): Promise<BigNumber>
+  }
 
   populateTransaction: {
     uniswapV2Call(
@@ -126,6 +120,6 @@ export class IUniswapV2Callee extends BaseContract {
       amount1: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-  };
+    ): Promise<PopulatedTransaction>
+  }
 }

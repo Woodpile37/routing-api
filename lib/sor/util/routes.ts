@@ -1,29 +1,24 @@
-import { Protocol } from '@uniswap/router-sdk';
-import { Percent } from '@uniswap/sdk-core';
-import { Pair } from '@uniswap/v2-sdk';
-import { Pool } from '@uniswap/v3-sdk';
-import _ from 'lodash';
+import { Protocol } from '@uniswap/router-sdk'
+import { Percent } from '@uniswap/sdk-core'
+import { Pair } from '@uniswap/v2-sdk'
+import { Pool } from '@uniswap/v3-sdk'
+import _ from 'lodash'
 
-import { RouteWithValidQuote } from '../routers/alpha-router';
-import { MixedRoute, V2Route, V3Route } from '../routers/router';
-import { V3_CORE_FACTORY_ADDRESSES } from './addresses';
+import { RouteWithValidQuote } from '../routers/alpha-router'
+import { MixedRoute, V2Route, V3Route } from '../routers/router'
+import { V3_CORE_FACTORY_ADDRESSES } from './addresses'
 
-import { CurrencyAmount } from '.';
+import { CurrencyAmount } from '.'
 
-export const routeToString = (
-  route: V3Route | V2Route | MixedRoute
-): string => {
-  const routeStr = [];
+export const routeToString = (route: V3Route | V2Route | MixedRoute): string => {
+  const routeStr = []
   const tokens =
     route.protocol === Protocol.V3
       ? route.tokenPath
       : // MixedRoute and V2Route have path
-        route.path;
-  const tokenPath = _.map(tokens, (token) => `${token.symbol}`);
-  const pools =
-    route.protocol === Protocol.V3 || route.protocol === Protocol.MIXED
-      ? route.pools
-      : route.pairs;
+        route.path
+  const tokenPath = _.map(tokens, (token) => `${token.symbol}`)
+  const pools = route.protocol === Protocol.V3 || route.protocol === Protocol.MIXED ? route.pools : route.pairs
   const poolFeePath = _.map(pools, (pool) => {
     return `${
       pool instanceof Pool
@@ -34,55 +29,44 @@ export const routeToString = (
             undefined,
             V3_CORE_FACTORY_ADDRESSES[pool.chainId]
           )}]`
-        : ` -- [${Pair.getAddress(
-            (pool as Pair).token0,
-            (pool as Pair).token1
-          )}]`
-    } --> `;
-  });
+        : ` -- [${Pair.getAddress((pool as Pair).token0, (pool as Pair).token1)}]`
+    } --> `
+  })
 
   for (let i = 0; i < tokenPath.length; i++) {
-    routeStr.push(tokenPath[i]);
+    routeStr.push(tokenPath[i])
     if (i < poolFeePath.length) {
-      routeStr.push(poolFeePath[i]);
+      routeStr.push(poolFeePath[i])
     }
   }
 
-  return routeStr.join('');
-};
+  return routeStr.join('')
+}
 
-export const routeAmountsToString = (
-  routeAmounts: RouteWithValidQuote[]
-): string => {
+export const routeAmountsToString = (routeAmounts: RouteWithValidQuote[]): string => {
   const total = _.reduce(
     routeAmounts,
     (total: CurrencyAmount, cur: RouteWithValidQuote) => {
-      return total.add(cur.amount);
+      return total.add(cur.amount)
     },
     CurrencyAmount.fromRawAmount(routeAmounts[0]!.amount.currency, 0)
-  );
+  )
 
   const routeStrings = _.map(routeAmounts, ({ protocol, route, amount }) => {
-    const portion = amount.divide(total);
-    const percent = new Percent(portion.numerator, portion.denominator);
+    const portion = amount.divide(total)
+    const percent = new Percent(portion.numerator, portion.denominator)
     /// @dev special case for MIXED routes we want to show user friendly V2+V3 instead
-    return `[${
-      protocol == Protocol.MIXED ? 'V2 + V3' : protocol
-    }] ${percent.toFixed(2)}% = ${routeToString(route)}`;
-  });
+    return `[${protocol == Protocol.MIXED ? 'V2 + V3' : protocol}] ${percent.toFixed(2)}% = ${routeToString(route)}`
+  })
 
-  return _.join(routeStrings, ', ');
-};
+  return _.join(routeStrings, ', ')
+}
 
-export const routeAmountToString = (
-  routeAmount: RouteWithValidQuote
-): string => {
-  const { route, amount } = routeAmount;
-  return `${amount.toExact()} = ${routeToString(route)}`;
-};
+export const routeAmountToString = (routeAmount: RouteWithValidQuote): string => {
+  const { route, amount } = routeAmount
+  return `${amount.toExact()} = ${routeToString(route)}`
+}
 
 export const poolToString = (p: Pool | Pair): string => {
-  return `${p.token0.symbol}/${p.token1.symbol}${
-    p instanceof Pool ? `/${p.fee / 10000}%` : ``
-  }`;
-};
+  return `${p.token0.symbol}/${p.token1.symbol}${p instanceof Pool ? `/${p.fee / 10000}%` : ``}`
+}

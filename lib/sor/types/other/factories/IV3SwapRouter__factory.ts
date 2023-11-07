@@ -2,9 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Provider } from "@ethersproject/providers";
-import { Contract, Signer, utils } from "ethers";
-import type { IV3SwapRouter, IV3SwapRouterInterface } from "../IV3SwapRouter";
+import { Provider } from '@ethersproject/providers'
+import { Contract, Signer, utils } from 'ethers'
+import type { IV3SwapRouter, IV3SwapRouterInterface } from '../IV3SwapRouter'
 
 const _abi = [
   {
@@ -12,229 +12,226 @@ const _abi = [
       {
         components: [
           {
-            internalType: "bytes",
-            name: "path",
-            type: "bytes",
+            internalType: 'bytes',
+            name: 'path',
+            type: 'bytes',
           },
           {
-            internalType: "address",
-            name: "recipient",
-            type: "address",
+            internalType: 'address',
+            name: 'recipient',
+            type: 'address',
           },
           {
-            internalType: "uint256",
-            name: "amountIn",
-            type: "uint256",
+            internalType: 'uint256',
+            name: 'amountIn',
+            type: 'uint256',
           },
           {
-            internalType: "uint256",
-            name: "amountOutMinimum",
-            type: "uint256",
+            internalType: 'uint256',
+            name: 'amountOutMinimum',
+            type: 'uint256',
           },
         ],
-        internalType: "struct IV3SwapRouter.ExactInputParams",
-        name: "params",
-        type: "tuple",
+        internalType: 'struct IV3SwapRouter.ExactInputParams',
+        name: 'params',
+        type: 'tuple',
       },
     ],
-    name: "exactInput",
+    name: 'exactInput',
     outputs: [
       {
-        internalType: "uint256",
-        name: "amountOut",
-        type: "uint256",
+        internalType: 'uint256',
+        name: 'amountOut',
+        type: 'uint256',
       },
     ],
-    stateMutability: "payable",
-    type: "function",
+    stateMutability: 'payable',
+    type: 'function',
   },
   {
     inputs: [
       {
         components: [
           {
-            internalType: "address",
-            name: "tokenIn",
-            type: "address",
+            internalType: 'address',
+            name: 'tokenIn',
+            type: 'address',
           },
           {
-            internalType: "address",
-            name: "tokenOut",
-            type: "address",
+            internalType: 'address',
+            name: 'tokenOut',
+            type: 'address',
           },
           {
-            internalType: "uint24",
-            name: "fee",
-            type: "uint24",
+            internalType: 'uint24',
+            name: 'fee',
+            type: 'uint24',
           },
           {
-            internalType: "address",
-            name: "recipient",
-            type: "address",
+            internalType: 'address',
+            name: 'recipient',
+            type: 'address',
           },
           {
-            internalType: "uint256",
-            name: "amountIn",
-            type: "uint256",
+            internalType: 'uint256',
+            name: 'amountIn',
+            type: 'uint256',
           },
           {
-            internalType: "uint256",
-            name: "amountOutMinimum",
-            type: "uint256",
+            internalType: 'uint256',
+            name: 'amountOutMinimum',
+            type: 'uint256',
           },
           {
-            internalType: "uint160",
-            name: "sqrtPriceLimitX96",
-            type: "uint160",
+            internalType: 'uint160',
+            name: 'sqrtPriceLimitX96',
+            type: 'uint160',
           },
         ],
-        internalType: "struct IV3SwapRouter.ExactInputSingleParams",
-        name: "params",
-        type: "tuple",
+        internalType: 'struct IV3SwapRouter.ExactInputSingleParams',
+        name: 'params',
+        type: 'tuple',
       },
     ],
-    name: "exactInputSingle",
+    name: 'exactInputSingle',
     outputs: [
       {
-        internalType: "uint256",
-        name: "amountOut",
-        type: "uint256",
+        internalType: 'uint256',
+        name: 'amountOut',
+        type: 'uint256',
       },
     ],
-    stateMutability: "payable",
-    type: "function",
+    stateMutability: 'payable',
+    type: 'function',
   },
   {
     inputs: [
       {
         components: [
           {
-            internalType: "bytes",
-            name: "path",
-            type: "bytes",
+            internalType: 'bytes',
+            name: 'path',
+            type: 'bytes',
           },
           {
-            internalType: "address",
-            name: "recipient",
-            type: "address",
+            internalType: 'address',
+            name: 'recipient',
+            type: 'address',
           },
           {
-            internalType: "uint256",
-            name: "amountOut",
-            type: "uint256",
+            internalType: 'uint256',
+            name: 'amountOut',
+            type: 'uint256',
           },
           {
-            internalType: "uint256",
-            name: "amountInMaximum",
-            type: "uint256",
+            internalType: 'uint256',
+            name: 'amountInMaximum',
+            type: 'uint256',
           },
         ],
-        internalType: "struct IV3SwapRouter.ExactOutputParams",
-        name: "params",
-        type: "tuple",
+        internalType: 'struct IV3SwapRouter.ExactOutputParams',
+        name: 'params',
+        type: 'tuple',
       },
     ],
-    name: "exactOutput",
+    name: 'exactOutput',
     outputs: [
       {
-        internalType: "uint256",
-        name: "amountIn",
-        type: "uint256",
+        internalType: 'uint256',
+        name: 'amountIn',
+        type: 'uint256',
       },
     ],
-    stateMutability: "payable",
-    type: "function",
+    stateMutability: 'payable',
+    type: 'function',
   },
   {
     inputs: [
       {
         components: [
           {
-            internalType: "address",
-            name: "tokenIn",
-            type: "address",
+            internalType: 'address',
+            name: 'tokenIn',
+            type: 'address',
           },
           {
-            internalType: "address",
-            name: "tokenOut",
-            type: "address",
+            internalType: 'address',
+            name: 'tokenOut',
+            type: 'address',
           },
           {
-            internalType: "uint24",
-            name: "fee",
-            type: "uint24",
+            internalType: 'uint24',
+            name: 'fee',
+            type: 'uint24',
           },
           {
-            internalType: "address",
-            name: "recipient",
-            type: "address",
+            internalType: 'address',
+            name: 'recipient',
+            type: 'address',
           },
           {
-            internalType: "uint256",
-            name: "amountOut",
-            type: "uint256",
+            internalType: 'uint256',
+            name: 'amountOut',
+            type: 'uint256',
           },
           {
-            internalType: "uint256",
-            name: "amountInMaximum",
-            type: "uint256",
+            internalType: 'uint256',
+            name: 'amountInMaximum',
+            type: 'uint256',
           },
           {
-            internalType: "uint160",
-            name: "sqrtPriceLimitX96",
-            type: "uint160",
+            internalType: 'uint160',
+            name: 'sqrtPriceLimitX96',
+            type: 'uint160',
           },
         ],
-        internalType: "struct IV3SwapRouter.ExactOutputSingleParams",
-        name: "params",
-        type: "tuple",
+        internalType: 'struct IV3SwapRouter.ExactOutputSingleParams',
+        name: 'params',
+        type: 'tuple',
       },
     ],
-    name: "exactOutputSingle",
+    name: 'exactOutputSingle',
     outputs: [
       {
-        internalType: "uint256",
-        name: "amountIn",
-        type: "uint256",
+        internalType: 'uint256',
+        name: 'amountIn',
+        type: 'uint256',
       },
     ],
-    stateMutability: "payable",
-    type: "function",
+    stateMutability: 'payable',
+    type: 'function',
   },
   {
     inputs: [
       {
-        internalType: "int256",
-        name: "amount0Delta",
-        type: "int256",
+        internalType: 'int256',
+        name: 'amount0Delta',
+        type: 'int256',
       },
       {
-        internalType: "int256",
-        name: "amount1Delta",
-        type: "int256",
+        internalType: 'int256',
+        name: 'amount1Delta',
+        type: 'int256',
       },
       {
-        internalType: "bytes",
-        name: "data",
-        type: "bytes",
+        internalType: 'bytes',
+        name: 'data',
+        type: 'bytes',
       },
     ],
-    name: "uniswapV3SwapCallback",
+    name: 'uniswapV3SwapCallback',
     outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
-];
+]
 
 export class IV3SwapRouter__factory {
-  static readonly abi = _abi;
+  static readonly abi = _abi
   static createInterface(): IV3SwapRouterInterface {
-    return new utils.Interface(_abi) as IV3SwapRouterInterface;
+    return new utils.Interface(_abi) as IV3SwapRouterInterface
   }
-  static connect(
-    address: string,
-    signerOrProvider: Signer | Provider
-  ): IV3SwapRouter {
-    return new Contract(address, _abi, signerOrProvider) as IV3SwapRouter;
+  static connect(address: string, signerOrProvider: Signer | Provider): IV3SwapRouter {
+    return new Contract(address, _abi, signerOrProvider) as IV3SwapRouter
   }
 }

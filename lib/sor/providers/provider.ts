@@ -2,14 +2,14 @@ export type ProviderConfig = {
   /**
    * The block number to use when getting data on-chain.
    */
-  blockNumber?: number | Promise<number>;
+  blockNumber?: number | Promise<number>
   /*
-  * Debug flag to test some codepaths
+   * Debug flag to test some codepaths
    */
-  debugRouting?: boolean;
-};
+  debugRouting?: boolean
+}
 
 export type LocalCacheEntry<T> = {
-  entry: T;
-  blockNumber: number;
-};
+  entry: T
+  blockNumber: number
+}

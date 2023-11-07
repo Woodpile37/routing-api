@@ -2,9 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { FunctionFragment, Result } from "@ethersproject/abi";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
+import { FunctionFragment, Result } from '@ethersproject/abi'
+import { BytesLike } from '@ethersproject/bytes'
+import { Listener, Provider } from '@ethersproject/providers'
 import {
   BaseContract,
   BigNumber,
@@ -16,119 +16,66 @@ import {
   PayableOverrides,
   PopulatedTransaction,
   Signer,
-} from "ethers";
-import { TypedEvent, TypedEventFilter, TypedListener } from "./commons";
+} from 'ethers'
+import { TypedEvent, TypedEventFilter, TypedListener } from './commons'
 
 interface UniswapV2Router02Interface extends ethers.utils.Interface {
   functions: {
-    "WETH()": FunctionFragment;
-    "addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256)": FunctionFragment;
-    "addLiquidityETH(address,uint256,uint256,uint256,address,uint256)": FunctionFragment;
-    "factory()": FunctionFragment;
-    "getAmountIn(uint256,uint256,uint256)": FunctionFragment;
-    "getAmountOut(uint256,uint256,uint256)": FunctionFragment;
-    "getAmountsIn(uint256,address[])": FunctionFragment;
-    "getAmountsOut(uint256,address[])": FunctionFragment;
-    "quote(uint256,uint256,uint256)": FunctionFragment;
-    "removeLiquidity(address,address,uint256,uint256,uint256,address,uint256)": FunctionFragment;
-    "removeLiquidityETH(address,uint256,uint256,uint256,address,uint256)": FunctionFragment;
-    "removeLiquidityETHSupportingFeeOnTransferTokens(address,uint256,uint256,uint256,address,uint256)": FunctionFragment;
-    "removeLiquidityETHWithPermit(address,uint256,uint256,uint256,address,uint256,bool,uint8,bytes32,bytes32)": FunctionFragment;
-    "removeLiquidityETHWithPermitSupportingFeeOnTransferTokens(address,uint256,uint256,uint256,address,uint256,bool,uint8,bytes32,bytes32)": FunctionFragment;
-    "removeLiquidityWithPermit(address,address,uint256,uint256,uint256,address,uint256,bool,uint8,bytes32,bytes32)": FunctionFragment;
-    "swapETHForExactTokens(uint256,address[],address,uint256)": FunctionFragment;
-    "swapExactETHForTokens(uint256,address[],address,uint256)": FunctionFragment;
-    "swapExactETHForTokensSupportingFeeOnTransferTokens(uint256,address[],address,uint256)": FunctionFragment;
-    "swapExactTokensForETH(uint256,uint256,address[],address,uint256)": FunctionFragment;
-    "swapExactTokensForETHSupportingFeeOnTransferTokens(uint256,uint256,address[],address,uint256)": FunctionFragment;
-    "swapExactTokensForTokens(uint256,uint256,address[],address,uint256)": FunctionFragment;
-    "swapExactTokensForTokensSupportingFeeOnTransferTokens(uint256,uint256,address[],address,uint256)": FunctionFragment;
-    "swapTokensForExactETH(uint256,uint256,address[],address,uint256)": FunctionFragment;
-    "swapTokensForExactTokens(uint256,uint256,address[],address,uint256)": FunctionFragment;
-  };
+    'WETH()': FunctionFragment
+    'addLiquidity(address,address,uint256,uint256,uint256,uint256,address,uint256)': FunctionFragment
+    'addLiquidityETH(address,uint256,uint256,uint256,address,uint256)': FunctionFragment
+    'factory()': FunctionFragment
+    'getAmountIn(uint256,uint256,uint256)': FunctionFragment
+    'getAmountOut(uint256,uint256,uint256)': FunctionFragment
+    'getAmountsIn(uint256,address[])': FunctionFragment
+    'getAmountsOut(uint256,address[])': FunctionFragment
+    'quote(uint256,uint256,uint256)': FunctionFragment
+    'removeLiquidity(address,address,uint256,uint256,uint256,address,uint256)': FunctionFragment
+    'removeLiquidityETH(address,uint256,uint256,uint256,address,uint256)': FunctionFragment
+    'removeLiquidityETHSupportingFeeOnTransferTokens(address,uint256,uint256,uint256,address,uint256)': FunctionFragment
+    'removeLiquidityETHWithPermit(address,uint256,uint256,uint256,address,uint256,bool,uint8,bytes32,bytes32)': FunctionFragment
+    'removeLiquidityETHWithPermitSupportingFeeOnTransferTokens(address,uint256,uint256,uint256,address,uint256,bool,uint8,bytes32,bytes32)': FunctionFragment
+    'removeLiquidityWithPermit(address,address,uint256,uint256,uint256,address,uint256,bool,uint8,bytes32,bytes32)': FunctionFragment
+    'swapETHForExactTokens(uint256,address[],address,uint256)': FunctionFragment
+    'swapExactETHForTokens(uint256,address[],address,uint256)': FunctionFragment
+    'swapExactETHForTokensSupportingFeeOnTransferTokens(uint256,address[],address,uint256)': FunctionFragment
+    'swapExactTokensForETH(uint256,uint256,address[],address,uint256)': FunctionFragment
+    'swapExactTokensForETHSupportingFeeOnTransferTokens(uint256,uint256,address[],address,uint256)': FunctionFragment
+    'swapExactTokensForTokens(uint256,uint256,address[],address,uint256)': FunctionFragment
+    'swapExactTokensForTokensSupportingFeeOnTransferTokens(uint256,uint256,address[],address,uint256)': FunctionFragment
+    'swapTokensForExactETH(uint256,uint256,address[],address,uint256)': FunctionFragment
+    'swapTokensForExactTokens(uint256,uint256,address[],address,uint256)': FunctionFragment
+  }
 
-  encodeFunctionData(functionFragment: "WETH", values?: undefined): string;
+  encodeFunctionData(functionFragment: 'WETH', values?: undefined): string
   encodeFunctionData(
-    functionFragment: "addLiquidity",
-    values: [
-      string,
-      string,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      string,
-      BigNumberish
-    ]
-  ): string;
+    functionFragment: 'addLiquidity',
+    values: [string, string, BigNumberish, BigNumberish, BigNumberish, BigNumberish, string, BigNumberish]
+  ): string
   encodeFunctionData(
-    functionFragment: "addLiquidityETH",
-    values: [
-      string,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      string,
-      BigNumberish
-    ]
-  ): string;
-  encodeFunctionData(functionFragment: "factory", values?: undefined): string;
+    functionFragment: 'addLiquidityETH',
+    values: [string, BigNumberish, BigNumberish, BigNumberish, string, BigNumberish]
+  ): string
+  encodeFunctionData(functionFragment: 'factory', values?: undefined): string
+  encodeFunctionData(functionFragment: 'getAmountIn', values: [BigNumberish, BigNumberish, BigNumberish]): string
+  encodeFunctionData(functionFragment: 'getAmountOut', values: [BigNumberish, BigNumberish, BigNumberish]): string
+  encodeFunctionData(functionFragment: 'getAmountsIn', values: [BigNumberish, string[]]): string
+  encodeFunctionData(functionFragment: 'getAmountsOut', values: [BigNumberish, string[]]): string
+  encodeFunctionData(functionFragment: 'quote', values: [BigNumberish, BigNumberish, BigNumberish]): string
   encodeFunctionData(
-    functionFragment: "getAmountIn",
-    values: [BigNumberish, BigNumberish, BigNumberish]
-  ): string;
+    functionFragment: 'removeLiquidity',
+    values: [string, string, BigNumberish, BigNumberish, BigNumberish, string, BigNumberish]
+  ): string
   encodeFunctionData(
-    functionFragment: "getAmountOut",
-    values: [BigNumberish, BigNumberish, BigNumberish]
-  ): string;
+    functionFragment: 'removeLiquidityETH',
+    values: [string, BigNumberish, BigNumberish, BigNumberish, string, BigNumberish]
+  ): string
   encodeFunctionData(
-    functionFragment: "getAmountsIn",
-    values: [BigNumberish, string[]]
-  ): string;
+    functionFragment: 'removeLiquidityETHSupportingFeeOnTransferTokens',
+    values: [string, BigNumberish, BigNumberish, BigNumberish, string, BigNumberish]
+  ): string
   encodeFunctionData(
-    functionFragment: "getAmountsOut",
-    values: [BigNumberish, string[]]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "quote",
-    values: [BigNumberish, BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "removeLiquidity",
-    values: [
-      string,
-      string,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      string,
-      BigNumberish
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "removeLiquidityETH",
-    values: [
-      string,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      string,
-      BigNumberish
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "removeLiquidityETHSupportingFeeOnTransferTokens",
-    values: [
-      string,
-      BigNumberish,
-      BigNumberish,
-      BigNumberish,
-      string,
-      BigNumberish
-    ]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "removeLiquidityETHWithPermit",
+    functionFragment: 'removeLiquidityETHWithPermit',
     values: [
       string,
       BigNumberish,
@@ -141,9 +88,9 @@ interface UniswapV2Router02Interface extends ethers.utils.Interface {
       BytesLike,
       BytesLike
     ]
-  ): string;
+  ): string
   encodeFunctionData(
-    functionFragment: "removeLiquidityETHWithPermitSupportingFeeOnTransferTokens",
+    functionFragment: 'removeLiquidityETHWithPermitSupportingFeeOnTransferTokens',
     values: [
       string,
       BigNumberish,
@@ -156,9 +103,9 @@ interface UniswapV2Router02Interface extends ethers.utils.Interface {
       BytesLike,
       BytesLike
     ]
-  ): string;
+  ): string
   encodeFunctionData(
-    functionFragment: "removeLiquidityWithPermit",
+    functionFragment: 'removeLiquidityWithPermit',
     values: [
       string,
       string,
@@ -172,180 +119,123 @@ interface UniswapV2Router02Interface extends ethers.utils.Interface {
       BytesLike,
       BytesLike
     ]
-  ): string;
+  ): string
   encodeFunctionData(
-    functionFragment: "swapETHForExactTokens",
+    functionFragment: 'swapETHForExactTokens',
     values: [BigNumberish, string[], string, BigNumberish]
-  ): string;
+  ): string
   encodeFunctionData(
-    functionFragment: "swapExactETHForTokens",
+    functionFragment: 'swapExactETHForTokens',
     values: [BigNumberish, string[], string, BigNumberish]
-  ): string;
+  ): string
   encodeFunctionData(
-    functionFragment: "swapExactETHForTokensSupportingFeeOnTransferTokens",
+    functionFragment: 'swapExactETHForTokensSupportingFeeOnTransferTokens',
     values: [BigNumberish, string[], string, BigNumberish]
-  ): string;
+  ): string
   encodeFunctionData(
-    functionFragment: "swapExactTokensForETH",
+    functionFragment: 'swapExactTokensForETH',
     values: [BigNumberish, BigNumberish, string[], string, BigNumberish]
-  ): string;
+  ): string
   encodeFunctionData(
-    functionFragment: "swapExactTokensForETHSupportingFeeOnTransferTokens",
+    functionFragment: 'swapExactTokensForETHSupportingFeeOnTransferTokens',
     values: [BigNumberish, BigNumberish, string[], string, BigNumberish]
-  ): string;
+  ): string
   encodeFunctionData(
-    functionFragment: "swapExactTokensForTokens",
+    functionFragment: 'swapExactTokensForTokens',
     values: [BigNumberish, BigNumberish, string[], string, BigNumberish]
-  ): string;
+  ): string
   encodeFunctionData(
-    functionFragment: "swapExactTokensForTokensSupportingFeeOnTransferTokens",
+    functionFragment: 'swapExactTokensForTokensSupportingFeeOnTransferTokens',
     values: [BigNumberish, BigNumberish, string[], string, BigNumberish]
-  ): string;
+  ): string
   encodeFunctionData(
-    functionFragment: "swapTokensForExactETH",
+    functionFragment: 'swapTokensForExactETH',
     values: [BigNumberish, BigNumberish, string[], string, BigNumberish]
-  ): string;
+  ): string
   encodeFunctionData(
-    functionFragment: "swapTokensForExactTokens",
+    functionFragment: 'swapTokensForExactTokens',
     values: [BigNumberish, BigNumberish, string[], string, BigNumberish]
-  ): string;
+  ): string
 
-  decodeFunctionResult(functionFragment: "WETH", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'WETH', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'addLiquidity', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'addLiquidityETH', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'factory', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'getAmountIn', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'getAmountOut', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'getAmountsIn', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'getAmountsOut', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'quote', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'removeLiquidity', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'removeLiquidityETH', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'removeLiquidityETHSupportingFeeOnTransferTokens', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'removeLiquidityETHWithPermit', data: BytesLike): Result
   decodeFunctionResult(
-    functionFragment: "addLiquidity",
+    functionFragment: 'removeLiquidityETHWithPermitSupportingFeeOnTransferTokens',
     data: BytesLike
-  ): Result;
+  ): Result
+  decodeFunctionResult(functionFragment: 'removeLiquidityWithPermit', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'swapETHForExactTokens', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'swapExactETHForTokens', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'swapExactETHForTokensSupportingFeeOnTransferTokens', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'swapExactTokensForETH', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'swapExactTokensForETHSupportingFeeOnTransferTokens', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'swapExactTokensForTokens', data: BytesLike): Result
   decodeFunctionResult(
-    functionFragment: "addLiquidityETH",
+    functionFragment: 'swapExactTokensForTokensSupportingFeeOnTransferTokens',
     data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "factory", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "getAmountIn",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getAmountOut",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getAmountsIn",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getAmountsOut",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "quote", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "removeLiquidity",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "removeLiquidityETH",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "removeLiquidityETHSupportingFeeOnTransferTokens",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "removeLiquidityETHWithPermit",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "removeLiquidityETHWithPermitSupportingFeeOnTransferTokens",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "removeLiquidityWithPermit",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "swapETHForExactTokens",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "swapExactETHForTokens",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "swapExactETHForTokensSupportingFeeOnTransferTokens",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "swapExactTokensForETH",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "swapExactTokensForETHSupportingFeeOnTransferTokens",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "swapExactTokensForTokens",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "swapExactTokensForTokensSupportingFeeOnTransferTokens",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "swapTokensForExactETH",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "swapTokensForExactTokens",
-    data: BytesLike
-  ): Result;
+  ): Result
+  decodeFunctionResult(functionFragment: 'swapTokensForExactETH', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'swapTokensForExactTokens', data: BytesLike): Result
 
-  events: {};
+  events: {}
 }
 
 export class UniswapV2Router02 extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this;
-  attach(addressOrName: string): this;
-  deployed(): Promise<this>;
+  connect(signerOrProvider: Signer | Provider | string): this
+  attach(addressOrName: string): this
+  deployed(): Promise<this>
 
   listeners<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter?: TypedEventFilter<EventArgsArray, EventArgsObject>
-  ): Array<TypedListener<EventArgsArray, EventArgsObject>>;
+  ): Array<TypedListener<EventArgsArray, EventArgsObject>>
   off<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   on<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   once<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   removeListener<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   removeAllListeners<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
 
-  listeners(eventName?: string): Array<Listener>;
-  off(eventName: string, listener: Listener): this;
-  on(eventName: string, listener: Listener): this;
-  once(eventName: string, listener: Listener): this;
-  removeListener(eventName: string, listener: Listener): this;
-  removeAllListeners(eventName?: string): this;
+  listeners(eventName?: string): Array<Listener>
+  off(eventName: string, listener: Listener): this
+  on(eventName: string, listener: Listener): this
+  once(eventName: string, listener: Listener): this
+  removeListener(eventName: string, listener: Listener): this
+  removeAllListeners(eventName?: string): this
 
   queryFilter<EventArgsArray extends Array<any>, EventArgsObject>(
     event: TypedEventFilter<EventArgsArray, EventArgsObject>,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
+  ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>
 
-  interface: UniswapV2Router02Interface;
+  interface: UniswapV2Router02Interface
 
   functions: {
-    WETH(overrides?: CallOverrides): Promise<[string]>;
+    WETH(overrides?: CallOverrides): Promise<[string]>
 
     addLiquidity(
       tokenA: string,
@@ -357,7 +247,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     addLiquidityETH(
       token: string,
@@ -367,42 +257,42 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
-    factory(overrides?: CallOverrides): Promise<[string]>;
+    factory(overrides?: CallOverrides): Promise<[string]>
 
     getAmountIn(
       amountOut: BigNumberish,
       reserveIn: BigNumberish,
       reserveOut: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[BigNumber] & { amountIn: BigNumber }>;
+    ): Promise<[BigNumber] & { amountIn: BigNumber }>
 
     getAmountOut(
       amountIn: BigNumberish,
       reserveIn: BigNumberish,
       reserveOut: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[BigNumber] & { amountOut: BigNumber }>;
+    ): Promise<[BigNumber] & { amountOut: BigNumber }>
 
     getAmountsIn(
       amountOut: BigNumberish,
       path: string[],
       overrides?: CallOverrides
-    ): Promise<[BigNumber[]] & { amounts: BigNumber[] }>;
+    ): Promise<[BigNumber[]] & { amounts: BigNumber[] }>
 
     getAmountsOut(
       amountIn: BigNumberish,
       path: string[],
       overrides?: CallOverrides
-    ): Promise<[BigNumber[]] & { amounts: BigNumber[] }>;
+    ): Promise<[BigNumber[]] & { amounts: BigNumber[] }>
 
     quote(
       amountA: BigNumberish,
       reserveA: BigNumberish,
       reserveB: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[BigNumber] & { amountB: BigNumber }>;
+    ): Promise<[BigNumber] & { amountB: BigNumber }>
 
     removeLiquidity(
       tokenA: string,
@@ -413,7 +303,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     removeLiquidityETH(
       token: string,
@@ -423,7 +313,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     removeLiquidityETHSupportingFeeOnTransferTokens(
       token: string,
@@ -433,7 +323,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     removeLiquidityETHWithPermit(
       token: string,
@@ -447,7 +337,7 @@ export class UniswapV2Router02 extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     removeLiquidityETHWithPermitSupportingFeeOnTransferTokens(
       token: string,
@@ -461,7 +351,7 @@ export class UniswapV2Router02 extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     removeLiquidityWithPermit(
       tokenA: string,
@@ -476,7 +366,7 @@ export class UniswapV2Router02 extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     swapETHForExactTokens(
       amountOut: BigNumberish,
@@ -484,7 +374,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     swapExactETHForTokens(
       amountOutMin: BigNumberish,
@@ -492,7 +382,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     swapExactETHForTokensSupportingFeeOnTransferTokens(
       amountOutMin: BigNumberish,
@@ -500,7 +390,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     swapExactTokensForETH(
       amountIn: BigNumberish,
@@ -509,7 +399,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     swapExactTokensForETHSupportingFeeOnTransferTokens(
       amountIn: BigNumberish,
@@ -518,7 +408,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     swapExactTokensForTokens(
       amountIn: BigNumberish,
@@ -527,7 +417,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     swapExactTokensForTokensSupportingFeeOnTransferTokens(
       amountIn: BigNumberish,
@@ -536,7 +426,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     swapTokensForExactETH(
       amountOut: BigNumberish,
@@ -545,7 +435,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     swapTokensForExactTokens(
       amountOut: BigNumberish,
@@ -554,10 +444,10 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-  };
+    ): Promise<ContractTransaction>
+  }
 
-  WETH(overrides?: CallOverrides): Promise<string>;
+  WETH(overrides?: CallOverrides): Promise<string>
 
   addLiquidity(
     tokenA: string,
@@ -569,7 +459,7 @@ export class UniswapV2Router02 extends BaseContract {
     to: string,
     deadline: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   addLiquidityETH(
     token: string,
@@ -579,42 +469,34 @@ export class UniswapV2Router02 extends BaseContract {
     to: string,
     deadline: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
-  factory(overrides?: CallOverrides): Promise<string>;
+  factory(overrides?: CallOverrides): Promise<string>
 
   getAmountIn(
     amountOut: BigNumberish,
     reserveIn: BigNumberish,
     reserveOut: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<BigNumber>;
+  ): Promise<BigNumber>
 
   getAmountOut(
     amountIn: BigNumberish,
     reserveIn: BigNumberish,
     reserveOut: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<BigNumber>;
+  ): Promise<BigNumber>
 
-  getAmountsIn(
-    amountOut: BigNumberish,
-    path: string[],
-    overrides?: CallOverrides
-  ): Promise<BigNumber[]>;
+  getAmountsIn(amountOut: BigNumberish, path: string[], overrides?: CallOverrides): Promise<BigNumber[]>
 
-  getAmountsOut(
-    amountIn: BigNumberish,
-    path: string[],
-    overrides?: CallOverrides
-  ): Promise<BigNumber[]>;
+  getAmountsOut(amountIn: BigNumberish, path: string[], overrides?: CallOverrides): Promise<BigNumber[]>
 
   quote(
     amountA: BigNumberish,
     reserveA: BigNumberish,
     reserveB: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<BigNumber>;
+  ): Promise<BigNumber>
 
   removeLiquidity(
     tokenA: string,
@@ -625,7 +507,7 @@ export class UniswapV2Router02 extends BaseContract {
     to: string,
     deadline: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   removeLiquidityETH(
     token: string,
@@ -635,7 +517,7 @@ export class UniswapV2Router02 extends BaseContract {
     to: string,
     deadline: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   removeLiquidityETHSupportingFeeOnTransferTokens(
     token: string,
@@ -645,7 +527,7 @@ export class UniswapV2Router02 extends BaseContract {
     to: string,
     deadline: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   removeLiquidityETHWithPermit(
     token: string,
@@ -659,7 +541,7 @@ export class UniswapV2Router02 extends BaseContract {
     r: BytesLike,
     s: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   removeLiquidityETHWithPermitSupportingFeeOnTransferTokens(
     token: string,
@@ -673,7 +555,7 @@ export class UniswapV2Router02 extends BaseContract {
     r: BytesLike,
     s: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   removeLiquidityWithPermit(
     tokenA: string,
@@ -688,7 +570,7 @@ export class UniswapV2Router02 extends BaseContract {
     r: BytesLike,
     s: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   swapETHForExactTokens(
     amountOut: BigNumberish,
@@ -696,7 +578,7 @@ export class UniswapV2Router02 extends BaseContract {
     to: string,
     deadline: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   swapExactETHForTokens(
     amountOutMin: BigNumberish,
@@ -704,7 +586,7 @@ export class UniswapV2Router02 extends BaseContract {
     to: string,
     deadline: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   swapExactETHForTokensSupportingFeeOnTransferTokens(
     amountOutMin: BigNumberish,
@@ -712,7 +594,7 @@ export class UniswapV2Router02 extends BaseContract {
     to: string,
     deadline: BigNumberish,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   swapExactTokensForETH(
     amountIn: BigNumberish,
@@ -721,7 +603,7 @@ export class UniswapV2Router02 extends BaseContract {
     to: string,
     deadline: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   swapExactTokensForETHSupportingFeeOnTransferTokens(
     amountIn: BigNumberish,
@@ -730,7 +612,7 @@ export class UniswapV2Router02 extends BaseContract {
     to: string,
     deadline: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   swapExactTokensForTokens(
     amountIn: BigNumberish,
@@ -739,7 +621,7 @@ export class UniswapV2Router02 extends BaseContract {
     to: string,
     deadline: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   swapExactTokensForTokensSupportingFeeOnTransferTokens(
     amountIn: BigNumberish,
@@ -748,7 +630,7 @@ export class UniswapV2Router02 extends BaseContract {
     to: string,
     deadline: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   swapTokensForExactETH(
     amountOut: BigNumberish,
@@ -757,7 +639,7 @@ export class UniswapV2Router02 extends BaseContract {
     to: string,
     deadline: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   swapTokensForExactTokens(
     amountOut: BigNumberish,
@@ -766,10 +648,10 @@ export class UniswapV2Router02 extends BaseContract {
     to: string,
     deadline: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   callStatic: {
-    WETH(overrides?: CallOverrides): Promise<string>;
+    WETH(overrides?: CallOverrides): Promise<string>
 
     addLiquidity(
       tokenA: string,
@@ -783,11 +665,11 @@ export class UniswapV2Router02 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<
       [BigNumber, BigNumber, BigNumber] & {
-        amountA: BigNumber;
-        amountB: BigNumber;
-        liquidity: BigNumber;
+        amountA: BigNumber
+        amountB: BigNumber
+        liquidity: BigNumber
       }
-    >;
+    >
 
     addLiquidityETH(
       token: string,
@@ -799,46 +681,38 @@ export class UniswapV2Router02 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<
       [BigNumber, BigNumber, BigNumber] & {
-        amountToken: BigNumber;
-        amountETH: BigNumber;
-        liquidity: BigNumber;
+        amountToken: BigNumber
+        amountETH: BigNumber
+        liquidity: BigNumber
       }
-    >;
+    >
 
-    factory(overrides?: CallOverrides): Promise<string>;
+    factory(overrides?: CallOverrides): Promise<string>
 
     getAmountIn(
       amountOut: BigNumberish,
       reserveIn: BigNumberish,
       reserveOut: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     getAmountOut(
       amountIn: BigNumberish,
       reserveIn: BigNumberish,
       reserveOut: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    getAmountsIn(
-      amountOut: BigNumberish,
-      path: string[],
-      overrides?: CallOverrides
-    ): Promise<BigNumber[]>;
+    getAmountsIn(amountOut: BigNumberish, path: string[], overrides?: CallOverrides): Promise<BigNumber[]>
 
-    getAmountsOut(
-      amountIn: BigNumberish,
-      path: string[],
-      overrides?: CallOverrides
-    ): Promise<BigNumber[]>;
+    getAmountsOut(amountIn: BigNumberish, path: string[], overrides?: CallOverrides): Promise<BigNumber[]>
 
     quote(
       amountA: BigNumberish,
       reserveA: BigNumberish,
       reserveB: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     removeLiquidity(
       tokenA: string,
@@ -849,9 +723,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber] & { amountA: BigNumber; amountB: BigNumber }
-    >;
+    ): Promise<[BigNumber, BigNumber] & { amountA: BigNumber; amountB: BigNumber }>
 
     removeLiquidityETH(
       token: string,
@@ -861,9 +733,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber] & { amountToken: BigNumber; amountETH: BigNumber }
-    >;
+    ): Promise<[BigNumber, BigNumber] & { amountToken: BigNumber; amountETH: BigNumber }>
 
     removeLiquidityETHSupportingFeeOnTransferTokens(
       token: string,
@@ -873,7 +743,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     removeLiquidityETHWithPermit(
       token: string,
@@ -887,9 +757,7 @@ export class UniswapV2Router02 extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber] & { amountToken: BigNumber; amountETH: BigNumber }
-    >;
+    ): Promise<[BigNumber, BigNumber] & { amountToken: BigNumber; amountETH: BigNumber }>
 
     removeLiquidityETHWithPermitSupportingFeeOnTransferTokens(
       token: string,
@@ -903,7 +771,7 @@ export class UniswapV2Router02 extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     removeLiquidityWithPermit(
       tokenA: string,
@@ -918,9 +786,7 @@ export class UniswapV2Router02 extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber] & { amountA: BigNumber; amountB: BigNumber }
-    >;
+    ): Promise<[BigNumber, BigNumber] & { amountA: BigNumber; amountB: BigNumber }>
 
     swapETHForExactTokens(
       amountOut: BigNumberish,
@@ -928,7 +794,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber[]>;
+    ): Promise<BigNumber[]>
 
     swapExactETHForTokens(
       amountOutMin: BigNumberish,
@@ -936,7 +802,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber[]>;
+    ): Promise<BigNumber[]>
 
     swapExactETHForTokensSupportingFeeOnTransferTokens(
       amountOutMin: BigNumberish,
@@ -944,7 +810,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
     swapExactTokensForETH(
       amountIn: BigNumberish,
@@ -953,7 +819,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber[]>;
+    ): Promise<BigNumber[]>
 
     swapExactTokensForETHSupportingFeeOnTransferTokens(
       amountIn: BigNumberish,
@@ -962,7 +828,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
     swapExactTokensForTokens(
       amountIn: BigNumberish,
@@ -971,7 +837,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber[]>;
+    ): Promise<BigNumber[]>
 
     swapExactTokensForTokensSupportingFeeOnTransferTokens(
       amountIn: BigNumberish,
@@ -980,7 +846,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
     swapTokensForExactETH(
       amountOut: BigNumberish,
@@ -989,7 +855,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber[]>;
+    ): Promise<BigNumber[]>
 
     swapTokensForExactTokens(
       amountOut: BigNumberish,
@@ -998,13 +864,13 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber[]>;
-  };
+    ): Promise<BigNumber[]>
+  }
 
-  filters: {};
+  filters: {}
 
   estimateGas: {
-    WETH(overrides?: CallOverrides): Promise<BigNumber>;
+    WETH(overrides?: CallOverrides): Promise<BigNumber>
 
     addLiquidity(
       tokenA: string,
@@ -1016,7 +882,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     addLiquidityETH(
       token: string,
@@ -1026,42 +892,34 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    factory(overrides?: CallOverrides): Promise<BigNumber>;
+    factory(overrides?: CallOverrides): Promise<BigNumber>
 
     getAmountIn(
       amountOut: BigNumberish,
       reserveIn: BigNumberish,
       reserveOut: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     getAmountOut(
       amountIn: BigNumberish,
       reserveIn: BigNumberish,
       reserveOut: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    getAmountsIn(
-      amountOut: BigNumberish,
-      path: string[],
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    getAmountsIn(amountOut: BigNumberish, path: string[], overrides?: CallOverrides): Promise<BigNumber>
 
-    getAmountsOut(
-      amountIn: BigNumberish,
-      path: string[],
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    getAmountsOut(amountIn: BigNumberish, path: string[], overrides?: CallOverrides): Promise<BigNumber>
 
     quote(
       amountA: BigNumberish,
       reserveA: BigNumberish,
       reserveB: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     removeLiquidity(
       tokenA: string,
@@ -1072,7 +930,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     removeLiquidityETH(
       token: string,
@@ -1082,7 +940,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     removeLiquidityETHSupportingFeeOnTransferTokens(
       token: string,
@@ -1092,7 +950,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     removeLiquidityETHWithPermit(
       token: string,
@@ -1106,7 +964,7 @@ export class UniswapV2Router02 extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     removeLiquidityETHWithPermitSupportingFeeOnTransferTokens(
       token: string,
@@ -1120,7 +978,7 @@ export class UniswapV2Router02 extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     removeLiquidityWithPermit(
       tokenA: string,
@@ -1135,7 +993,7 @@ export class UniswapV2Router02 extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     swapETHForExactTokens(
       amountOut: BigNumberish,
@@ -1143,7 +1001,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     swapExactETHForTokens(
       amountOutMin: BigNumberish,
@@ -1151,7 +1009,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     swapExactETHForTokensSupportingFeeOnTransferTokens(
       amountOutMin: BigNumberish,
@@ -1159,7 +1017,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     swapExactTokensForETH(
       amountIn: BigNumberish,
@@ -1168,7 +1026,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     swapExactTokensForETHSupportingFeeOnTransferTokens(
       amountIn: BigNumberish,
@@ -1177,7 +1035,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     swapExactTokensForTokens(
       amountIn: BigNumberish,
@@ -1186,7 +1044,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     swapExactTokensForTokensSupportingFeeOnTransferTokens(
       amountIn: BigNumberish,
@@ -1195,7 +1053,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     swapTokensForExactETH(
       amountOut: BigNumberish,
@@ -1204,7 +1062,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     swapTokensForExactTokens(
       amountOut: BigNumberish,
@@ -1213,11 +1071,11 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-  };
+    ): Promise<BigNumber>
+  }
 
   populateTransaction: {
-    WETH(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    WETH(overrides?: CallOverrides): Promise<PopulatedTransaction>
 
     addLiquidity(
       tokenA: string,
@@ -1229,7 +1087,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     addLiquidityETH(
       token: string,
@@ -1239,42 +1097,34 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    factory(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    factory(overrides?: CallOverrides): Promise<PopulatedTransaction>
 
     getAmountIn(
       amountOut: BigNumberish,
       reserveIn: BigNumberish,
       reserveOut: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     getAmountOut(
       amountIn: BigNumberish,
       reserveIn: BigNumberish,
       reserveOut: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    getAmountsIn(
-      amountOut: BigNumberish,
-      path: string[],
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    getAmountsIn(amountOut: BigNumberish, path: string[], overrides?: CallOverrides): Promise<PopulatedTransaction>
 
-    getAmountsOut(
-      amountIn: BigNumberish,
-      path: string[],
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    getAmountsOut(amountIn: BigNumberish, path: string[], overrides?: CallOverrides): Promise<PopulatedTransaction>
 
     quote(
       amountA: BigNumberish,
       reserveA: BigNumberish,
       reserveB: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     removeLiquidity(
       tokenA: string,
@@ -1285,7 +1135,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     removeLiquidityETH(
       token: string,
@@ -1295,7 +1145,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     removeLiquidityETHSupportingFeeOnTransferTokens(
       token: string,
@@ -1305,7 +1155,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     removeLiquidityETHWithPermit(
       token: string,
@@ -1319,7 +1169,7 @@ export class UniswapV2Router02 extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     removeLiquidityETHWithPermitSupportingFeeOnTransferTokens(
       token: string,
@@ -1333,7 +1183,7 @@ export class UniswapV2Router02 extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     removeLiquidityWithPermit(
       tokenA: string,
@@ -1348,7 +1198,7 @@ export class UniswapV2Router02 extends BaseContract {
       r: BytesLike,
       s: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     swapETHForExactTokens(
       amountOut: BigNumberish,
@@ -1356,7 +1206,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     swapExactETHForTokens(
       amountOutMin: BigNumberish,
@@ -1364,7 +1214,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     swapExactETHForTokensSupportingFeeOnTransferTokens(
       amountOutMin: BigNumberish,
@@ -1372,7 +1222,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     swapExactTokensForETH(
       amountIn: BigNumberish,
@@ -1381,7 +1231,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     swapExactTokensForETHSupportingFeeOnTransferTokens(
       amountIn: BigNumberish,
@@ -1390,7 +1240,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     swapExactTokensForTokens(
       amountIn: BigNumberish,
@@ -1399,7 +1249,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     swapExactTokensForTokensSupportingFeeOnTransferTokens(
       amountIn: BigNumberish,
@@ -1408,7 +1258,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     swapTokensForExactETH(
       amountOut: BigNumberish,
@@ -1417,7 +1267,7 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     swapTokensForExactTokens(
       amountOut: BigNumberish,
@@ -1426,6 +1276,6 @@ export class UniswapV2Router02 extends BaseContract {
       to: string,
       deadline: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-  };
+    ): Promise<PopulatedTransaction>
+  }
 }

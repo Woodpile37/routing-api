@@ -2,163 +2,152 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { FunctionFragment, Result } from "@ethersproject/abi";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import {
-  BaseContract,
-  BigNumber,
-  BigNumberish,
-  CallOverrides,
-  ethers,
-  PopulatedTransaction,
-  Signer,
-} from "ethers";
-import { TypedEvent, TypedEventFilter, TypedListener } from "./commons";
+import { FunctionFragment, Result } from '@ethersproject/abi'
+import { BytesLike } from '@ethersproject/bytes'
+import { Listener, Provider } from '@ethersproject/providers'
+import { BaseContract, BigNumber, BigNumberish, CallOverrides, ethers, PopulatedTransaction, Signer } from 'ethers'
+import { TypedEvent, TypedEventFilter, TypedListener } from './commons'
 
 interface IOracleSlippageInterface extends ethers.utils.Interface {
   functions: {
-    "checkOracleSlippage(bytes[],uint128[],uint24,uint32)": FunctionFragment;
-  };
+    'checkOracleSlippage(bytes[],uint128[],uint24,uint32)': FunctionFragment
+  }
 
   encodeFunctionData(
-    functionFragment: "checkOracleSlippage",
+    functionFragment: 'checkOracleSlippage',
     values: [BytesLike[], BigNumberish[], BigNumberish, BigNumberish]
-  ): string;
+  ): string
 
-  decodeFunctionResult(
-    functionFragment: "checkOracleSlippage",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: 'checkOracleSlippage', data: BytesLike): Result
 
-  events: {};
+  events: {}
 }
 
 export class IOracleSlippage extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this;
-  attach(addressOrName: string): this;
-  deployed(): Promise<this>;
+  connect(signerOrProvider: Signer | Provider | string): this
+  attach(addressOrName: string): this
+  deployed(): Promise<this>
 
   listeners<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter?: TypedEventFilter<EventArgsArray, EventArgsObject>
-  ): Array<TypedListener<EventArgsArray, EventArgsObject>>;
+  ): Array<TypedListener<EventArgsArray, EventArgsObject>>
   off<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   on<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   once<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   removeListener<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   removeAllListeners<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
 
-  listeners(eventName?: string): Array<Listener>;
-  off(eventName: string, listener: Listener): this;
-  on(eventName: string, listener: Listener): this;
-  once(eventName: string, listener: Listener): this;
-  removeListener(eventName: string, listener: Listener): this;
-  removeAllListeners(eventName?: string): this;
+  listeners(eventName?: string): Array<Listener>
+  off(eventName: string, listener: Listener): this
+  on(eventName: string, listener: Listener): this
+  once(eventName: string, listener: Listener): this
+  removeListener(eventName: string, listener: Listener): this
+  removeAllListeners(eventName?: string): this
 
   queryFilter<EventArgsArray extends Array<any>, EventArgsObject>(
     event: TypedEventFilter<EventArgsArray, EventArgsObject>,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
+  ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>
 
-  interface: IOracleSlippageInterface;
+  interface: IOracleSlippageInterface
 
   functions: {
-    "checkOracleSlippage(bytes[],uint128[],uint24,uint32)"(
+    'checkOracleSlippage(bytes[],uint128[],uint24,uint32)'(
       paths: BytesLike[],
       amounts: BigNumberish[],
       maximumTickDivergence: BigNumberish,
       secondsAgo: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[void]>;
+    ): Promise<[void]>
 
-    "checkOracleSlippage(bytes,uint24,uint32)"(
+    'checkOracleSlippage(bytes,uint24,uint32)'(
       path: BytesLike,
       maximumTickDivergence: BigNumberish,
       secondsAgo: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<[void]>;
-  };
+    ): Promise<[void]>
+  }
 
-  "checkOracleSlippage(bytes[],uint128[],uint24,uint32)"(
+  'checkOracleSlippage(bytes[],uint128[],uint24,uint32)'(
     paths: BytesLike[],
     amounts: BigNumberish[],
     maximumTickDivergence: BigNumberish,
     secondsAgo: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<void>;
+  ): Promise<void>
 
-  "checkOracleSlippage(bytes,uint24,uint32)"(
+  'checkOracleSlippage(bytes,uint24,uint32)'(
     path: BytesLike,
     maximumTickDivergence: BigNumberish,
     secondsAgo: BigNumberish,
     overrides?: CallOverrides
-  ): Promise<void>;
+  ): Promise<void>
 
   callStatic: {
-    "checkOracleSlippage(bytes[],uint128[],uint24,uint32)"(
+    'checkOracleSlippage(bytes[],uint128[],uint24,uint32)'(
       paths: BytesLike[],
       amounts: BigNumberish[],
       maximumTickDivergence: BigNumberish,
       secondsAgo: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
-    "checkOracleSlippage(bytes,uint24,uint32)"(
+    'checkOracleSlippage(bytes,uint24,uint32)'(
       path: BytesLike,
       maximumTickDivergence: BigNumberish,
       secondsAgo: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<void>;
-  };
+    ): Promise<void>
+  }
 
-  filters: {};
+  filters: {}
 
   estimateGas: {
-    "checkOracleSlippage(bytes[],uint128[],uint24,uint32)"(
+    'checkOracleSlippage(bytes[],uint128[],uint24,uint32)'(
       paths: BytesLike[],
       amounts: BigNumberish[],
       maximumTickDivergence: BigNumberish,
       secondsAgo: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    "checkOracleSlippage(bytes,uint24,uint32)"(
+    'checkOracleSlippage(bytes,uint24,uint32)'(
       path: BytesLike,
       maximumTickDivergence: BigNumberish,
       secondsAgo: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
-  };
+    ): Promise<BigNumber>
+  }
 
   populateTransaction: {
-    "checkOracleSlippage(bytes[],uint128[],uint24,uint32)"(
+    'checkOracleSlippage(bytes[],uint128[],uint24,uint32)'(
       paths: BytesLike[],
       amounts: BigNumberish[],
       maximumTickDivergence: BigNumberish,
       secondsAgo: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    "checkOracleSlippage(bytes,uint24,uint32)"(
+    'checkOracleSlippage(bytes,uint24,uint32)'(
       path: BytesLike,
       maximumTickDivergence: BigNumberish,
       secondsAgo: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-  };
+    ): Promise<PopulatedTransaction>
+  }
 }

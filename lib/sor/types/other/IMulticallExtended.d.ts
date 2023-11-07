@@ -2,9 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { FunctionFragment, Result } from "@ethersproject/abi";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
+import { FunctionFragment, Result } from '@ethersproject/abi'
+import { BytesLike } from '@ethersproject/bytes'
+import { Listener, Provider } from '@ethersproject/providers'
 import {
   BaseContract,
   BigNumber,
@@ -15,159 +15,153 @@ import {
   PayableOverrides,
   PopulatedTransaction,
   Signer,
-} from "ethers";
-import { TypedEvent, TypedEventFilter, TypedListener } from "./commons";
+} from 'ethers'
+import { TypedEvent, TypedEventFilter, TypedListener } from './commons'
 
 interface IMulticallExtendedInterface extends ethers.utils.Interface {
   functions: {
-    "multicall(bytes32,bytes[])": FunctionFragment;
-  };
+    'multicall(bytes32,bytes[])': FunctionFragment
+  }
 
-  encodeFunctionData(
-    functionFragment: "multicall",
-    values: [BytesLike, BytesLike[]]
-  ): string;
+  encodeFunctionData(functionFragment: 'multicall', values: [BytesLike, BytesLike[]]): string
 
-  decodeFunctionResult(functionFragment: "multicall", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'multicall', data: BytesLike): Result
 
-  events: {};
+  events: {}
 }
 
 export class IMulticallExtended extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this;
-  attach(addressOrName: string): this;
-  deployed(): Promise<this>;
+  connect(signerOrProvider: Signer | Provider | string): this
+  attach(addressOrName: string): this
+  deployed(): Promise<this>
 
   listeners<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter?: TypedEventFilter<EventArgsArray, EventArgsObject>
-  ): Array<TypedListener<EventArgsArray, EventArgsObject>>;
+  ): Array<TypedListener<EventArgsArray, EventArgsObject>>
   off<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   on<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   once<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   removeListener<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   removeAllListeners<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
 
-  listeners(eventName?: string): Array<Listener>;
-  off(eventName: string, listener: Listener): this;
-  on(eventName: string, listener: Listener): this;
-  once(eventName: string, listener: Listener): this;
-  removeListener(eventName: string, listener: Listener): this;
-  removeAllListeners(eventName?: string): this;
+  listeners(eventName?: string): Array<Listener>
+  off(eventName: string, listener: Listener): this
+  on(eventName: string, listener: Listener): this
+  once(eventName: string, listener: Listener): this
+  removeListener(eventName: string, listener: Listener): this
+  removeAllListeners(eventName?: string): this
 
   queryFilter<EventArgsArray extends Array<any>, EventArgsObject>(
     event: TypedEventFilter<EventArgsArray, EventArgsObject>,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
+  ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>
 
-  interface: IMulticallExtendedInterface;
+  interface: IMulticallExtendedInterface
 
   functions: {
-    "multicall(bytes32,bytes[])"(
+    'multicall(bytes32,bytes[])'(
       previousBlockhash: BytesLike,
       data: BytesLike[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
-    "multicall(uint256,bytes[])"(
+    'multicall(uint256,bytes[])'(
       deadline: BigNumberish,
       data: BytesLike[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
-    "multicall(bytes[])"(
+    'multicall(bytes[])'(
       data: BytesLike[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-  };
+    ): Promise<ContractTransaction>
+  }
 
-  "multicall(bytes32,bytes[])"(
+  'multicall(bytes32,bytes[])'(
     previousBlockhash: BytesLike,
     data: BytesLike[],
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
-  "multicall(uint256,bytes[])"(
+  'multicall(uint256,bytes[])'(
     deadline: BigNumberish,
     data: BytesLike[],
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
-  "multicall(bytes[])"(
+  'multicall(bytes[])'(
     data: BytesLike[],
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   callStatic: {
-    "multicall(bytes32,bytes[])"(
+    'multicall(bytes32,bytes[])'(
       previousBlockhash: BytesLike,
       data: BytesLike[],
       overrides?: CallOverrides
-    ): Promise<string[]>;
+    ): Promise<string[]>
 
-    "multicall(uint256,bytes[])"(
+    'multicall(uint256,bytes[])'(
       deadline: BigNumberish,
       data: BytesLike[],
       overrides?: CallOverrides
-    ): Promise<string[]>;
+    ): Promise<string[]>
 
-    "multicall(bytes[])"(
-      data: BytesLike[],
-      overrides?: CallOverrides
-    ): Promise<string[]>;
-  };
+    'multicall(bytes[])'(data: BytesLike[], overrides?: CallOverrides): Promise<string[]>
+  }
 
-  filters: {};
+  filters: {}
 
   estimateGas: {
-    "multicall(bytes32,bytes[])"(
+    'multicall(bytes32,bytes[])'(
       previousBlockhash: BytesLike,
       data: BytesLike[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    "multicall(uint256,bytes[])"(
+    'multicall(uint256,bytes[])'(
       deadline: BigNumberish,
       data: BytesLike[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    "multicall(bytes[])"(
+    'multicall(bytes[])'(
       data: BytesLike[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-  };
+    ): Promise<BigNumber>
+  }
 
   populateTransaction: {
-    "multicall(bytes32,bytes[])"(
+    'multicall(bytes32,bytes[])'(
       previousBlockhash: BytesLike,
       data: BytesLike[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    "multicall(uint256,bytes[])"(
+    'multicall(uint256,bytes[])'(
       deadline: BigNumberish,
       data: BytesLike[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    "multicall(bytes[])"(
+    'multicall(bytes[])'(
       data: BytesLike[],
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-  };
+    ): Promise<PopulatedTransaction>
+  }
 }

@@ -1,43 +1,33 @@
-import { Token } from '@uniswap/sdk-core';
-import { Pair } from '@uniswap/v2-sdk';
-import { Pool } from '@uniswap/v3-sdk';
+import { Token } from '@uniswap/sdk-core'
+import { Pair } from '@uniswap/v2-sdk'
+import { Pool } from '@uniswap/v3-sdk'
 
-import { log } from '../../../util/log';
-import { poolToString, routeToString } from '../../../util/routes';
-import { MixedRoute, V2Route, V3Route } from '../../router';
+import { log } from '../../../util/log'
+import { poolToString, routeToString } from '../../../util/routes'
+import { MixedRoute, V2Route, V3Route } from '../../router'
 
-export function computeAllV3Routes(
-  tokenIn: Token,
-  tokenOut: Token,
-  pools: Pool[],
-  maxHops: number
-): V3Route[] {
+export function computeAllV3Routes(tokenIn: Token, tokenOut: Token, pools: Pool[], maxHops: number): V3Route[] {
   return computeAllRoutes<Pool, V3Route>(
     tokenIn,
     tokenOut,
     (route: Pool[], tokenIn: Token, tokenOut: Token) => {
-      return new V3Route(route, tokenIn, tokenOut);
+      return new V3Route(route, tokenIn, tokenOut)
     },
     pools,
     maxHops
-  );
+  )
 }
 
-export function computeAllV2Routes(
-  tokenIn: Token,
-  tokenOut: Token,
-  pools: Pair[],
-  maxHops: number
-): V2Route[] {
+export function computeAllV2Routes(tokenIn: Token, tokenOut: Token, pools: Pair[], maxHops: number): V2Route[] {
   return computeAllRoutes<Pair, V2Route>(
     tokenIn,
     tokenOut,
     (route: Pair[], tokenIn: Token, tokenOut: Token) => {
-      return new V2Route(route, tokenIn, tokenOut);
+      return new V2Route(route, tokenIn, tokenOut)
     },
     pools,
     maxHops
-  );
+  )
 }
 
 export function computeAllMixedRoutes(
@@ -50,32 +40,26 @@ export function computeAllMixedRoutes(
     tokenIn,
     tokenOut,
     (route: (Pool | Pair)[], tokenIn: Token, tokenOut: Token) => {
-      return new MixedRoute(route, tokenIn, tokenOut);
+      return new MixedRoute(route, tokenIn, tokenOut)
     },
     parts,
     maxHops
-  );
+  )
   /// filter out pure v3 and v2 routes
   return routesRaw.filter((route) => {
-    return (
-      !route.pools.every((pool) => pool instanceof Pool) &&
-      !route.pools.every((pool) => pool instanceof Pair)
-    );
-  });
+    return !route.pools.every((pool) => pool instanceof Pool) && !route.pools.every((pool) => pool instanceof Pair)
+  })
 }
 
-export function computeAllRoutes<
-  TPool extends Pair | Pool,
-  TRoute extends V3Route | V2Route | MixedRoute
->(
+export function computeAllRoutes<TPool extends Pair | Pool, TRoute extends V3Route | V2Route | MixedRoute>(
   tokenIn: Token,
   tokenOut: Token,
   buildRoute: (route: TPool[], tokenIn: Token, tokenOut: Token) => TRoute,
   pools: TPool[],
   maxHops: number
 ): TRoute[] {
-  const poolsUsed = Array<boolean>(pools.length).fill(false);
-  const routes: TRoute[] = [];
+  const poolsUsed = Array<boolean>(pools.length).fill(false)
+  const routes: TRoute[] = []
 
   const computeRoutes = (
     tokenIn: Token,
@@ -85,48 +69,37 @@ export function computeAllRoutes<
     _previousTokenOut?: Token
   ) => {
     if (currentRoute.length > maxHops) {
-      return;
+      return
     }
 
-    if (
-      currentRoute.length > 0 &&
-      currentRoute[currentRoute.length - 1]!.involvesToken(tokenOut)
-    ) {
-      routes.push(buildRoute([...currentRoute], tokenIn, tokenOut));
-      return;
+    if (currentRoute.length > 0 && currentRoute[currentRoute.length - 1]!.involvesToken(tokenOut)) {
+      routes.push(buildRoute([...currentRoute], tokenIn, tokenOut))
+      return
     }
 
     for (let i = 0; i < pools.length; i++) {
       if (poolsUsed[i]) {
-        continue;
+        continue
       }
 
-      const curPool = pools[i]!;
-      const previousTokenOut = _previousTokenOut ? _previousTokenOut : tokenIn;
+      const curPool = pools[i]!
+      const previousTokenOut = _previousTokenOut ? _previousTokenOut : tokenIn
 
       if (!curPool.involvesToken(previousTokenOut)) {
-        continue;
+        continue
       }
 
-      const currentTokenOut = curPool.token0.equals(previousTokenOut)
-        ? curPool.token1
-        : curPool.token0;
+      const currentTokenOut = curPool.token0.equals(previousTokenOut) ? curPool.token1 : curPool.token0
 
-      currentRoute.push(curPool);
-      poolsUsed[i] = true;
-      computeRoutes(
-        tokenIn,
-        tokenOut,
-        currentRoute,
-        poolsUsed,
-        currentTokenOut
-      );
-      poolsUsed[i] = false;
-      currentRoute.pop();
+      currentRoute.push(curPool)
+      poolsUsed[i] = true
+      computeRoutes(tokenIn, tokenOut, currentRoute, poolsUsed, currentTokenOut)
+      poolsUsed[i] = false
+      currentRoute.pop()
     }
-  };
+  }
 
-  computeRoutes(tokenIn, tokenOut, [], poolsUsed);
+  computeRoutes(tokenIn, tokenOut, [], poolsUsed)
 
   log.info(
     {
@@ -134,7 +107,7 @@ export function computeAllRoutes<
       pools: pools.map(poolToString),
     },
     `Computed ${routes.length} possible routes for type ${routes[0]?.protocol}.`
-  );
+  )
 
-  return routes;
+  return routes
 }

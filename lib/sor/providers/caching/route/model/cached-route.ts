@@ -1,11 +1,11 @@
-import { Protocol } from '@uniswap/router-sdk';
-import { Token } from '@uniswap/sdk-core';
+import { Protocol } from '@uniswap/router-sdk'
+import { Token } from '@uniswap/sdk-core'
 
-import { MixedRoute, V2Route, V3Route } from '../../../../routers';
+import { MixedRoute, V2Route, V3Route } from '../../../../routers'
 
 interface CachedRouteParams<Route extends V3Route | V2Route | MixedRoute> {
-  route: Route;
-  percent: number;
+  route: Route
+  percent: number
 }
 
 /**
@@ -15,27 +15,27 @@ interface CachedRouteParams<Route extends V3Route | V2Route | MixedRoute> {
  * @class CachedRoute
  */
 export class CachedRoute<Route extends V3Route | V2Route | MixedRoute> {
-  public readonly route: Route;
-  public readonly percent: number;
+  public readonly route: Route
+  public readonly percent: number
 
   /**
    * @param route
    * @param percent
    */
   constructor({ route, percent }: CachedRouteParams<Route>) {
-    this.route = route;
-    this.percent = percent;
+    this.route = route
+    this.percent = percent
   }
 
   public get protocol(): Protocol {
-    return this.route.protocol;
+    return this.route.protocol
   }
 
   public get tokenIn(): Token {
-    return this.route.input;
+    return this.route.input
   }
 
   public get tokenOut(): Token {
-    return this.route.output;
+    return this.route.output
   }
 }

@@ -1,55 +1,46 @@
-import { Interface } from '@ethersproject/abi';
-import { BigNumber } from '@ethersproject/bignumber';
+import { Interface } from '@ethersproject/abi'
+import { BigNumber } from '@ethersproject/bignumber'
 
-import { ProviderConfig } from './provider';
+import { ProviderConfig } from './provider'
 
-export type CallSameFunctionOnMultipleContractsParams<
-  TFunctionParams,
-  TAdditionalConfig = any
-> = {
-  addresses: string[];
-  contractInterface: Interface;
-  functionName: string;
-  functionParams?: TFunctionParams;
-  providerConfig?: ProviderConfig;
-  additionalConfig?: TAdditionalConfig;
-};
+export type CallSameFunctionOnMultipleContractsParams<TFunctionParams, TAdditionalConfig = any> = {
+  addresses: string[]
+  contractInterface: Interface
+  functionName: string
+  functionParams?: TFunctionParams
+  providerConfig?: ProviderConfig
+  additionalConfig?: TAdditionalConfig
+}
 
-export type CallSameFunctionOnContractWithMultipleParams<
-  TFunctionParams,
-  TAdditionalConfig = any
-> = {
-  address: string;
-  contractInterface: Interface;
-  functionName: string;
-  functionParams: TFunctionParams[];
-  providerConfig?: ProviderConfig;
-  additionalConfig?: TAdditionalConfig;
-};
+export type CallSameFunctionOnContractWithMultipleParams<TFunctionParams, TAdditionalConfig = any> = {
+  address: string
+  contractInterface: Interface
+  functionName: string
+  functionParams: TFunctionParams[]
+  providerConfig?: ProviderConfig
+  additionalConfig?: TAdditionalConfig
+}
 
-export type CallMultipleFunctionsOnSameContractParams<
-  TFunctionParams,
-  TAdditionalConfig = any
-> = {
-  address: string;
-  contractInterface: Interface;
-  functionNames: string[];
-  functionParams?: TFunctionParams[];
-  providerConfig?: ProviderConfig;
-  additionalConfig?: TAdditionalConfig;
-};
+export type CallMultipleFunctionsOnSameContractParams<TFunctionParams, TAdditionalConfig = any> = {
+  address: string
+  contractInterface: Interface
+  functionNames: string[]
+  functionParams?: TFunctionParams[]
+  providerConfig?: ProviderConfig
+  additionalConfig?: TAdditionalConfig
+}
 
 export type SuccessResult<TReturn> = {
-  success: true;
-  result: TReturn;
-};
+  success: true
+  result: TReturn
+}
 
 export type FailResult = {
-  success: false;
-  returnData: string;
-};
+  success: false
+  returnData: string
+}
 
-export type Result<TReturn> = SuccessResult<TReturn> | FailResult;
+export type Result<TReturn> = SuccessResult<TReturn> | FailResult
 
 /**
  * Provider for fetching data on chain using multicall contracts.
@@ -72,18 +63,12 @@ export abstract class IMulticallProvider<TMulticallConfig = any> {
    * @param params
    * @returns {*}
    */
-  public abstract callSameFunctionOnMultipleContracts<
-    TFunctionParams extends any[] | undefined,
-    TReturn = any
-  >(
-    params: CallSameFunctionOnMultipleContractsParams<
-      TFunctionParams,
-      TMulticallConfig
-    >
+  public abstract callSameFunctionOnMultipleContracts<TFunctionParams extends any[] | undefined, TReturn = any>(
+    params: CallSameFunctionOnMultipleContractsParams<TFunctionParams, TMulticallConfig>
   ): Promise<{
-    blockNumber: BigNumber;
-    results: Result<TReturn>[];
-  }>;
+    blockNumber: BigNumber
+    results: Result<TReturn>[]
+  }>
 
   /**
    * Calls a function on a single contract with different parameters.
@@ -101,25 +86,16 @@ export abstract class IMulticallProvider<TMulticallConfig = any> {
     TFunctionParams extends any[] | undefined,
     TReturn = any
   >(
-    params: CallSameFunctionOnContractWithMultipleParams<
-      TFunctionParams,
-      TMulticallConfig
-    >
+    params: CallSameFunctionOnContractWithMultipleParams<TFunctionParams, TMulticallConfig>
   ): Promise<{
-    blockNumber: BigNumber;
-    results: Result<TReturn>[];
-  }>;
+    blockNumber: BigNumber
+    results: Result<TReturn>[]
+  }>
 
-  public abstract callMultipleFunctionsOnSameContract<
-    TFunctionParams extends any[] | undefined,
-    TReturn = any
-  >(
-    params: CallMultipleFunctionsOnSameContractParams<
-      TFunctionParams,
-      TMulticallConfig
-    >
+  public abstract callMultipleFunctionsOnSameContract<TFunctionParams extends any[] | undefined, TReturn = any>(
+    params: CallMultipleFunctionsOnSameContractParams<TFunctionParams, TMulticallConfig>
   ): Promise<{
-    blockNumber: BigNumber;
-    results: Result<TReturn>[];
-  }>;
+    blockNumber: BigNumber
+    results: Result<TReturn>[]
+  }>
 }

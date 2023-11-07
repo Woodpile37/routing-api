@@ -2,80 +2,66 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { FunctionFragment, Result } from "@ethersproject/abi";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import {
-  BaseContract,
-  BigNumber,
-  BigNumberish,
-  CallOverrides,
-  ethers,
-  PopulatedTransaction,
-  Signer,
-} from "ethers";
-import { TypedEvent, TypedEventFilter, TypedListener } from "./commons";
+import { FunctionFragment, Result } from '@ethersproject/abi'
+import { BytesLike } from '@ethersproject/bytes'
+import { Listener, Provider } from '@ethersproject/providers'
+import { BaseContract, BigNumber, BigNumberish, CallOverrides, ethers, PopulatedTransaction, Signer } from 'ethers'
+import { TypedEvent, TypedEventFilter, TypedListener } from './commons'
 
 interface TickLensInterface extends ethers.utils.Interface {
   functions: {
-    "getPopulatedTicksInWord(address,int16)": FunctionFragment;
-  };
+    'getPopulatedTicksInWord(address,int16)': FunctionFragment
+  }
 
-  encodeFunctionData(
-    functionFragment: "getPopulatedTicksInWord",
-    values: [string, BigNumberish]
-  ): string;
+  encodeFunctionData(functionFragment: 'getPopulatedTicksInWord', values: [string, BigNumberish]): string
 
-  decodeFunctionResult(
-    functionFragment: "getPopulatedTicksInWord",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: 'getPopulatedTicksInWord', data: BytesLike): Result
 
-  events: {};
+  events: {}
 }
 
 export class TickLens extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this;
-  attach(addressOrName: string): this;
-  deployed(): Promise<this>;
+  connect(signerOrProvider: Signer | Provider | string): this
+  attach(addressOrName: string): this
+  deployed(): Promise<this>
 
   listeners<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter?: TypedEventFilter<EventArgsArray, EventArgsObject>
-  ): Array<TypedListener<EventArgsArray, EventArgsObject>>;
+  ): Array<TypedListener<EventArgsArray, EventArgsObject>>
   off<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   on<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   once<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   removeListener<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   removeAllListeners<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
 
-  listeners(eventName?: string): Array<Listener>;
-  off(eventName: string, listener: Listener): this;
-  on(eventName: string, listener: Listener): this;
-  once(eventName: string, listener: Listener): this;
-  removeListener(eventName: string, listener: Listener): this;
-  removeAllListeners(eventName?: string): this;
+  listeners(eventName?: string): Array<Listener>
+  off(eventName: string, listener: Listener): this
+  on(eventName: string, listener: Listener): this
+  once(eventName: string, listener: Listener): this
+  removeListener(eventName: string, listener: Listener): this
+  removeAllListeners(eventName?: string): this
 
   queryFilter<EventArgsArray extends Array<any>, EventArgsObject>(
     event: TypedEventFilter<EventArgsArray, EventArgsObject>,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
+  ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>
 
-  interface: TickLensInterface;
+  interface: TickLensInterface
 
   functions: {
     getPopulatedTicksInWord(
@@ -85,19 +71,19 @@ export class TickLens extends BaseContract {
     ): Promise<
       [
         ([number, BigNumber, BigNumber] & {
-          tick: number;
-          liquidityNet: BigNumber;
-          liquidityGross: BigNumber;
+          tick: number
+          liquidityNet: BigNumber
+          liquidityGross: BigNumber
         })[]
       ] & {
         populatedTicks: ([number, BigNumber, BigNumber] & {
-          tick: number;
-          liquidityNet: BigNumber;
-          liquidityGross: BigNumber;
-        })[];
+          tick: number
+          liquidityNet: BigNumber
+          liquidityGross: BigNumber
+        })[]
       }
-    >;
-  };
+    >
+  }
 
   getPopulatedTicksInWord(
     pool: string,
@@ -105,11 +91,11 @@ export class TickLens extends BaseContract {
     overrides?: CallOverrides
   ): Promise<
     ([number, BigNumber, BigNumber] & {
-      tick: number;
-      liquidityNet: BigNumber;
-      liquidityGross: BigNumber;
+      tick: number
+      liquidityNet: BigNumber
+      liquidityGross: BigNumber
     })[]
-  >;
+  >
 
   callStatic: {
     getPopulatedTicksInWord(
@@ -118,28 +104,24 @@ export class TickLens extends BaseContract {
       overrides?: CallOverrides
     ): Promise<
       ([number, BigNumber, BigNumber] & {
-        tick: number;
-        liquidityNet: BigNumber;
-        liquidityGross: BigNumber;
+        tick: number
+        liquidityNet: BigNumber
+        liquidityGross: BigNumber
       })[]
-    >;
-  };
+    >
+  }
 
-  filters: {};
+  filters: {}
 
   estimateGas: {
-    getPopulatedTicksInWord(
-      pool: string,
-      tickBitmapIndex: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
-  };
+    getPopulatedTicksInWord(pool: string, tickBitmapIndex: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>
+  }
 
   populateTransaction: {
     getPopulatedTicksInWord(
       pool: string,
       tickBitmapIndex: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-  };
+    ): Promise<PopulatedTransaction>
+  }
 }

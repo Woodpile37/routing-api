@@ -2,9 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { EventFragment, FunctionFragment, Result } from "@ethersproject/abi";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
+import { EventFragment, FunctionFragment, Result } from '@ethersproject/abi'
+import { BytesLike } from '@ethersproject/bytes'
+import { Listener, Provider } from '@ethersproject/providers'
 import {
   BaseContract,
   BigNumber,
@@ -15,89 +15,68 @@ import {
   Overrides,
   PopulatedTransaction,
   Signer,
-} from "ethers";
-import { TypedEvent, TypedEventFilter, TypedListener } from "./commons";
+} from 'ethers'
+import { TypedEvent, TypedEventFilter, TypedListener } from './commons'
 
 interface Permit2Interface extends ethers.utils.Interface {
   functions: {
-    "DOMAIN_SEPARATOR()": FunctionFragment;
-    "allowance(address,address,address)": FunctionFragment;
-    "approve(address,address,uint160,uint48)": FunctionFragment;
-    "invalidateNonces(address,address,uint48)": FunctionFragment;
-    "invalidateUnorderedNonces(uint256,uint256)": FunctionFragment;
-    "lockdown(tuple[])": FunctionFragment;
-    "nonceBitmap(address,uint256)": FunctionFragment;
-    "permit(address,tuple,bytes)": FunctionFragment;
-    "permitTransferFrom(tuple,tuple,address,bytes)": FunctionFragment;
-    "permitWitnessTransferFrom(tuple,tuple,address,bytes32,string,bytes)": FunctionFragment;
-    "transferFrom(tuple[])": FunctionFragment;
-  };
+    'DOMAIN_SEPARATOR()': FunctionFragment
+    'allowance(address,address,address)': FunctionFragment
+    'approve(address,address,uint160,uint48)': FunctionFragment
+    'invalidateNonces(address,address,uint48)': FunctionFragment
+    'invalidateUnorderedNonces(uint256,uint256)': FunctionFragment
+    'lockdown(tuple[])': FunctionFragment
+    'nonceBitmap(address,uint256)': FunctionFragment
+    'permit(address,tuple,bytes)': FunctionFragment
+    'permitTransferFrom(tuple,tuple,address,bytes)': FunctionFragment
+    'permitWitnessTransferFrom(tuple,tuple,address,bytes32,string,bytes)': FunctionFragment
+    'transferFrom(tuple[])': FunctionFragment
+  }
 
+  encodeFunctionData(functionFragment: 'DOMAIN_SEPARATOR', values?: undefined): string
+  encodeFunctionData(functionFragment: 'allowance', values: [string, string, string]): string
+  encodeFunctionData(functionFragment: 'approve', values: [string, string, BigNumberish, BigNumberish]): string
+  encodeFunctionData(functionFragment: 'invalidateNonces', values: [string, string, BigNumberish]): string
+  encodeFunctionData(functionFragment: 'invalidateUnorderedNonces', values: [BigNumberish, BigNumberish]): string
+  encodeFunctionData(functionFragment: 'lockdown', values: [{ token: string; spender: string }[]]): string
+  encodeFunctionData(functionFragment: 'nonceBitmap', values: [string, BigNumberish]): string
   encodeFunctionData(
-    functionFragment: "DOMAIN_SEPARATOR",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "allowance",
-    values: [string, string, string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "approve",
-    values: [string, string, BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "invalidateNonces",
-    values: [string, string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "invalidateUnorderedNonces",
-    values: [BigNumberish, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "lockdown",
-    values: [{ token: string; spender: string }[]]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "nonceBitmap",
-    values: [string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "permit",
+    functionFragment: 'permit',
     values: [
       string,
       {
         details: {
-          token: string;
-          amount: BigNumberish;
-          expiration: BigNumberish;
-          nonce: BigNumberish;
-        }[];
-        spender: string;
-        sigDeadline: BigNumberish;
+          token: string
+          amount: BigNumberish
+          expiration: BigNumberish
+          nonce: BigNumberish
+        }[]
+        spender: string
+        sigDeadline: BigNumberish
       },
       BytesLike
     ]
-  ): string;
+  ): string
   encodeFunctionData(
-    functionFragment: "permitTransferFrom",
+    functionFragment: 'permitTransferFrom',
     values: [
       {
-        permitted: { token: string; amount: BigNumberish };
-        nonce: BigNumberish;
-        deadline: BigNumberish;
+        permitted: { token: string; amount: BigNumberish }
+        nonce: BigNumberish
+        deadline: BigNumberish
       },
       { to: string; requestedAmount: BigNumberish },
       string,
       BytesLike
     ]
-  ): string;
+  ): string
   encodeFunctionData(
-    functionFragment: "permitWitnessTransferFrom",
+    functionFragment: 'permitWitnessTransferFrom',
     values: [
       {
-        permitted: { token: string; amount: BigNumberish };
-        nonce: BigNumberish;
-        deadline: BigNumberish;
+        permitted: { token: string; amount: BigNumberish }
+        nonce: BigNumberish
+        deadline: BigNumberish
       },
       { to: string; requestedAmount: BigNumberish },
       string,
@@ -105,107 +84,84 @@ interface Permit2Interface extends ethers.utils.Interface {
       string,
       BytesLike
     ]
-  ): string;
+  ): string
   encodeFunctionData(
-    functionFragment: "transferFrom",
-    values: [
-      { from: string; to: string; amount: BigNumberish; token: string }[]
-    ]
-  ): string;
+    functionFragment: 'transferFrom',
+    values: [{ from: string; to: string; amount: BigNumberish; token: string }[]]
+  ): string
 
-  decodeFunctionResult(
-    functionFragment: "DOMAIN_SEPARATOR",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "allowance", data: BytesLike): Result;
-  decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "invalidateNonces",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "invalidateUnorderedNonces",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "lockdown", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "nonceBitmap",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "permit", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "permitTransferFrom",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "permitWitnessTransferFrom",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "transferFrom",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: 'DOMAIN_SEPARATOR', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'allowance', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'approve', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'invalidateNonces', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'invalidateUnorderedNonces', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'lockdown', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'nonceBitmap', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'permit', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'permitTransferFrom', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'permitWitnessTransferFrom', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'transferFrom', data: BytesLike): Result
 
   events: {
-    "Approval(address,address,address,uint160,uint48)": EventFragment;
-    "Lockdown(address,address,address)": EventFragment;
-    "NonceInvalidation(address,address,address,uint48,uint48)": EventFragment;
-    "Permit(address,address,address,uint160,uint48,uint48)": EventFragment;
-    "UnorderedNonceInvalidation(address,uint256,uint256)": EventFragment;
-  };
+    'Approval(address,address,address,uint160,uint48)': EventFragment
+    'Lockdown(address,address,address)': EventFragment
+    'NonceInvalidation(address,address,address,uint48,uint48)': EventFragment
+    'Permit(address,address,address,uint160,uint48,uint48)': EventFragment
+    'UnorderedNonceInvalidation(address,uint256,uint256)': EventFragment
+  }
 
-  getEvent(nameOrSignatureOrTopic: "Approval"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Lockdown"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "NonceInvalidation"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "Permit"): EventFragment;
-  getEvent(nameOrSignatureOrTopic: "UnorderedNonceInvalidation"): EventFragment;
+  getEvent(nameOrSignatureOrTopic: 'Approval'): EventFragment
+  getEvent(nameOrSignatureOrTopic: 'Lockdown'): EventFragment
+  getEvent(nameOrSignatureOrTopic: 'NonceInvalidation'): EventFragment
+  getEvent(nameOrSignatureOrTopic: 'Permit'): EventFragment
+  getEvent(nameOrSignatureOrTopic: 'UnorderedNonceInvalidation'): EventFragment
 }
 
 export class Permit2 extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this;
-  attach(addressOrName: string): this;
-  deployed(): Promise<this>;
+  connect(signerOrProvider: Signer | Provider | string): this
+  attach(addressOrName: string): this
+  deployed(): Promise<this>
 
   listeners<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter?: TypedEventFilter<EventArgsArray, EventArgsObject>
-  ): Array<TypedListener<EventArgsArray, EventArgsObject>>;
+  ): Array<TypedListener<EventArgsArray, EventArgsObject>>
   off<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   on<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   once<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   removeListener<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   removeAllListeners<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
 
-  listeners(eventName?: string): Array<Listener>;
-  off(eventName: string, listener: Listener): this;
-  on(eventName: string, listener: Listener): this;
-  once(eventName: string, listener: Listener): this;
-  removeListener(eventName: string, listener: Listener): this;
-  removeAllListeners(eventName?: string): this;
+  listeners(eventName?: string): Array<Listener>
+  off(eventName: string, listener: Listener): this
+  on(eventName: string, listener: Listener): this
+  once(eventName: string, listener: Listener): this
+  removeListener(eventName: string, listener: Listener): this
+  removeAllListeners(eventName?: string): this
 
   queryFilter<EventArgsArray extends Array<any>, EventArgsObject>(
     event: TypedEventFilter<EventArgsArray, EventArgsObject>,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
+  ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>
 
-  interface: Permit2Interface;
+  interface: Permit2Interface
 
   functions: {
-    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<[string]>;
+    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<[string]>
 
     allowance(
       arg0: string,
@@ -214,11 +170,11 @@ export class Permit2 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<
       [BigNumber, number, number] & {
-        amount: BigNumber;
-        expiration: number;
-        nonce: number;
+        amount: BigNumber
+        expiration: number
+        nonce: number
       }
-    >;
+    >
 
     approve(
       token: string,
@@ -226,93 +182,89 @@ export class Permit2 extends BaseContract {
       amount: BigNumberish,
       expiration: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     invalidateNonces(
       token: string,
       spender: string,
       newNonce: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     invalidateUnorderedNonces(
       wordPos: BigNumberish,
       mask: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     lockdown(
       approvals: { token: string; spender: string }[],
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
-    nonceBitmap(
-      arg0: string,
-      arg1: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber]>;
+    nonceBitmap(arg0: string, arg1: BigNumberish, overrides?: CallOverrides): Promise<[BigNumber]>
 
-    "permit(address,(tuple[],address,uint256),bytes)"(
+    'permit(address,(tuple[],address,uint256),bytes)'(
       owner: string,
       permitBatch: {
         details: {
-          token: string;
-          amount: BigNumberish;
-          expiration: BigNumberish;
-          nonce: BigNumberish;
-        }[];
-        spender: string;
-        sigDeadline: BigNumberish;
+          token: string
+          amount: BigNumberish
+          expiration: BigNumberish
+          nonce: BigNumberish
+        }[]
+        spender: string
+        sigDeadline: BigNumberish
       },
       signature: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
-    "permit(address,((address,uint160,uint48,uint48),address,uint256),bytes)"(
+    'permit(address,((address,uint160,uint48,uint48),address,uint256),bytes)'(
       owner: string,
       permitSingle: {
         details: {
-          token: string;
-          amount: BigNumberish;
-          expiration: BigNumberish;
-          nonce: BigNumberish;
-        };
-        spender: string;
-        sigDeadline: BigNumberish;
+          token: string
+          amount: BigNumberish
+          expiration: BigNumberish
+          nonce: BigNumberish
+        }
+        spender: string
+        sigDeadline: BigNumberish
       },
       signature: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
-    "permitTransferFrom(((address,uint256),uint256,uint256),(address,uint256),address,bytes)"(
+    'permitTransferFrom(((address,uint256),uint256,uint256),(address,uint256),address,bytes)'(
       permit: {
-        permitted: { token: string; amount: BigNumberish };
-        nonce: BigNumberish;
-        deadline: BigNumberish;
+        permitted: { token: string; amount: BigNumberish }
+        nonce: BigNumberish
+        deadline: BigNumberish
       },
       transferDetails: { to: string; requestedAmount: BigNumberish },
       owner: string,
       signature: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
-    "permitTransferFrom((tuple[],uint256,uint256),tuple[],address,bytes)"(
+    'permitTransferFrom((tuple[],uint256,uint256),tuple[],address,bytes)'(
       permit: {
-        permitted: { token: string; amount: BigNumberish }[];
-        nonce: BigNumberish;
-        deadline: BigNumberish;
+        permitted: { token: string; amount: BigNumberish }[]
+        nonce: BigNumberish
+        deadline: BigNumberish
       },
       transferDetails: { to: string; requestedAmount: BigNumberish }[],
       owner: string,
       signature: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
-    "permitWitnessTransferFrom(((address,uint256),uint256,uint256),(address,uint256),address,bytes32,string,bytes)"(
+    'permitWitnessTransferFrom(((address,uint256),uint256,uint256),(address,uint256),address,bytes32,string,bytes)'(
       permit: {
-        permitted: { token: string; amount: BigNumberish };
-        nonce: BigNumberish;
-        deadline: BigNumberish;
+        permitted: { token: string; amount: BigNumberish }
+        nonce: BigNumberish
+        deadline: BigNumberish
       },
       transferDetails: { to: string; requestedAmount: BigNumberish },
       owner: string,
@@ -320,13 +272,13 @@ export class Permit2 extends BaseContract {
       witnessTypeString: string,
       signature: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
-    "permitWitnessTransferFrom((tuple[],uint256,uint256),tuple[],address,bytes32,string,bytes)"(
+    'permitWitnessTransferFrom((tuple[],uint256,uint256),tuple[],address,bytes32,string,bytes)'(
       permit: {
-        permitted: { token: string; amount: BigNumberish }[];
-        nonce: BigNumberish;
-        deadline: BigNumberish;
+        permitted: { token: string; amount: BigNumberish }[]
+        nonce: BigNumberish
+        deadline: BigNumberish
       },
       transferDetails: { to: string; requestedAmount: BigNumberish }[],
       owner: string,
@@ -334,28 +286,28 @@ export class Permit2 extends BaseContract {
       witnessTypeString: string,
       signature: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
-    "transferFrom(tuple[])"(
+    'transferFrom(tuple[])'(
       transferDetails: {
-        from: string;
-        to: string;
-        amount: BigNumberish;
-        token: string;
+        from: string
+        to: string
+        amount: BigNumberish
+        token: string
       }[],
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
-    "transferFrom(address,address,uint160,address)"(
+    'transferFrom(address,address,uint160,address)'(
       from: string,
       to: string,
       amount: BigNumberish,
       token: string,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-  };
+    ): Promise<ContractTransaction>
+  }
 
-  DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<string>;
+  DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<string>
 
   allowance(
     arg0: string,
@@ -364,11 +316,11 @@ export class Permit2 extends BaseContract {
     overrides?: CallOverrides
   ): Promise<
     [BigNumber, number, number] & {
-      amount: BigNumber;
-      expiration: number;
-      nonce: number;
+      amount: BigNumber
+      expiration: number
+      nonce: number
     }
-  >;
+  >
 
   approve(
     token: string,
@@ -376,93 +328,89 @@ export class Permit2 extends BaseContract {
     amount: BigNumberish,
     expiration: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   invalidateNonces(
     token: string,
     spender: string,
     newNonce: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   invalidateUnorderedNonces(
     wordPos: BigNumberish,
     mask: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   lockdown(
     approvals: { token: string; spender: string }[],
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
-  nonceBitmap(
-    arg0: string,
-    arg1: BigNumberish,
-    overrides?: CallOverrides
-  ): Promise<BigNumber>;
+  nonceBitmap(arg0: string, arg1: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>
 
-  "permit(address,(tuple[],address,uint256),bytes)"(
+  'permit(address,(tuple[],address,uint256),bytes)'(
     owner: string,
     permitBatch: {
       details: {
-        token: string;
-        amount: BigNumberish;
-        expiration: BigNumberish;
-        nonce: BigNumberish;
-      }[];
-      spender: string;
-      sigDeadline: BigNumberish;
+        token: string
+        amount: BigNumberish
+        expiration: BigNumberish
+        nonce: BigNumberish
+      }[]
+      spender: string
+      sigDeadline: BigNumberish
     },
     signature: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
-  "permit(address,((address,uint160,uint48,uint48),address,uint256),bytes)"(
+  'permit(address,((address,uint160,uint48,uint48),address,uint256),bytes)'(
     owner: string,
     permitSingle: {
       details: {
-        token: string;
-        amount: BigNumberish;
-        expiration: BigNumberish;
-        nonce: BigNumberish;
-      };
-      spender: string;
-      sigDeadline: BigNumberish;
+        token: string
+        amount: BigNumberish
+        expiration: BigNumberish
+        nonce: BigNumberish
+      }
+      spender: string
+      sigDeadline: BigNumberish
     },
     signature: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
-  "permitTransferFrom(((address,uint256),uint256,uint256),(address,uint256),address,bytes)"(
+  'permitTransferFrom(((address,uint256),uint256,uint256),(address,uint256),address,bytes)'(
     permit: {
-      permitted: { token: string; amount: BigNumberish };
-      nonce: BigNumberish;
-      deadline: BigNumberish;
+      permitted: { token: string; amount: BigNumberish }
+      nonce: BigNumberish
+      deadline: BigNumberish
     },
     transferDetails: { to: string; requestedAmount: BigNumberish },
     owner: string,
     signature: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
-  "permitTransferFrom((tuple[],uint256,uint256),tuple[],address,bytes)"(
+  'permitTransferFrom((tuple[],uint256,uint256),tuple[],address,bytes)'(
     permit: {
-      permitted: { token: string; amount: BigNumberish }[];
-      nonce: BigNumberish;
-      deadline: BigNumberish;
+      permitted: { token: string; amount: BigNumberish }[]
+      nonce: BigNumberish
+      deadline: BigNumberish
     },
     transferDetails: { to: string; requestedAmount: BigNumberish }[],
     owner: string,
     signature: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
-  "permitWitnessTransferFrom(((address,uint256),uint256,uint256),(address,uint256),address,bytes32,string,bytes)"(
+  'permitWitnessTransferFrom(((address,uint256),uint256,uint256),(address,uint256),address,bytes32,string,bytes)'(
     permit: {
-      permitted: { token: string; amount: BigNumberish };
-      nonce: BigNumberish;
-      deadline: BigNumberish;
+      permitted: { token: string; amount: BigNumberish }
+      nonce: BigNumberish
+      deadline: BigNumberish
     },
     transferDetails: { to: string; requestedAmount: BigNumberish },
     owner: string,
@@ -470,13 +418,13 @@ export class Permit2 extends BaseContract {
     witnessTypeString: string,
     signature: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
-  "permitWitnessTransferFrom((tuple[],uint256,uint256),tuple[],address,bytes32,string,bytes)"(
+  'permitWitnessTransferFrom((tuple[],uint256,uint256),tuple[],address,bytes32,string,bytes)'(
     permit: {
-      permitted: { token: string; amount: BigNumberish }[];
-      nonce: BigNumberish;
-      deadline: BigNumberish;
+      permitted: { token: string; amount: BigNumberish }[]
+      nonce: BigNumberish
+      deadline: BigNumberish
     },
     transferDetails: { to: string; requestedAmount: BigNumberish }[],
     owner: string,
@@ -484,28 +432,28 @@ export class Permit2 extends BaseContract {
     witnessTypeString: string,
     signature: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
-  "transferFrom(tuple[])"(
+  'transferFrom(tuple[])'(
     transferDetails: {
-      from: string;
-      to: string;
-      amount: BigNumberish;
-      token: string;
+      from: string
+      to: string
+      amount: BigNumberish
+      token: string
     }[],
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
-  "transferFrom(address,address,uint160,address)"(
+  'transferFrom(address,address,uint160,address)'(
     from: string,
     to: string,
     amount: BigNumberish,
     token: string,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   callStatic: {
-    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<string>;
+    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<string>
 
     allowance(
       arg0: string,
@@ -514,11 +462,11 @@ export class Permit2 extends BaseContract {
       overrides?: CallOverrides
     ): Promise<
       [BigNumber, number, number] & {
-        amount: BigNumber;
-        expiration: number;
-        nonce: number;
+        amount: BigNumber
+        expiration: number
+        nonce: number
       }
-    >;
+    >
 
     approve(
       token: string,
@@ -526,93 +474,77 @@ export class Permit2 extends BaseContract {
       amount: BigNumberish,
       expiration: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
-    invalidateNonces(
-      token: string,
-      spender: string,
-      newNonce: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    invalidateNonces(token: string, spender: string, newNonce: BigNumberish, overrides?: CallOverrides): Promise<void>
 
-    invalidateUnorderedNonces(
-      wordPos: BigNumberish,
-      mask: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    invalidateUnorderedNonces(wordPos: BigNumberish, mask: BigNumberish, overrides?: CallOverrides): Promise<void>
 
-    lockdown(
-      approvals: { token: string; spender: string }[],
-      overrides?: CallOverrides
-    ): Promise<void>;
+    lockdown(approvals: { token: string; spender: string }[], overrides?: CallOverrides): Promise<void>
 
-    nonceBitmap(
-      arg0: string,
-      arg1: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    nonceBitmap(arg0: string, arg1: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>
 
-    "permit(address,(tuple[],address,uint256),bytes)"(
+    'permit(address,(tuple[],address,uint256),bytes)'(
       owner: string,
       permitBatch: {
         details: {
-          token: string;
-          amount: BigNumberish;
-          expiration: BigNumberish;
-          nonce: BigNumberish;
-        }[];
-        spender: string;
-        sigDeadline: BigNumberish;
+          token: string
+          amount: BigNumberish
+          expiration: BigNumberish
+          nonce: BigNumberish
+        }[]
+        spender: string
+        sigDeadline: BigNumberish
       },
       signature: BytesLike,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
-    "permit(address,((address,uint160,uint48,uint48),address,uint256),bytes)"(
+    'permit(address,((address,uint160,uint48,uint48),address,uint256),bytes)'(
       owner: string,
       permitSingle: {
         details: {
-          token: string;
-          amount: BigNumberish;
-          expiration: BigNumberish;
-          nonce: BigNumberish;
-        };
-        spender: string;
-        sigDeadline: BigNumberish;
+          token: string
+          amount: BigNumberish
+          expiration: BigNumberish
+          nonce: BigNumberish
+        }
+        spender: string
+        sigDeadline: BigNumberish
       },
       signature: BytesLike,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
-    "permitTransferFrom(((address,uint256),uint256,uint256),(address,uint256),address,bytes)"(
+    'permitTransferFrom(((address,uint256),uint256,uint256),(address,uint256),address,bytes)'(
       permit: {
-        permitted: { token: string; amount: BigNumberish };
-        nonce: BigNumberish;
-        deadline: BigNumberish;
+        permitted: { token: string; amount: BigNumberish }
+        nonce: BigNumberish
+        deadline: BigNumberish
       },
       transferDetails: { to: string; requestedAmount: BigNumberish },
       owner: string,
       signature: BytesLike,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
-    "permitTransferFrom((tuple[],uint256,uint256),tuple[],address,bytes)"(
+    'permitTransferFrom((tuple[],uint256,uint256),tuple[],address,bytes)'(
       permit: {
-        permitted: { token: string; amount: BigNumberish }[];
-        nonce: BigNumberish;
-        deadline: BigNumberish;
+        permitted: { token: string; amount: BigNumberish }[]
+        nonce: BigNumberish
+        deadline: BigNumberish
       },
       transferDetails: { to: string; requestedAmount: BigNumberish }[],
       owner: string,
       signature: BytesLike,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
-    "permitWitnessTransferFrom(((address,uint256),uint256,uint256),(address,uint256),address,bytes32,string,bytes)"(
+    'permitWitnessTransferFrom(((address,uint256),uint256,uint256),(address,uint256),address,bytes32,string,bytes)'(
       permit: {
-        permitted: { token: string; amount: BigNumberish };
-        nonce: BigNumberish;
-        deadline: BigNumberish;
+        permitted: { token: string; amount: BigNumberish }
+        nonce: BigNumberish
+        deadline: BigNumberish
       },
       transferDetails: { to: string; requestedAmount: BigNumberish },
       owner: string,
@@ -620,13 +552,13 @@ export class Permit2 extends BaseContract {
       witnessTypeString: string,
       signature: BytesLike,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
-    "permitWitnessTransferFrom((tuple[],uint256,uint256),tuple[],address,bytes32,string,bytes)"(
+    'permitWitnessTransferFrom((tuple[],uint256,uint256),tuple[],address,bytes32,string,bytes)'(
       permit: {
-        permitted: { token: string; amount: BigNumberish }[];
-        nonce: BigNumberish;
-        deadline: BigNumberish;
+        permitted: { token: string; amount: BigNumberish }[]
+        nonce: BigNumberish
+        deadline: BigNumberish
       },
       transferDetails: { to: string; requestedAmount: BigNumberish }[],
       owner: string,
@@ -634,26 +566,26 @@ export class Permit2 extends BaseContract {
       witnessTypeString: string,
       signature: BytesLike,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
-    "transferFrom(tuple[])"(
+    'transferFrom(tuple[])'(
       transferDetails: {
-        from: string;
-        to: string;
-        amount: BigNumberish;
-        token: string;
+        from: string
+        to: string
+        amount: BigNumberish
+        token: string
       }[],
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
-    "transferFrom(address,address,uint160,address)"(
+    'transferFrom(address,address,uint160,address)'(
       from: string,
       to: string,
       amount: BigNumberish,
       token: string,
       overrides?: CallOverrides
-    ): Promise<void>;
-  };
+    ): Promise<void>
+  }
 
   filters: {
     Approval(
@@ -665,22 +597,19 @@ export class Permit2 extends BaseContract {
     ): TypedEventFilter<
       [string, string, string, BigNumber, number],
       {
-        owner: string;
-        token: string;
-        spender: string;
-        amount: BigNumber;
-        expiration: number;
+        owner: string
+        token: string
+        spender: string
+        amount: BigNumber
+        expiration: number
       }
-    >;
+    >
 
     Lockdown(
       owner?: string | null,
       token?: null,
       spender?: null
-    ): TypedEventFilter<
-      [string, string, string],
-      { owner: string; token: string; spender: string }
-    >;
+    ): TypedEventFilter<[string, string, string], { owner: string; token: string; spender: string }>
 
     NonceInvalidation(
       owner?: string | null,
@@ -691,13 +620,13 @@ export class Permit2 extends BaseContract {
     ): TypedEventFilter<
       [string, string, string, number, number],
       {
-        owner: string;
-        token: string;
-        spender: string;
-        newNonce: number;
-        oldNonce: number;
+        owner: string
+        token: string
+        spender: string
+        newNonce: number
+        oldNonce: number
       }
-    >;
+    >
 
     Permit(
       owner?: string | null,
@@ -709,34 +638,26 @@ export class Permit2 extends BaseContract {
     ): TypedEventFilter<
       [string, string, string, BigNumber, number, number],
       {
-        owner: string;
-        token: string;
-        spender: string;
-        amount: BigNumber;
-        expiration: number;
-        nonce: number;
+        owner: string
+        token: string
+        spender: string
+        amount: BigNumber
+        expiration: number
+        nonce: number
       }
-    >;
+    >
 
     UnorderedNonceInvalidation(
       owner?: string | null,
       word?: null,
       mask?: null
-    ): TypedEventFilter<
-      [string, BigNumber, BigNumber],
-      { owner: string; word: BigNumber; mask: BigNumber }
-    >;
-  };
+    ): TypedEventFilter<[string, BigNumber, BigNumber], { owner: string; word: BigNumber; mask: BigNumber }>
+  }
 
   estimateGas: {
-    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<BigNumber>;
+    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<BigNumber>
 
-    allowance(
-      arg0: string,
-      arg1: string,
-      arg2: string,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    allowance(arg0: string, arg1: string, arg2: string, overrides?: CallOverrides): Promise<BigNumber>
 
     approve(
       token: string,
@@ -744,93 +665,89 @@ export class Permit2 extends BaseContract {
       amount: BigNumberish,
       expiration: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     invalidateNonces(
       token: string,
       spender: string,
       newNonce: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     invalidateUnorderedNonces(
       wordPos: BigNumberish,
       mask: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     lockdown(
       approvals: { token: string; spender: string }[],
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    nonceBitmap(
-      arg0: string,
-      arg1: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<BigNumber>;
+    nonceBitmap(arg0: string, arg1: BigNumberish, overrides?: CallOverrides): Promise<BigNumber>
 
-    "permit(address,(tuple[],address,uint256),bytes)"(
+    'permit(address,(tuple[],address,uint256),bytes)'(
       owner: string,
       permitBatch: {
         details: {
-          token: string;
-          amount: BigNumberish;
-          expiration: BigNumberish;
-          nonce: BigNumberish;
-        }[];
-        spender: string;
-        sigDeadline: BigNumberish;
+          token: string
+          amount: BigNumberish
+          expiration: BigNumberish
+          nonce: BigNumberish
+        }[]
+        spender: string
+        sigDeadline: BigNumberish
       },
       signature: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    "permit(address,((address,uint160,uint48,uint48),address,uint256),bytes)"(
+    'permit(address,((address,uint160,uint48,uint48),address,uint256),bytes)'(
       owner: string,
       permitSingle: {
         details: {
-          token: string;
-          amount: BigNumberish;
-          expiration: BigNumberish;
-          nonce: BigNumberish;
-        };
-        spender: string;
-        sigDeadline: BigNumberish;
+          token: string
+          amount: BigNumberish
+          expiration: BigNumberish
+          nonce: BigNumberish
+        }
+        spender: string
+        sigDeadline: BigNumberish
       },
       signature: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    "permitTransferFrom(((address,uint256),uint256,uint256),(address,uint256),address,bytes)"(
+    'permitTransferFrom(((address,uint256),uint256,uint256),(address,uint256),address,bytes)'(
       permit: {
-        permitted: { token: string; amount: BigNumberish };
-        nonce: BigNumberish;
-        deadline: BigNumberish;
+        permitted: { token: string; amount: BigNumberish }
+        nonce: BigNumberish
+        deadline: BigNumberish
       },
       transferDetails: { to: string; requestedAmount: BigNumberish },
       owner: string,
       signature: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    "permitTransferFrom((tuple[],uint256,uint256),tuple[],address,bytes)"(
+    'permitTransferFrom((tuple[],uint256,uint256),tuple[],address,bytes)'(
       permit: {
-        permitted: { token: string; amount: BigNumberish }[];
-        nonce: BigNumberish;
-        deadline: BigNumberish;
+        permitted: { token: string; amount: BigNumberish }[]
+        nonce: BigNumberish
+        deadline: BigNumberish
       },
       transferDetails: { to: string; requestedAmount: BigNumberish }[],
       owner: string,
       signature: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    "permitWitnessTransferFrom(((address,uint256),uint256,uint256),(address,uint256),address,bytes32,string,bytes)"(
+    'permitWitnessTransferFrom(((address,uint256),uint256,uint256),(address,uint256),address,bytes32,string,bytes)'(
       permit: {
-        permitted: { token: string; amount: BigNumberish };
-        nonce: BigNumberish;
-        deadline: BigNumberish;
+        permitted: { token: string; amount: BigNumberish }
+        nonce: BigNumberish
+        deadline: BigNumberish
       },
       transferDetails: { to: string; requestedAmount: BigNumberish },
       owner: string,
@@ -838,13 +755,13 @@ export class Permit2 extends BaseContract {
       witnessTypeString: string,
       signature: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    "permitWitnessTransferFrom((tuple[],uint256,uint256),tuple[],address,bytes32,string,bytes)"(
+    'permitWitnessTransferFrom((tuple[],uint256,uint256),tuple[],address,bytes32,string,bytes)'(
       permit: {
-        permitted: { token: string; amount: BigNumberish }[];
-        nonce: BigNumberish;
-        deadline: BigNumberish;
+        permitted: { token: string; amount: BigNumberish }[]
+        nonce: BigNumberish
+        deadline: BigNumberish
       },
       transferDetails: { to: string; requestedAmount: BigNumberish }[],
       owner: string,
@@ -852,36 +769,31 @@ export class Permit2 extends BaseContract {
       witnessTypeString: string,
       signature: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    "transferFrom(tuple[])"(
+    'transferFrom(tuple[])'(
       transferDetails: {
-        from: string;
-        to: string;
-        amount: BigNumberish;
-        token: string;
+        from: string
+        to: string
+        amount: BigNumberish
+        token: string
       }[],
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
-    "transferFrom(address,address,uint160,address)"(
+    'transferFrom(address,address,uint160,address)'(
       from: string,
       to: string,
       amount: BigNumberish,
       token: string,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-  };
+    ): Promise<BigNumber>
+  }
 
   populateTransaction: {
-    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+    DOMAIN_SEPARATOR(overrides?: CallOverrides): Promise<PopulatedTransaction>
 
-    allowance(
-      arg0: string,
-      arg1: string,
-      arg2: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    allowance(arg0: string, arg1: string, arg2: string, overrides?: CallOverrides): Promise<PopulatedTransaction>
 
     approve(
       token: string,
@@ -889,93 +801,89 @@ export class Permit2 extends BaseContract {
       amount: BigNumberish,
       expiration: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     invalidateNonces(
       token: string,
       spender: string,
       newNonce: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     invalidateUnorderedNonces(
       wordPos: BigNumberish,
       mask: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     lockdown(
       approvals: { token: string; spender: string }[],
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    nonceBitmap(
-      arg0: string,
-      arg1: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    nonceBitmap(arg0: string, arg1: BigNumberish, overrides?: CallOverrides): Promise<PopulatedTransaction>
 
-    "permit(address,(tuple[],address,uint256),bytes)"(
+    'permit(address,(tuple[],address,uint256),bytes)'(
       owner: string,
       permitBatch: {
         details: {
-          token: string;
-          amount: BigNumberish;
-          expiration: BigNumberish;
-          nonce: BigNumberish;
-        }[];
-        spender: string;
-        sigDeadline: BigNumberish;
+          token: string
+          amount: BigNumberish
+          expiration: BigNumberish
+          nonce: BigNumberish
+        }[]
+        spender: string
+        sigDeadline: BigNumberish
       },
       signature: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    "permit(address,((address,uint160,uint48,uint48),address,uint256),bytes)"(
+    'permit(address,((address,uint160,uint48,uint48),address,uint256),bytes)'(
       owner: string,
       permitSingle: {
         details: {
-          token: string;
-          amount: BigNumberish;
-          expiration: BigNumberish;
-          nonce: BigNumberish;
-        };
-        spender: string;
-        sigDeadline: BigNumberish;
+          token: string
+          amount: BigNumberish
+          expiration: BigNumberish
+          nonce: BigNumberish
+        }
+        spender: string
+        sigDeadline: BigNumberish
       },
       signature: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    "permitTransferFrom(((address,uint256),uint256,uint256),(address,uint256),address,bytes)"(
+    'permitTransferFrom(((address,uint256),uint256,uint256),(address,uint256),address,bytes)'(
       permit: {
-        permitted: { token: string; amount: BigNumberish };
-        nonce: BigNumberish;
-        deadline: BigNumberish;
+        permitted: { token: string; amount: BigNumberish }
+        nonce: BigNumberish
+        deadline: BigNumberish
       },
       transferDetails: { to: string; requestedAmount: BigNumberish },
       owner: string,
       signature: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    "permitTransferFrom((tuple[],uint256,uint256),tuple[],address,bytes)"(
+    'permitTransferFrom((tuple[],uint256,uint256),tuple[],address,bytes)'(
       permit: {
-        permitted: { token: string; amount: BigNumberish }[];
-        nonce: BigNumberish;
-        deadline: BigNumberish;
+        permitted: { token: string; amount: BigNumberish }[]
+        nonce: BigNumberish
+        deadline: BigNumberish
       },
       transferDetails: { to: string; requestedAmount: BigNumberish }[],
       owner: string,
       signature: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    "permitWitnessTransferFrom(((address,uint256),uint256,uint256),(address,uint256),address,bytes32,string,bytes)"(
+    'permitWitnessTransferFrom(((address,uint256),uint256,uint256),(address,uint256),address,bytes32,string,bytes)'(
       permit: {
-        permitted: { token: string; amount: BigNumberish };
-        nonce: BigNumberish;
-        deadline: BigNumberish;
+        permitted: { token: string; amount: BigNumberish }
+        nonce: BigNumberish
+        deadline: BigNumberish
       },
       transferDetails: { to: string; requestedAmount: BigNumberish },
       owner: string,
@@ -983,13 +891,13 @@ export class Permit2 extends BaseContract {
       witnessTypeString: string,
       signature: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    "permitWitnessTransferFrom((tuple[],uint256,uint256),tuple[],address,bytes32,string,bytes)"(
+    'permitWitnessTransferFrom((tuple[],uint256,uint256),tuple[],address,bytes32,string,bytes)'(
       permit: {
-        permitted: { token: string; amount: BigNumberish }[];
-        nonce: BigNumberish;
-        deadline: BigNumberish;
+        permitted: { token: string; amount: BigNumberish }[]
+        nonce: BigNumberish
+        deadline: BigNumberish
       },
       transferDetails: { to: string; requestedAmount: BigNumberish }[],
       owner: string,
@@ -997,24 +905,24 @@ export class Permit2 extends BaseContract {
       witnessTypeString: string,
       signature: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    "transferFrom(tuple[])"(
+    'transferFrom(tuple[])'(
       transferDetails: {
-        from: string;
-        to: string;
-        amount: BigNumberish;
-        token: string;
+        from: string
+        to: string
+        amount: BigNumberish
+        token: string
       }[],
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
-    "transferFrom(address,address,uint160,address)"(
+    'transferFrom(address,address,uint160,address)'(
       from: string,
       to: string,
       amount: BigNumberish,
       token: string,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-  };
+    ): Promise<PopulatedTransaction>
+  }
 }

@@ -2,9 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { FunctionFragment, Result } from "@ethersproject/abi";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
+import { FunctionFragment, Result } from '@ethersproject/abi'
+import { BytesLike } from '@ethersproject/bytes'
+import { Listener, Provider } from '@ethersproject/providers'
 import {
   BaseContract,
   BigNumber,
@@ -16,421 +16,375 @@ import {
   PayableOverrides,
   PopulatedTransaction,
   Signer,
-} from "ethers";
-import { TypedEvent, TypedEventFilter, TypedListener } from "./commons";
+} from 'ethers'
+import { TypedEvent, TypedEventFilter, TypedListener } from './commons'
 
 interface IApproveAndCallInterface extends ethers.utils.Interface {
   functions: {
-    "approveMax(address)": FunctionFragment;
-    "approveMaxMinusOne(address)": FunctionFragment;
-    "approveZeroThenMax(address)": FunctionFragment;
-    "approveZeroThenMaxMinusOne(address)": FunctionFragment;
-    "callPositionManager(bytes)": FunctionFragment;
-    "getApprovalType(address,uint256)": FunctionFragment;
-    "increaseLiquidity(tuple)": FunctionFragment;
-    "mint(tuple)": FunctionFragment;
-  };
+    'approveMax(address)': FunctionFragment
+    'approveMaxMinusOne(address)': FunctionFragment
+    'approveZeroThenMax(address)': FunctionFragment
+    'approveZeroThenMaxMinusOne(address)': FunctionFragment
+    'callPositionManager(bytes)': FunctionFragment
+    'getApprovalType(address,uint256)': FunctionFragment
+    'increaseLiquidity(tuple)': FunctionFragment
+    'mint(tuple)': FunctionFragment
+  }
 
-  encodeFunctionData(functionFragment: "approveMax", values: [string]): string;
+  encodeFunctionData(functionFragment: 'approveMax', values: [string]): string
+  encodeFunctionData(functionFragment: 'approveMaxMinusOne', values: [string]): string
+  encodeFunctionData(functionFragment: 'approveZeroThenMax', values: [string]): string
+  encodeFunctionData(functionFragment: 'approveZeroThenMaxMinusOne', values: [string]): string
+  encodeFunctionData(functionFragment: 'callPositionManager', values: [BytesLike]): string
+  encodeFunctionData(functionFragment: 'getApprovalType', values: [string, BigNumberish]): string
   encodeFunctionData(
-    functionFragment: "approveMaxMinusOne",
-    values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "approveZeroThenMax",
-    values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "approveZeroThenMaxMinusOne",
-    values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "callPositionManager",
-    values: [BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getApprovalType",
-    values: [string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "increaseLiquidity",
+    functionFragment: 'increaseLiquidity',
     values: [
       {
-        token0: string;
-        token1: string;
-        tokenId: BigNumberish;
-        amount0Min: BigNumberish;
-        amount1Min: BigNumberish;
+        token0: string
+        token1: string
+        tokenId: BigNumberish
+        amount0Min: BigNumberish
+        amount1Min: BigNumberish
       }
     ]
-  ): string;
+  ): string
   encodeFunctionData(
-    functionFragment: "mint",
+    functionFragment: 'mint',
     values: [
       {
-        token0: string;
-        token1: string;
-        fee: BigNumberish;
-        tickLower: BigNumberish;
-        tickUpper: BigNumberish;
-        amount0Min: BigNumberish;
-        amount1Min: BigNumberish;
-        recipient: string;
+        token0: string
+        token1: string
+        fee: BigNumberish
+        tickLower: BigNumberish
+        tickUpper: BigNumberish
+        amount0Min: BigNumberish
+        amount1Min: BigNumberish
+        recipient: string
       }
     ]
-  ): string;
+  ): string
 
-  decodeFunctionResult(functionFragment: "approveMax", data: BytesLike): Result;
-  decodeFunctionResult(
-    functionFragment: "approveMaxMinusOne",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "approveZeroThenMax",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "approveZeroThenMaxMinusOne",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "callPositionManager",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getApprovalType",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "increaseLiquidity",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "mint", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'approveMax', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'approveMaxMinusOne', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'approveZeroThenMax', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'approveZeroThenMaxMinusOne', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'callPositionManager', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'getApprovalType', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'increaseLiquidity', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'mint', data: BytesLike): Result
 
-  events: {};
+  events: {}
 }
 
 export class IApproveAndCall extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this;
-  attach(addressOrName: string): this;
-  deployed(): Promise<this>;
+  connect(signerOrProvider: Signer | Provider | string): this
+  attach(addressOrName: string): this
+  deployed(): Promise<this>
 
   listeners<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter?: TypedEventFilter<EventArgsArray, EventArgsObject>
-  ): Array<TypedListener<EventArgsArray, EventArgsObject>>;
+  ): Array<TypedListener<EventArgsArray, EventArgsObject>>
   off<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   on<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   once<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   removeListener<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   removeAllListeners<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
 
-  listeners(eventName?: string): Array<Listener>;
-  off(eventName: string, listener: Listener): this;
-  on(eventName: string, listener: Listener): this;
-  once(eventName: string, listener: Listener): this;
-  removeListener(eventName: string, listener: Listener): this;
-  removeAllListeners(eventName?: string): this;
+  listeners(eventName?: string): Array<Listener>
+  off(eventName: string, listener: Listener): this
+  on(eventName: string, listener: Listener): this
+  once(eventName: string, listener: Listener): this
+  removeListener(eventName: string, listener: Listener): this
+  removeAllListeners(eventName?: string): this
 
   queryFilter<EventArgsArray extends Array<any>, EventArgsObject>(
     event: TypedEventFilter<EventArgsArray, EventArgsObject>,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
+  ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>
 
-  interface: IApproveAndCallInterface;
+  interface: IApproveAndCallInterface
 
   functions: {
     approveMax(
       token: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     approveMaxMinusOne(
       token: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     approveZeroThenMax(
       token: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     approveZeroThenMaxMinusOne(
       token: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     callPositionManager(
       data: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     getApprovalType(
       token: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     increaseLiquidity(
       params: {
-        token0: string;
-        token1: string;
-        tokenId: BigNumberish;
-        amount0Min: BigNumberish;
-        amount1Min: BigNumberish;
+        token0: string
+        token1: string
+        tokenId: BigNumberish
+        amount0Min: BigNumberish
+        amount1Min: BigNumberish
       },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     mint(
       params: {
-        token0: string;
-        token1: string;
-        fee: BigNumberish;
-        tickLower: BigNumberish;
-        tickUpper: BigNumberish;
-        amount0Min: BigNumberish;
-        amount1Min: BigNumberish;
-        recipient: string;
+        token0: string
+        token1: string
+        fee: BigNumberish
+        tickLower: BigNumberish
+        tickUpper: BigNumberish
+        amount0Min: BigNumberish
+        amount1Min: BigNumberish
+        recipient: string
       },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-  };
+    ): Promise<ContractTransaction>
+  }
 
   approveMax(
     token: string,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   approveMaxMinusOne(
     token: string,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   approveZeroThenMax(
     token: string,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   approveZeroThenMaxMinusOne(
     token: string,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   callPositionManager(
     data: BytesLike,
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   getApprovalType(
     token: string,
     amount: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   increaseLiquidity(
     params: {
-      token0: string;
-      token1: string;
-      tokenId: BigNumberish;
-      amount0Min: BigNumberish;
-      amount1Min: BigNumberish;
+      token0: string
+      token1: string
+      tokenId: BigNumberish
+      amount0Min: BigNumberish
+      amount1Min: BigNumberish
     },
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   mint(
     params: {
-      token0: string;
-      token1: string;
-      fee: BigNumberish;
-      tickLower: BigNumberish;
-      tickUpper: BigNumberish;
-      amount0Min: BigNumberish;
-      amount1Min: BigNumberish;
-      recipient: string;
+      token0: string
+      token1: string
+      fee: BigNumberish
+      tickLower: BigNumberish
+      tickUpper: BigNumberish
+      amount0Min: BigNumberish
+      amount1Min: BigNumberish
+      recipient: string
     },
     overrides?: PayableOverrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   callStatic: {
-    approveMax(token: string, overrides?: CallOverrides): Promise<void>;
+    approveMax(token: string, overrides?: CallOverrides): Promise<void>
 
-    approveMaxMinusOne(token: string, overrides?: CallOverrides): Promise<void>;
+    approveMaxMinusOne(token: string, overrides?: CallOverrides): Promise<void>
 
-    approveZeroThenMax(token: string, overrides?: CallOverrides): Promise<void>;
+    approveZeroThenMax(token: string, overrides?: CallOverrides): Promise<void>
 
-    approveZeroThenMaxMinusOne(
-      token: string,
-      overrides?: CallOverrides
-    ): Promise<void>;
+    approveZeroThenMaxMinusOne(token: string, overrides?: CallOverrides): Promise<void>
 
-    callPositionManager(
-      data: BytesLike,
-      overrides?: CallOverrides
-    ): Promise<string>;
+    callPositionManager(data: BytesLike, overrides?: CallOverrides): Promise<string>
 
-    getApprovalType(
-      token: string,
-      amount: BigNumberish,
-      overrides?: CallOverrides
-    ): Promise<number>;
+    getApprovalType(token: string, amount: BigNumberish, overrides?: CallOverrides): Promise<number>
 
     increaseLiquidity(
       params: {
-        token0: string;
-        token1: string;
-        tokenId: BigNumberish;
-        amount0Min: BigNumberish;
-        amount1Min: BigNumberish;
+        token0: string
+        token1: string
+        tokenId: BigNumberish
+        amount0Min: BigNumberish
+        amount1Min: BigNumberish
       },
       overrides?: CallOverrides
-    ): Promise<string>;
+    ): Promise<string>
 
     mint(
       params: {
-        token0: string;
-        token1: string;
-        fee: BigNumberish;
-        tickLower: BigNumberish;
-        tickUpper: BigNumberish;
-        amount0Min: BigNumberish;
-        amount1Min: BigNumberish;
-        recipient: string;
+        token0: string
+        token1: string
+        fee: BigNumberish
+        tickLower: BigNumberish
+        tickUpper: BigNumberish
+        amount0Min: BigNumberish
+        amount1Min: BigNumberish
+        recipient: string
       },
       overrides?: CallOverrides
-    ): Promise<string>;
-  };
+    ): Promise<string>
+  }
 
-  filters: {};
+  filters: {}
 
   estimateGas: {
-    approveMax(
-      token: string,
-      overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    approveMax(token: string, overrides?: PayableOverrides & { from?: string | Promise<string> }): Promise<BigNumber>
 
     approveMaxMinusOne(
       token: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     approveZeroThenMax(
       token: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     approveZeroThenMaxMinusOne(
       token: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     callPositionManager(
       data: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     getApprovalType(
       token: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     increaseLiquidity(
       params: {
-        token0: string;
-        token1: string;
-        tokenId: BigNumberish;
-        amount0Min: BigNumberish;
-        amount1Min: BigNumberish;
+        token0: string
+        token1: string
+        tokenId: BigNumberish
+        amount0Min: BigNumberish
+        amount1Min: BigNumberish
       },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     mint(
       params: {
-        token0: string;
-        token1: string;
-        fee: BigNumberish;
-        tickLower: BigNumberish;
-        tickUpper: BigNumberish;
-        amount0Min: BigNumberish;
-        amount1Min: BigNumberish;
-        recipient: string;
+        token0: string
+        token1: string
+        fee: BigNumberish
+        tickLower: BigNumberish
+        tickUpper: BigNumberish
+        amount0Min: BigNumberish
+        amount1Min: BigNumberish
+        recipient: string
       },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-  };
+    ): Promise<BigNumber>
+  }
 
   populateTransaction: {
     approveMax(
       token: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     approveMaxMinusOne(
       token: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     approveZeroThenMax(
       token: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     approveZeroThenMaxMinusOne(
       token: string,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     callPositionManager(
       data: BytesLike,
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     getApprovalType(
       token: string,
       amount: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     increaseLiquidity(
       params: {
-        token0: string;
-        token1: string;
-        tokenId: BigNumberish;
-        amount0Min: BigNumberish;
-        amount1Min: BigNumberish;
+        token0: string
+        token1: string
+        tokenId: BigNumberish
+        amount0Min: BigNumberish
+        amount1Min: BigNumberish
       },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     mint(
       params: {
-        token0: string;
-        token1: string;
-        fee: BigNumberish;
-        tickLower: BigNumberish;
-        tickUpper: BigNumberish;
-        amount0Min: BigNumberish;
-        amount1Min: BigNumberish;
-        recipient: string;
+        token0: string
+        token1: string
+        fee: BigNumberish
+        tickLower: BigNumberish
+        tickUpper: BigNumberish
+        amount0Min: BigNumberish
+        amount1Min: BigNumberish
+        recipient: string
       },
       overrides?: PayableOverrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-  };
+    ): Promise<PopulatedTransaction>
+  }
 }

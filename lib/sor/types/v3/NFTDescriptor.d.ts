@@ -2,205 +2,194 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { FunctionFragment, Result } from "@ethersproject/abi";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
-import {
-  BaseContract,
-  BigNumber,
-  BigNumberish,
-  CallOverrides,
-  ethers,
-  PopulatedTransaction,
-  Signer,
-} from "ethers";
-import { TypedEvent, TypedEventFilter, TypedListener } from "./commons";
+import { FunctionFragment, Result } from '@ethersproject/abi'
+import { BytesLike } from '@ethersproject/bytes'
+import { Listener, Provider } from '@ethersproject/providers'
+import { BaseContract, BigNumber, BigNumberish, CallOverrides, ethers, PopulatedTransaction, Signer } from 'ethers'
+import { TypedEvent, TypedEventFilter, TypedListener } from './commons'
 
 interface NFTDescriptorInterface extends ethers.utils.Interface {
   functions: {
-    "constructTokenURI(tuple)": FunctionFragment;
-  };
+    'constructTokenURI(tuple)': FunctionFragment
+  }
 
   encodeFunctionData(
-    functionFragment: "constructTokenURI",
+    functionFragment: 'constructTokenURI',
     values: [
       {
-        tokenId: BigNumberish;
-        quoteTokenAddress: string;
-        baseTokenAddress: string;
-        quoteTokenSymbol: string;
-        baseTokenSymbol: string;
-        quoteTokenDecimals: BigNumberish;
-        baseTokenDecimals: BigNumberish;
-        flipRatio: boolean;
-        tickLower: BigNumberish;
-        tickUpper: BigNumberish;
-        tickCurrent: BigNumberish;
-        tickSpacing: BigNumberish;
-        fee: BigNumberish;
-        poolAddress: string;
+        tokenId: BigNumberish
+        quoteTokenAddress: string
+        baseTokenAddress: string
+        quoteTokenSymbol: string
+        baseTokenSymbol: string
+        quoteTokenDecimals: BigNumberish
+        baseTokenDecimals: BigNumberish
+        flipRatio: boolean
+        tickLower: BigNumberish
+        tickUpper: BigNumberish
+        tickCurrent: BigNumberish
+        tickSpacing: BigNumberish
+        fee: BigNumberish
+        poolAddress: string
       }
     ]
-  ): string;
+  ): string
 
-  decodeFunctionResult(
-    functionFragment: "constructTokenURI",
-    data: BytesLike
-  ): Result;
+  decodeFunctionResult(functionFragment: 'constructTokenURI', data: BytesLike): Result
 
-  events: {};
+  events: {}
 }
 
 export class NFTDescriptor extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this;
-  attach(addressOrName: string): this;
-  deployed(): Promise<this>;
+  connect(signerOrProvider: Signer | Provider | string): this
+  attach(addressOrName: string): this
+  deployed(): Promise<this>
 
   listeners<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter?: TypedEventFilter<EventArgsArray, EventArgsObject>
-  ): Array<TypedListener<EventArgsArray, EventArgsObject>>;
+  ): Array<TypedListener<EventArgsArray, EventArgsObject>>
   off<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   on<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   once<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   removeListener<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   removeAllListeners<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
 
-  listeners(eventName?: string): Array<Listener>;
-  off(eventName: string, listener: Listener): this;
-  on(eventName: string, listener: Listener): this;
-  once(eventName: string, listener: Listener): this;
-  removeListener(eventName: string, listener: Listener): this;
-  removeAllListeners(eventName?: string): this;
+  listeners(eventName?: string): Array<Listener>
+  off(eventName: string, listener: Listener): this
+  on(eventName: string, listener: Listener): this
+  once(eventName: string, listener: Listener): this
+  removeListener(eventName: string, listener: Listener): this
+  removeAllListeners(eventName?: string): this
 
   queryFilter<EventArgsArray extends Array<any>, EventArgsObject>(
     event: TypedEventFilter<EventArgsArray, EventArgsObject>,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
+  ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>
 
-  interface: NFTDescriptorInterface;
+  interface: NFTDescriptorInterface
 
   functions: {
     constructTokenURI(
       params: {
-        tokenId: BigNumberish;
-        quoteTokenAddress: string;
-        baseTokenAddress: string;
-        quoteTokenSymbol: string;
-        baseTokenSymbol: string;
-        quoteTokenDecimals: BigNumberish;
-        baseTokenDecimals: BigNumberish;
-        flipRatio: boolean;
-        tickLower: BigNumberish;
-        tickUpper: BigNumberish;
-        tickCurrent: BigNumberish;
-        tickSpacing: BigNumberish;
-        fee: BigNumberish;
-        poolAddress: string;
+        tokenId: BigNumberish
+        quoteTokenAddress: string
+        baseTokenAddress: string
+        quoteTokenSymbol: string
+        baseTokenSymbol: string
+        quoteTokenDecimals: BigNumberish
+        baseTokenDecimals: BigNumberish
+        flipRatio: boolean
+        tickLower: BigNumberish
+        tickUpper: BigNumberish
+        tickCurrent: BigNumberish
+        tickSpacing: BigNumberish
+        fee: BigNumberish
+        poolAddress: string
       },
       overrides?: CallOverrides
-    ): Promise<[string]>;
-  };
+    ): Promise<[string]>
+  }
 
   constructTokenURI(
     params: {
-      tokenId: BigNumberish;
-      quoteTokenAddress: string;
-      baseTokenAddress: string;
-      quoteTokenSymbol: string;
-      baseTokenSymbol: string;
-      quoteTokenDecimals: BigNumberish;
-      baseTokenDecimals: BigNumberish;
-      flipRatio: boolean;
-      tickLower: BigNumberish;
-      tickUpper: BigNumberish;
-      tickCurrent: BigNumberish;
-      tickSpacing: BigNumberish;
-      fee: BigNumberish;
-      poolAddress: string;
+      tokenId: BigNumberish
+      quoteTokenAddress: string
+      baseTokenAddress: string
+      quoteTokenSymbol: string
+      baseTokenSymbol: string
+      quoteTokenDecimals: BigNumberish
+      baseTokenDecimals: BigNumberish
+      flipRatio: boolean
+      tickLower: BigNumberish
+      tickUpper: BigNumberish
+      tickCurrent: BigNumberish
+      tickSpacing: BigNumberish
+      fee: BigNumberish
+      poolAddress: string
     },
     overrides?: CallOverrides
-  ): Promise<string>;
+  ): Promise<string>
 
   callStatic: {
     constructTokenURI(
       params: {
-        tokenId: BigNumberish;
-        quoteTokenAddress: string;
-        baseTokenAddress: string;
-        quoteTokenSymbol: string;
-        baseTokenSymbol: string;
-        quoteTokenDecimals: BigNumberish;
-        baseTokenDecimals: BigNumberish;
-        flipRatio: boolean;
-        tickLower: BigNumberish;
-        tickUpper: BigNumberish;
-        tickCurrent: BigNumberish;
-        tickSpacing: BigNumberish;
-        fee: BigNumberish;
-        poolAddress: string;
+        tokenId: BigNumberish
+        quoteTokenAddress: string
+        baseTokenAddress: string
+        quoteTokenSymbol: string
+        baseTokenSymbol: string
+        quoteTokenDecimals: BigNumberish
+        baseTokenDecimals: BigNumberish
+        flipRatio: boolean
+        tickLower: BigNumberish
+        tickUpper: BigNumberish
+        tickCurrent: BigNumberish
+        tickSpacing: BigNumberish
+        fee: BigNumberish
+        poolAddress: string
       },
       overrides?: CallOverrides
-    ): Promise<string>;
-  };
+    ): Promise<string>
+  }
 
-  filters: {};
+  filters: {}
 
   estimateGas: {
     constructTokenURI(
       params: {
-        tokenId: BigNumberish;
-        quoteTokenAddress: string;
-        baseTokenAddress: string;
-        quoteTokenSymbol: string;
-        baseTokenSymbol: string;
-        quoteTokenDecimals: BigNumberish;
-        baseTokenDecimals: BigNumberish;
-        flipRatio: boolean;
-        tickLower: BigNumberish;
-        tickUpper: BigNumberish;
-        tickCurrent: BigNumberish;
-        tickSpacing: BigNumberish;
-        fee: BigNumberish;
-        poolAddress: string;
+        tokenId: BigNumberish
+        quoteTokenAddress: string
+        baseTokenAddress: string
+        quoteTokenSymbol: string
+        baseTokenSymbol: string
+        quoteTokenDecimals: BigNumberish
+        baseTokenDecimals: BigNumberish
+        flipRatio: boolean
+        tickLower: BigNumberish
+        tickUpper: BigNumberish
+        tickCurrent: BigNumberish
+        tickSpacing: BigNumberish
+        fee: BigNumberish
+        poolAddress: string
       },
       overrides?: CallOverrides
-    ): Promise<BigNumber>;
-  };
+    ): Promise<BigNumber>
+  }
 
   populateTransaction: {
     constructTokenURI(
       params: {
-        tokenId: BigNumberish;
-        quoteTokenAddress: string;
-        baseTokenAddress: string;
-        quoteTokenSymbol: string;
-        baseTokenSymbol: string;
-        quoteTokenDecimals: BigNumberish;
-        baseTokenDecimals: BigNumberish;
-        flipRatio: boolean;
-        tickLower: BigNumberish;
-        tickUpper: BigNumberish;
-        tickCurrent: BigNumberish;
-        tickSpacing: BigNumberish;
-        fee: BigNumberish;
-        poolAddress: string;
+        tokenId: BigNumberish
+        quoteTokenAddress: string
+        baseTokenAddress: string
+        quoteTokenSymbol: string
+        baseTokenSymbol: string
+        quoteTokenDecimals: BigNumberish
+        baseTokenDecimals: BigNumberish
+        flipRatio: boolean
+        tickLower: BigNumberish
+        tickUpper: BigNumberish
+        tickCurrent: BigNumberish
+        tickSpacing: BigNumberish
+        fee: BigNumberish
+        poolAddress: string
       },
       overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
-  };
+    ): Promise<PopulatedTransaction>
+  }
 }

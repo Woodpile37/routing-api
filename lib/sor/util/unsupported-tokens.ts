@@ -170,8 +170,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'iAAVE',
       name: 'Synth Inverse Aave',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iAAVE.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iAAVE.svg',
       tags: ['inverse', 'synth'],
     },
     {
@@ -180,8 +179,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'iADA',
       name: 'Synth Inverse Cardano',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iADA.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iADA.svg',
       tags: ['inverse', 'synth'],
     },
     {
@@ -190,8 +188,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'iBNB',
       name: 'Synth Inverse Binance Coin',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iBNB.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iBNB.svg',
       tags: ['inverse', 'synth'],
     },
     {
@@ -200,8 +197,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'iBTC',
       name: 'Synth Inverse Bitcoin',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iBTC.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iBTC.svg',
       tags: ['inverse', 'synth'],
     },
     {
@@ -210,8 +206,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'iCEX',
       name: 'Synth Inverse Centralised Exchange Index',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iCEX.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iCEX.svg',
       tags: ['index', 'inverse', 'synth'],
     },
     {
@@ -220,8 +215,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'iCOMP',
       name: 'Synth Inverse Compound',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iCOMP.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iCOMP.svg',
       tags: ['inverse', 'synth'],
     },
     {
@@ -230,8 +224,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'iDASH',
       name: 'Synth Inverse Dash',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iDASH.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iDASH.svg',
       tags: ['inverse', 'synth'],
     },
     {
@@ -240,8 +233,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'iDEFI',
       name: 'Synth Inverse DeFi Index',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iDEFI.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iDEFI.svg',
       tags: ['index', 'inverse', 'synth'],
     },
     {
@@ -250,8 +242,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'iDOT',
       name: 'Synth Inverse Polkadot',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iDOT.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iDOT.svg',
       tags: ['inverse', 'synth'],
     },
     {
@@ -260,8 +251,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'iEOS',
       name: 'Synth Inverse EOS',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iEOS.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iEOS.svg',
       tags: ['inverse', 'synth'],
     },
     {
@@ -270,8 +260,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'iETC',
       name: 'Synth Inverse Ethereum Classic',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iETC.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iETC.svg',
       tags: ['inverse', 'synth'],
     },
     {
@@ -280,8 +269,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'iETH',
       name: 'Synth Inverse Ether',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iETH.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iETH.svg',
       tags: ['inverse', 'synth'],
     },
     {
@@ -290,8 +278,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'iLINK',
       name: 'Synth Inverse Chainlink',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iLINK.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iLINK.svg',
       tags: ['inverse', 'synth'],
     },
     {
@@ -300,8 +287,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'iLTC',
       name: 'Synth Inverse Litecoin',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iLTC.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iLTC.svg',
       tags: ['inverse', 'synth'],
     },
     {
@@ -310,8 +296,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'iOIL',
       name: 'Synth Inverse Perpetual Oil Futures',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iOIL.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iOIL.svg',
       tags: ['inverse', 'synth'],
     },
     {
@@ -320,8 +305,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'iREN',
       name: 'Synth Inverse Ren',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iREN.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iREN.svg',
       tags: ['inverse', 'synth'],
     },
     {
@@ -330,8 +314,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'iTRX',
       name: 'Synth Inverse TRON',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iTRX.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iTRX.svg',
       tags: ['inverse', 'synth'],
     },
     {
@@ -340,8 +323,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'iUNI',
       name: 'Synth Inverse Uniswap',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iUNI.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iUNI.svg',
       tags: ['inverse', 'synth'],
     },
     {
@@ -350,8 +332,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'iXMR',
       name: 'Synth Inverse Monero',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iXMR.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iXMR.svg',
       tags: ['inverse', 'synth'],
     },
     {
@@ -360,8 +341,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'iXRP',
       name: 'Synth Inverse Ripple',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iXRP.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iXRP.svg',
       tags: ['inverse', 'synth'],
     },
     {
@@ -370,8 +350,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'iXTZ',
       name: 'Synth Inverse Tezos',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iXTZ.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iXTZ.svg',
       tags: ['inverse', 'synth'],
     },
     {
@@ -380,8 +359,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'iYFI',
       name: 'Synth Inverse yearn.finance',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iYFI.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/iYFI.svg',
       tags: ['inverse', 'synth'],
     },
     {
@@ -390,8 +368,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 's1INCH',
       name: 'Synth 1inch',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/s1INCH.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/s1INCH.svg',
       tags: ['synth'],
     },
     {
@@ -400,8 +377,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sAAPL',
       name: 'Synth Apple',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sAAPL.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sAAPL.svg',
       tags: ['synth'],
     },
     {
@@ -410,8 +386,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sAAVE',
       name: 'Synth Aave',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sAAVE.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sAAVE.svg',
       tags: ['synth'],
     },
     {
@@ -420,8 +395,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sADA',
       name: 'Synth Cardano',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sADA.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sADA.svg',
       tags: ['synth'],
     },
     {
@@ -430,8 +404,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sAMZN',
       name: 'Synth Amazon',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sAMZN.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sAMZN.svg',
       tags: ['synth'],
     },
     {
@@ -440,8 +413,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sAUD',
       name: 'Synth Australian Dollars',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sAUD.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sAUD.svg',
       tags: ['synth'],
     },
     {
@@ -450,8 +422,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sBNB',
       name: 'Synth Binance Coin',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sBNB.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sBNB.svg',
       tags: ['synth'],
     },
     {
@@ -460,8 +431,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sBTC',
       name: 'Synth Bitcoin',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sBTC.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sBTC.svg',
       tags: ['synth'],
     },
     {
@@ -470,8 +440,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sCEX',
       name: 'Synth Centralised Exchange Index',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sCEX.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sCEX.svg',
       tags: ['index', 'synth'],
     },
     {
@@ -480,8 +449,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sCHF',
       name: 'Synth Swiss Franc',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sCHF.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sCHF.svg',
       tags: ['synth'],
     },
     {
@@ -490,8 +458,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sCOIN',
       name: 'Synth Coinbase',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sCOIN.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sCOIN.svg',
       tags: ['synth'],
     },
     {
@@ -500,8 +467,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sCOMP',
       name: 'Synth Compound',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sCOMP.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sCOMP.svg',
       tags: ['synth'],
     },
     {
@@ -510,8 +476,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sCRV',
       name: 'Synth Curve DAO Token',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sCRV.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sCRV.svg',
       tags: ['synth'],
     },
     {
@@ -520,8 +485,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sDASH',
       name: 'Synth Dash',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sDASH.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sDASH.svg',
       tags: ['synth'],
     },
     {
@@ -530,8 +494,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sDEFI',
       name: 'Synth DeFi Index',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sDEFI.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sDEFI.svg',
       tags: ['index', 'synth'],
     },
     {
@@ -540,8 +503,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sDOT',
       name: 'Synth Polkadot',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sDOT.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sDOT.svg',
       tags: ['synth'],
     },
     {
@@ -550,8 +512,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sEOS',
       name: 'Synth EOS',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sEOS.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sEOS.svg',
       tags: ['synth'],
     },
     {
@@ -560,8 +521,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sETC',
       name: 'Synth Ethereum Classic',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sETC.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sETC.svg',
       tags: ['synth'],
     },
     {
@@ -570,8 +530,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sETH',
       name: 'Synth Ether',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sETH.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sETH.svg',
       tags: ['synth'],
     },
     {
@@ -580,8 +539,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sEUR',
       name: 'Synth Euros',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sEUR.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sEUR.svg',
       tags: ['synth'],
     },
     {
@@ -590,8 +548,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sFB',
       name: 'Synth Facebook',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sFB.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sFB.svg',
       tags: ['synth'],
     },
     {
@@ -600,8 +557,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sFTSE',
       name: 'Synth FTSE 100 Index',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sFTSE.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sFTSE.svg',
       tags: ['synth'],
     },
     {
@@ -610,8 +566,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sGBP',
       name: 'Synth Pound Sterling',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sGBP.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sGBP.svg',
       tags: ['synth'],
     },
     {
@@ -620,8 +575,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sGOOG',
       name: 'Synth Alphabet',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sGOOG.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sGOOG.svg',
       tags: ['synth'],
     },
     {
@@ -630,8 +584,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sJPY',
       name: 'Synth Japanese Yen',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sJPY.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sJPY.svg',
       tags: ['synth'],
     },
     {
@@ -640,8 +593,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sKRW',
       name: 'Synth South Korean Won',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sKRW.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sKRW.svg',
       tags: ['synth'],
     },
     {
@@ -650,8 +602,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sLINK',
       name: 'Synth Chainlink',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sLINK.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sLINK.svg',
       tags: ['synth'],
     },
     {
@@ -660,8 +611,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sLTC',
       name: 'Synth Litecoin',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sLTC.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sLTC.svg',
       tags: ['synth'],
     },
     {
@@ -670,8 +620,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sMSFT',
       name: 'Synth Microsoft',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sMSFT.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sMSFT.svg',
       tags: ['synth'],
     },
     {
@@ -680,8 +629,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sNFLX',
       name: 'Synth Netflix',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sNFLX.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sNFLX.svg',
       tags: ['synth'],
     },
     {
@@ -690,8 +638,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sNIKKEI',
       name: 'Synth Nikkei 225 Index',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sNIKKEI.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sNIKKEI.svg',
       tags: ['synth'],
     },
     {
@@ -700,8 +647,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sOIL',
       name: 'Synth Perpetual Oil Futures',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sOIL.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sOIL.svg',
       tags: ['synth'],
     },
     {
@@ -710,8 +656,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sREN',
       name: 'Synth Ren',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sREN.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sREN.svg',
       tags: ['synth'],
     },
     {
@@ -720,8 +665,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sRUNE',
       name: 'Synth THORChain',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sRUNE.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sRUNE.svg',
       tags: ['synth'],
     },
     {
@@ -730,8 +674,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sTRX',
       name: 'Synth TRON',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sTRX.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sTRX.svg',
       tags: ['synth'],
     },
     {
@@ -740,8 +683,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sTSLA',
       name: 'Synth Tesla',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sTSLA.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sTSLA.svg',
       tags: ['synth'],
     },
     {
@@ -750,8 +692,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sUNI',
       name: 'Synth Uniswap',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sUNI.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sUNI.svg',
       tags: ['synth'],
     },
     {
@@ -760,8 +701,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sXAG',
       name: 'Synth Silver Ounce',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sXAG.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sXAG.svg',
       tags: ['synth'],
     },
     {
@@ -770,8 +710,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sXAU',
       name: 'Synth Gold Ounce',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sXAU.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sXAU.svg',
       tags: ['synth'],
     },
     {
@@ -780,8 +719,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sXMR',
       name: 'Synth Monero',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sXMR.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sXMR.svg',
       tags: ['synth'],
     },
     {
@@ -790,8 +728,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sXRP',
       name: 'Synth Ripple',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sXRP.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sXRP.svg',
       tags: ['synth'],
     },
     {
@@ -800,8 +737,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sXTZ',
       name: 'Synth Tezos',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sXTZ.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sXTZ.svg',
       tags: ['synth'],
     },
     {
@@ -810,8 +746,7 @@ export const UNSUPPORTED_TOKENS = {
       symbol: 'sYFI',
       name: 'Synth yearn.finance',
       decimals: 18,
-      logoURI:
-        'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sYFI.svg',
+      logoURI: 'https://raw.githubusercontent.com/Synthetixio/synthetix-assets/v2.0.10/synths/sYFI.svg',
       tags: ['synth'],
     },
     {
@@ -1179,4 +1114,4 @@ export const UNSUPPORTED_TOKENS = {
       decimals: 18,
     },
   ],
-};
+}

@@ -2,9 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { FunctionFragment, Result } from "@ethersproject/abi";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
+import { FunctionFragment, Result } from '@ethersproject/abi'
+import { BytesLike } from '@ethersproject/bytes'
+import { Listener, Provider } from '@ethersproject/providers'
 import {
   BaseContract,
   BigNumber,
@@ -15,84 +15,69 @@ import {
   Overrides,
   PopulatedTransaction,
   Signer,
-} from "ethers";
-import { TypedEvent, TypedEventFilter, TypedListener } from "./commons";
+} from 'ethers'
+import { TypedEvent, TypedEventFilter, TypedListener } from './commons'
 
 interface TokenFeeDetectorInterface extends ethers.utils.Interface {
   functions: {
-    "batchValidate(address[],address,uint256)": FunctionFragment;
-    "uniswapV2Call(address,uint256,uint256,bytes)": FunctionFragment;
-    "validate(address,address,uint256)": FunctionFragment;
-  };
+    'batchValidate(address[],address,uint256)': FunctionFragment
+    'uniswapV2Call(address,uint256,uint256,bytes)': FunctionFragment
+    'validate(address,address,uint256)': FunctionFragment
+  }
 
-  encodeFunctionData(
-    functionFragment: "batchValidate",
-    values: [string[], string, BigNumberish]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "uniswapV2Call",
-    values: [string, BigNumberish, BigNumberish, BytesLike]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "validate",
-    values: [string, string, BigNumberish]
-  ): string;
+  encodeFunctionData(functionFragment: 'batchValidate', values: [string[], string, BigNumberish]): string
+  encodeFunctionData(functionFragment: 'uniswapV2Call', values: [string, BigNumberish, BigNumberish, BytesLike]): string
+  encodeFunctionData(functionFragment: 'validate', values: [string, string, BigNumberish]): string
 
-  decodeFunctionResult(
-    functionFragment: "batchValidate",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "uniswapV2Call",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "validate", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'batchValidate', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'uniswapV2Call', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'validate', data: BytesLike): Result
 
-  events: {};
+  events: {}
 }
 
 export class TokenFeeDetector extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this;
-  attach(addressOrName: string): this;
-  deployed(): Promise<this>;
+  connect(signerOrProvider: Signer | Provider | string): this
+  attach(addressOrName: string): this
+  deployed(): Promise<this>
 
   listeners<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter?: TypedEventFilter<EventArgsArray, EventArgsObject>
-  ): Array<TypedListener<EventArgsArray, EventArgsObject>>;
+  ): Array<TypedListener<EventArgsArray, EventArgsObject>>
   off<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   on<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   once<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   removeListener<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   removeAllListeners<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
 
-  listeners(eventName?: string): Array<Listener>;
-  off(eventName: string, listener: Listener): this;
-  on(eventName: string, listener: Listener): this;
-  once(eventName: string, listener: Listener): this;
-  removeListener(eventName: string, listener: Listener): this;
-  removeAllListeners(eventName?: string): this;
+  listeners(eventName?: string): Array<Listener>
+  off(eventName: string, listener: Listener): this
+  on(eventName: string, listener: Listener): this
+  once(eventName: string, listener: Listener): this
+  removeListener(eventName: string, listener: Listener): this
+  removeAllListeners(eventName?: string): this
 
   queryFilter<EventArgsArray extends Array<any>, EventArgsObject>(
     event: TypedEventFilter<EventArgsArray, EventArgsObject>,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
+  ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>
 
-  interface: TokenFeeDetectorInterface;
+  interface: TokenFeeDetectorInterface
 
   functions: {
     batchValidate(
@@ -100,7 +85,7 @@ export class TokenFeeDetector extends BaseContract {
       baseToken: string,
       amountToBorrow: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     uniswapV2Call(
       arg0: string,
@@ -108,22 +93,22 @@ export class TokenFeeDetector extends BaseContract {
       arg2: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
+    ): Promise<ContractTransaction>
 
     validate(
       token: string,
       baseToken: string,
       amountToBorrow: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-  };
+    ): Promise<ContractTransaction>
+  }
 
   batchValidate(
     tokens: string[],
     baseToken: string,
     amountToBorrow: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   uniswapV2Call(
     arg0: string,
@@ -131,14 +116,14 @@ export class TokenFeeDetector extends BaseContract {
     arg2: BigNumberish,
     data: BytesLike,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   validate(
     token: string,
     baseToken: string,
     amountToBorrow: BigNumberish,
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   callStatic: {
     batchValidate(
@@ -148,10 +133,10 @@ export class TokenFeeDetector extends BaseContract {
       overrides?: CallOverrides
     ): Promise<
       ([BigNumber, BigNumber] & {
-        buyFeeBps: BigNumber;
-        sellFeeBps: BigNumber;
+        buyFeeBps: BigNumber
+        sellFeeBps: BigNumber
       })[]
-    >;
+    >
 
     uniswapV2Call(
       arg0: string,
@@ -159,19 +144,17 @@ export class TokenFeeDetector extends BaseContract {
       arg2: BigNumberish,
       data: BytesLike,
       overrides?: CallOverrides
-    ): Promise<void>;
+    ): Promise<void>
 
     validate(
       token: string,
       baseToken: string,
       amountToBorrow: BigNumberish,
       overrides?: CallOverrides
-    ): Promise<
-      [BigNumber, BigNumber] & { buyFeeBps: BigNumber; sellFeeBps: BigNumber }
-    >;
-  };
+    ): Promise<[BigNumber, BigNumber] & { buyFeeBps: BigNumber; sellFeeBps: BigNumber }>
+  }
 
-  filters: {};
+  filters: {}
 
   estimateGas: {
     batchValidate(
@@ -179,7 +162,7 @@ export class TokenFeeDetector extends BaseContract {
       baseToken: string,
       amountToBorrow: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     uniswapV2Call(
       arg0: string,
@@ -187,15 +170,15 @@ export class TokenFeeDetector extends BaseContract {
       arg2: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
+    ): Promise<BigNumber>
 
     validate(
       token: string,
       baseToken: string,
       amountToBorrow: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-  };
+    ): Promise<BigNumber>
+  }
 
   populateTransaction: {
     batchValidate(
@@ -203,7 +186,7 @@ export class TokenFeeDetector extends BaseContract {
       baseToken: string,
       amountToBorrow: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     uniswapV2Call(
       arg0: string,
@@ -211,13 +194,13 @@ export class TokenFeeDetector extends BaseContract {
       arg2: BigNumberish,
       data: BytesLike,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
+    ): Promise<PopulatedTransaction>
 
     validate(
       token: string,
       baseToken: string,
       amountToBorrow: BigNumberish,
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-  };
+    ): Promise<PopulatedTransaction>
+  }
 }

@@ -2,51 +2,45 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Provider } from "@ethersproject/providers";
-import { Contract, Signer, utils } from "ethers";
-import type {
-  IImmutableState,
-  IImmutableStateInterface,
-} from "../IImmutableState";
+import { Provider } from '@ethersproject/providers'
+import { Contract, Signer, utils } from 'ethers'
+import type { IImmutableState, IImmutableStateInterface } from '../IImmutableState'
 
 const _abi = [
   {
     inputs: [],
-    name: "factoryV2",
+    name: 'factoryV2',
     outputs: [
       {
-        internalType: "address",
-        name: "",
-        type: "address",
+        internalType: 'address',
+        name: '',
+        type: 'address',
       },
     ],
-    stateMutability: "view",
-    type: "function",
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     inputs: [],
-    name: "positionManager",
+    name: 'positionManager',
     outputs: [
       {
-        internalType: "address",
-        name: "",
-        type: "address",
+        internalType: 'address',
+        name: '',
+        type: 'address',
       },
     ],
-    stateMutability: "view",
-    type: "function",
+    stateMutability: 'view',
+    type: 'function',
   },
-];
+]
 
 export class IImmutableState__factory {
-  static readonly abi = _abi;
+  static readonly abi = _abi
   static createInterface(): IImmutableStateInterface {
-    return new utils.Interface(_abi) as IImmutableStateInterface;
+    return new utils.Interface(_abi) as IImmutableStateInterface
   }
-  static connect(
-    address: string,
-    signerOrProvider: Signer | Provider
-  ): IImmutableState {
-    return new Contract(address, _abi, signerOrProvider) as IImmutableState;
+  static connect(address: string, signerOrProvider: Signer | Provider): IImmutableState {
+    return new Contract(address, _abi, signerOrProvider) as IImmutableState
   }
 }

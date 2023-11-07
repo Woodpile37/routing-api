@@ -1,9 +1,9 @@
-import { Token } from '@uniswap/sdk-core';
+import { Token } from '@uniswap/sdk-core'
 
-import { log } from '../../util';
-import { ProviderConfig } from '../provider';
+import { log } from '../../util'
+import { ProviderConfig } from '../provider'
 
-import { IV2SubgraphProvider, V2SubgraphPool } from './subgraph-provider';
+import { IV2SubgraphProvider, V2SubgraphPool } from './subgraph-provider'
 
 /**
  * Provider for getting V2 subgraph pools that falls back to a different provider
@@ -19,25 +19,17 @@ export class V2SubgraphProviderWithFallBacks implements IV2SubgraphProvider {
    */
   constructor(private fallbacks: IV2SubgraphProvider[]) {}
 
-  public async getPools(
-    tokenIn?: Token,
-    tokenOut?: Token,
-    providerConfig?: ProviderConfig
-  ): Promise<V2SubgraphPool[]> {
+  public async getPools(tokenIn?: Token, tokenOut?: Token, providerConfig?: ProviderConfig): Promise<V2SubgraphPool[]> {
     for (let i = 0; i < this.fallbacks.length; i++) {
-      const provider = this.fallbacks[i]!;
+      const provider = this.fallbacks[i]!
       try {
-        const pools = await provider.getPools(
-          tokenIn,
-          tokenOut,
-          providerConfig
-        );
-        return pools;
+        const pools = await provider.getPools(tokenIn, tokenOut, providerConfig)
+        return pools
       } catch (err) {
-        log.info(`Failed to get subgraph pools for V2 from fallback #${i}`);
+        log.info(`Failed to get subgraph pools for V2 from fallback #${i}`)
       }
     }
 
-    throw new Error('Failed to get subgraph pools from any providers');
+    throw new Error('Failed to get subgraph pools from any providers')
   }
 }

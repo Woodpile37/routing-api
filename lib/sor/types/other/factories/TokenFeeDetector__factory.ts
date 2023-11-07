@@ -2,156 +2,150 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { Provider } from "@ethersproject/providers";
-import { Contract, Signer, utils } from "ethers";
-import type {
-  TokenFeeDetector,
-  TokenFeeDetectorInterface,
-} from "../TokenFeeDetector";
+import { Provider } from '@ethersproject/providers'
+import { Contract, Signer, utils } from 'ethers'
+import type { TokenFeeDetector, TokenFeeDetectorInterface } from '../TokenFeeDetector'
 
 const _abi = [
   {
     inputs: [
       {
-        internalType: "address",
-        name: "_factoryV2",
-        type: "address",
+        internalType: 'address',
+        name: '_factoryV2',
+        type: 'address',
       },
     ],
-    stateMutability: "nonpayable",
-    type: "constructor",
+    stateMutability: 'nonpayable',
+    type: 'constructor',
   },
   {
     inputs: [],
-    name: "PairLookupFailed",
-    type: "error",
+    name: 'PairLookupFailed',
+    type: 'error',
   },
   {
     inputs: [],
-    name: "SameToken",
-    type: "error",
+    name: 'SameToken',
+    type: 'error',
   },
   {
     inputs: [
       {
-        internalType: "address[]",
-        name: "tokens",
-        type: "address[]",
+        internalType: 'address[]',
+        name: 'tokens',
+        type: 'address[]',
       },
       {
-        internalType: "address",
-        name: "baseToken",
-        type: "address",
+        internalType: 'address',
+        name: 'baseToken',
+        type: 'address',
       },
       {
-        internalType: "uint256",
-        name: "amountToBorrow",
-        type: "uint256",
+        internalType: 'uint256',
+        name: 'amountToBorrow',
+        type: 'uint256',
       },
     ],
-    name: "batchValidate",
+    name: 'batchValidate',
     outputs: [
       {
         components: [
           {
-            internalType: "uint256",
-            name: "buyFeeBps",
-            type: "uint256",
+            internalType: 'uint256',
+            name: 'buyFeeBps',
+            type: 'uint256',
           },
           {
-            internalType: "uint256",
-            name: "sellFeeBps",
-            type: "uint256",
+            internalType: 'uint256',
+            name: 'sellFeeBps',
+            type: 'uint256',
           },
         ],
-        internalType: "struct TokenFees[]",
-        name: "fotResults",
-        type: "tuple[]",
+        internalType: 'struct TokenFees[]',
+        name: 'fotResults',
+        type: 'tuple[]',
       },
     ],
-    stateMutability: "nonpayable",
-    type: "function",
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     inputs: [
       {
-        internalType: "address",
-        name: "",
-        type: "address",
+        internalType: 'address',
+        name: '',
+        type: 'address',
       },
       {
-        internalType: "uint256",
-        name: "amount0",
-        type: "uint256",
+        internalType: 'uint256',
+        name: 'amount0',
+        type: 'uint256',
       },
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
       },
       {
-        internalType: "bytes",
-        name: "data",
-        type: "bytes",
+        internalType: 'bytes',
+        name: 'data',
+        type: 'bytes',
       },
     ],
-    name: "uniswapV2Call",
+    name: 'uniswapV2Call',
     outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     inputs: [
       {
-        internalType: "address",
-        name: "token",
-        type: "address",
+        internalType: 'address',
+        name: 'token',
+        type: 'address',
       },
       {
-        internalType: "address",
-        name: "baseToken",
-        type: "address",
+        internalType: 'address',
+        name: 'baseToken',
+        type: 'address',
       },
       {
-        internalType: "uint256",
-        name: "amountToBorrow",
-        type: "uint256",
+        internalType: 'uint256',
+        name: 'amountToBorrow',
+        type: 'uint256',
       },
     ],
-    name: "validate",
+    name: 'validate',
     outputs: [
       {
         components: [
           {
-            internalType: "uint256",
-            name: "buyFeeBps",
-            type: "uint256",
+            internalType: 'uint256',
+            name: 'buyFeeBps',
+            type: 'uint256',
           },
           {
-            internalType: "uint256",
-            name: "sellFeeBps",
-            type: "uint256",
+            internalType: 'uint256',
+            name: 'sellFeeBps',
+            type: 'uint256',
           },
         ],
-        internalType: "struct TokenFees",
-        name: "fotResult",
-        type: "tuple",
+        internalType: 'struct TokenFees',
+        name: 'fotResult',
+        type: 'tuple',
       },
     ],
-    stateMutability: "nonpayable",
-    type: "function",
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
-];
+]
 
 export class TokenFeeDetector__factory {
-  static readonly abi = _abi;
+  static readonly abi = _abi
   static createInterface(): TokenFeeDetectorInterface {
-    return new utils.Interface(_abi) as TokenFeeDetectorInterface;
+    return new utils.Interface(_abi) as TokenFeeDetectorInterface
   }
-  static connect(
-    address: string,
-    signerOrProvider: Signer | Provider
-  ): TokenFeeDetector {
-    return new Contract(address, _abi, signerOrProvider) as TokenFeeDetector;
+  static connect(address: string, signerOrProvider: Signer | Provider): TokenFeeDetector {
+    return new Contract(address, _abi, signerOrProvider) as TokenFeeDetector
   }
 }

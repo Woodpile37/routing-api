@@ -2,9 +2,9 @@
 /* tslint:disable */
 /* eslint-disable */
 
-import { FunctionFragment, Result } from "@ethersproject/abi";
-import { BytesLike } from "@ethersproject/bytes";
-import { Listener, Provider } from "@ethersproject/providers";
+import { FunctionFragment, Result } from '@ethersproject/abi'
+import { BytesLike } from '@ethersproject/bytes'
+import { Listener, Provider } from '@ethersproject/providers'
 import {
   BaseContract,
   BigNumber,
@@ -15,114 +15,97 @@ import {
   Overrides,
   PopulatedTransaction,
   Signer,
-} from "ethers";
-import { TypedEvent, TypedEventFilter, TypedListener } from "./commons";
+} from 'ethers'
+import { TypedEvent, TypedEventFilter, TypedListener } from './commons'
 
 interface UniswapInterfaceMulticallInterface extends ethers.utils.Interface {
   functions: {
-    "getCurrentBlockTimestamp()": FunctionFragment;
-    "getEthBalance(address)": FunctionFragment;
-    "multicall(tuple[])": FunctionFragment;
-  };
+    'getCurrentBlockTimestamp()': FunctionFragment
+    'getEthBalance(address)': FunctionFragment
+    'multicall(tuple[])': FunctionFragment
+  }
 
+  encodeFunctionData(functionFragment: 'getCurrentBlockTimestamp', values?: undefined): string
+  encodeFunctionData(functionFragment: 'getEthBalance', values: [string]): string
   encodeFunctionData(
-    functionFragment: "getCurrentBlockTimestamp",
-    values?: undefined
-  ): string;
-  encodeFunctionData(
-    functionFragment: "getEthBalance",
-    values: [string]
-  ): string;
-  encodeFunctionData(
-    functionFragment: "multicall",
+    functionFragment: 'multicall',
     values: [{ target: string; gasLimit: BigNumberish; callData: BytesLike }[]]
-  ): string;
+  ): string
 
-  decodeFunctionResult(
-    functionFragment: "getCurrentBlockTimestamp",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(
-    functionFragment: "getEthBalance",
-    data: BytesLike
-  ): Result;
-  decodeFunctionResult(functionFragment: "multicall", data: BytesLike): Result;
+  decodeFunctionResult(functionFragment: 'getCurrentBlockTimestamp', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'getEthBalance', data: BytesLike): Result
+  decodeFunctionResult(functionFragment: 'multicall', data: BytesLike): Result
 
-  events: {};
+  events: {}
 }
 
 export class UniswapInterfaceMulticall extends BaseContract {
-  connect(signerOrProvider: Signer | Provider | string): this;
-  attach(addressOrName: string): this;
-  deployed(): Promise<this>;
+  connect(signerOrProvider: Signer | Provider | string): this
+  attach(addressOrName: string): this
+  deployed(): Promise<this>
 
   listeners<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter?: TypedEventFilter<EventArgsArray, EventArgsObject>
-  ): Array<TypedListener<EventArgsArray, EventArgsObject>>;
+  ): Array<TypedListener<EventArgsArray, EventArgsObject>>
   off<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   on<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   once<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   removeListener<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>,
     listener: TypedListener<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
   removeAllListeners<EventArgsArray extends Array<any>, EventArgsObject>(
     eventFilter: TypedEventFilter<EventArgsArray, EventArgsObject>
-  ): this;
+  ): this
 
-  listeners(eventName?: string): Array<Listener>;
-  off(eventName: string, listener: Listener): this;
-  on(eventName: string, listener: Listener): this;
-  once(eventName: string, listener: Listener): this;
-  removeListener(eventName: string, listener: Listener): this;
-  removeAllListeners(eventName?: string): this;
+  listeners(eventName?: string): Array<Listener>
+  off(eventName: string, listener: Listener): this
+  on(eventName: string, listener: Listener): this
+  once(eventName: string, listener: Listener): this
+  removeListener(eventName: string, listener: Listener): this
+  removeAllListeners(eventName?: string): this
 
   queryFilter<EventArgsArray extends Array<any>, EventArgsObject>(
     event: TypedEventFilter<EventArgsArray, EventArgsObject>,
     fromBlockOrBlockhash?: string | number | undefined,
     toBlock?: string | number | undefined
-  ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>;
+  ): Promise<Array<TypedEvent<EventArgsArray & EventArgsObject>>>
 
-  interface: UniswapInterfaceMulticallInterface;
+  interface: UniswapInterfaceMulticallInterface
 
   functions: {
-    getCurrentBlockTimestamp(
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { timestamp: BigNumber }>;
+    getCurrentBlockTimestamp(overrides?: CallOverrides): Promise<[BigNumber] & { timestamp: BigNumber }>
 
-    getEthBalance(
-      addr: string,
-      overrides?: CallOverrides
-    ): Promise<[BigNumber] & { balance: BigNumber }>;
+    getEthBalance(addr: string, overrides?: CallOverrides): Promise<[BigNumber] & { balance: BigNumber }>
 
     multicall(
       calls: { target: string; gasLimit: BigNumberish; callData: BytesLike }[],
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<ContractTransaction>;
-  };
+    ): Promise<ContractTransaction>
+  }
 
-  getCurrentBlockTimestamp(overrides?: CallOverrides): Promise<BigNumber>;
+  getCurrentBlockTimestamp(overrides?: CallOverrides): Promise<BigNumber>
 
-  getEthBalance(addr: string, overrides?: CallOverrides): Promise<BigNumber>;
+  getEthBalance(addr: string, overrides?: CallOverrides): Promise<BigNumber>
 
   multicall(
     calls: { target: string; gasLimit: BigNumberish; callData: BytesLike }[],
     overrides?: Overrides & { from?: string | Promise<string> }
-  ): Promise<ContractTransaction>;
+  ): Promise<ContractTransaction>
 
   callStatic: {
-    getCurrentBlockTimestamp(overrides?: CallOverrides): Promise<BigNumber>;
+    getCurrentBlockTimestamp(overrides?: CallOverrides): Promise<BigNumber>
 
-    getEthBalance(addr: string, overrides?: CallOverrides): Promise<BigNumber>;
+    getEthBalance(addr: string, overrides?: CallOverrides): Promise<BigNumber>
 
     multicall(
       calls: { target: string; gasLimit: BigNumberish; callData: BytesLike }[],
@@ -131,47 +114,42 @@ export class UniswapInterfaceMulticall extends BaseContract {
       [
         BigNumber,
         ([boolean, BigNumber, string] & {
-          success: boolean;
-          gasUsed: BigNumber;
-          returnData: string;
+          success: boolean
+          gasUsed: BigNumber
+          returnData: string
         })[]
       ] & {
-        blockNumber: BigNumber;
+        blockNumber: BigNumber
         returnData: ([boolean, BigNumber, string] & {
-          success: boolean;
-          gasUsed: BigNumber;
-          returnData: string;
-        })[];
+          success: boolean
+          gasUsed: BigNumber
+          returnData: string
+        })[]
       }
-    >;
-  };
+    >
+  }
 
-  filters: {};
+  filters: {}
 
   estimateGas: {
-    getCurrentBlockTimestamp(overrides?: CallOverrides): Promise<BigNumber>;
+    getCurrentBlockTimestamp(overrides?: CallOverrides): Promise<BigNumber>
 
-    getEthBalance(addr: string, overrides?: CallOverrides): Promise<BigNumber>;
+    getEthBalance(addr: string, overrides?: CallOverrides): Promise<BigNumber>
 
     multicall(
       calls: { target: string; gasLimit: BigNumberish; callData: BytesLike }[],
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<BigNumber>;
-  };
+    ): Promise<BigNumber>
+  }
 
   populateTransaction: {
-    getCurrentBlockTimestamp(
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    getCurrentBlockTimestamp(overrides?: CallOverrides): Promise<PopulatedTransaction>
 
-    getEthBalance(
-      addr: string,
-      overrides?: CallOverrides
-    ): Promise<PopulatedTransaction>;
+    getEthBalance(addr: string, overrides?: CallOverrides): Promise<PopulatedTransaction>
 
     multicall(
       calls: { target: string; gasLimit: BigNumberish; callData: BytesLike }[],
       overrides?: Overrides & { from?: string | Promise<string> }
-    ): Promise<PopulatedTransaction>;
-  };
+    ): Promise<PopulatedTransaction>
+  }
 }
