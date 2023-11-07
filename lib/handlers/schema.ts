@@ -1,14 +1,11 @@
 import Joi from '@hapi/joi'
-import { MethodParameters } from '@uniswap/smart-order-router'
-import { BigNumber } from 'ethers'
+import { MethodParameters } from '../sor'
 
 export type TokenInRoute = {
   address: string
   chainId: number
   symbol: string
   decimals: string
-  buyFeeBps?: BigNumber
-  sellFeeBps?: BigNumber
 }
 
 export type V3PoolInRoute = {
@@ -63,7 +60,6 @@ export const QuoteResponseSchemaJoi = Joi.object().keys({
     value: Joi.string().required(),
     to: Joi.string().required(),
   }).optional(),
-  hitsCachedRoutes: Joi.boolean().optional(),
 })
 
 export type QuoteResponse = {
@@ -85,5 +81,4 @@ export type QuoteResponse = {
   route: Array<(V3PoolInRoute | V2PoolInRoute)[]>
   routeString: string
   methodParameters?: MethodParameters
-  hitsCachedRoutes?: boolean
 }

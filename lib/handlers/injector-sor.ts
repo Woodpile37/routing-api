@@ -5,10 +5,12 @@ import {
   CachingTokenProviderWithFallback,
   CachingV3PoolProvider,
   EIP1559GasPriceProvider,
-  EthEstimateGasSimulator,
   FallbackTenderlySimulator,
+  TenderlySimulator,
+  EthEstimateGasSimulator,
   IGasPriceProvider,
   IMetric,
+  Simulator,
   ITokenListProvider,
   ITokenProvider,
   IV2PoolProvider,
@@ -20,21 +22,16 @@ import {
   OnChainGasPriceProvider,
   OnChainQuoteProvider,
   setGlobalLogger,
-  Simulator,
   StaticV2SubgraphProvider,
   StaticV3SubgraphProvider,
-  TenderlySimulator,
   TokenProvider,
-  TokenPropertiesProvider,
   UniswapMulticallProvider,
   V2PoolProvider,
   V2QuoteProvider,
   V3PoolProvider,
   IRouteCachingProvider,
   CachingV2PoolProvider,
-  TokenValidatorProvider,
-  ITokenPropertiesProvider,
-} from '@uniswap/smart-order-router'
+} from '../sor'
 import { TokenList } from '@uniswap/token-lists'
 import { default as bunyan, default as Logger } from 'bunyan'
 import { ethers } from 'ethers'
@@ -50,8 +47,7 @@ import { TrafficSwitchV3PoolProvider } from './pools/provider-migration/v3/traff
 import { DefaultEVMClient } from './evm/EVMClient'
 import { InstrumentedEVMProvider } from './evm/provider/InstrumentedEVMProvider'
 import { deriveProviderName } from './evm/provider/ProviderName'
-import { V2DynamoCache } from './pools/pool-caching/v2/v2-dynamo-cache'
-import { OnChainTokenFeeFetcher } from '@uniswap/smart-order-router/build/main/providers/token-fee-fetcher'
+import { V2DebugCachingPoolProvider } from './pools/pool-caching/v2/v2-debug-caching-pool-provider'
 
 export const SUPPORTED_CHAINS: ChainId[] = [
   ChainId.MAINNET,
@@ -78,8 +74,6 @@ export interface RequestInjected<Router> extends BaseRInj {
   tokenProvider: ITokenProvider
   tokenListProvider: ITokenListProvider
   router: Router
-  quoteSpeed?: string
-  intent?: string
 }
 
 export type ContainerDependencies = {
@@ -98,8 +92,6 @@ export type ContainerDependencies = {
   v2QuoteProvider: V2QuoteProvider
   simulator: Simulator
   routeCachingProvider?: IRouteCachingProvider
-  tokenValidatorProvider: TokenValidatorProvider
-  tokenPropertiesProvider: ITokenPropertiesProvider
 }
 
 export interface ContainerInjected {
@@ -126,11 +118,9 @@ export abstract class InjectorSOR<Router, QueryParams> extends Injector<
       POOL_CACHE_BUCKET_2,
       POOL_CACHE_KEY,
       TOKEN_LIST_CACHE_BUCKET,
-      ROUTES_TABLE_NAME,
-      ROUTES_CACHING_REQUEST_FLAG_TABLE_NAME,
       CACHED_ROUTES_TABLE_NAME,
       AWS_LAMBDA_FUNCTION_NAME,
-      V2_PAIRS_CACHE_TABLE_NAME,
+      CACHING_REQUEST_FLAG_TABLE_NAME,
     } = process.env
 
     const dependenciesByChain: {
@@ -173,79 +163,16 @@ export abstract class InjectorSOR<Router, QueryParams> extends Injector<
           ],
         }).getProvider()
 
+        const tokenListProvider = await AWSTokenListProvider.fromTokenListS3Bucket(
+          chainId,
+          TOKEN_LIST_CACHE_BUCKET!,
+          DEFAULT_TOKEN_LIST
+        )
+
         const tokenCache = new NodeJSCache<Token>(new NodeCache({ stdTTL: 3600, useClones: false }))
         const blockedTokenCache = new NodeJSCache<Token>(new NodeCache({ stdTTL: 3600, useClones: false }))
+
         const multicall2Provider = new UniswapMulticallProvider(chainId, provider, 375_000)
-
-        const noCacheV3PoolProvider = new V3PoolProvider(chainId, multicall2Provider)
-        const inMemoryCachingV3PoolProvider = new CachingV3PoolProvider(
-          chainId,
-          noCacheV3PoolProvider,
-          new NodeJSCache(new NodeCache({ stdTTL: 180, useClones: false }))
-        )
-        const dynamoCachingV3PoolProvider = new DynamoDBCachingV3PoolProvider(
-          chainId,
-          noCacheV3PoolProvider,
-          'V3PoolsCachingDB'
-        )
-
-        const v3PoolProvider = new TrafficSwitchV3PoolProvider({
-          currentPoolProvider: inMemoryCachingV3PoolProvider,
-          targetPoolProvider: dynamoCachingV3PoolProvider,
-          sourceOfTruthPoolProvider: noCacheV3PoolProvider,
-        })
-
-        const tokenFeeFetcher = new OnChainTokenFeeFetcher(chainId, provider)
-        const tokenValidatorProvider = new TokenValidatorProvider(
-          chainId,
-          multicall2Provider,
-          new NodeJSCache(new NodeCache({ stdTTL: 30000, useClones: false }))
-        )
-        const tokenPropertiesProvider = new TokenPropertiesProvider(
-          chainId,
-          tokenValidatorProvider,
-          new NodeJSCache(new NodeCache({ stdTTL: 30000, useClones: false })),
-          tokenFeeFetcher
-        )
-        const underlyingV2PoolProvider = new V2PoolProvider(chainId, multicall2Provider, tokenPropertiesProvider)
-        const v2PoolProvider = new CachingV2PoolProvider(
-          chainId,
-          underlyingV2PoolProvider,
-          new V2DynamoCache(V2_PAIRS_CACHE_TABLE_NAME!)
-        )
-
-        const [tokenListProvider, blockedTokenListProvider, v3SubgraphProvider, v2SubgraphProvider] = await Promise.all(
-          [
-            AWSTokenListProvider.fromTokenListS3Bucket(chainId, TOKEN_LIST_CACHE_BUCKET!, DEFAULT_TOKEN_LIST),
-            CachingTokenListProvider.fromTokenList(chainId, UNSUPPORTED_TOKEN_LIST as TokenList, blockedTokenCache),
-            (async () => {
-              try {
-                const subgraphProvider = await V3AWSSubgraphProvider.EagerBuild(
-                  POOL_CACHE_BUCKET_2!,
-                  POOL_CACHE_KEY!,
-                  chainId
-                )
-                return subgraphProvider
-              } catch (err) {
-                log.error({ err }, 'AWS Subgraph Provider unavailable, defaulting to Static Subgraph Provider')
-                return new StaticV3SubgraphProvider(chainId, v3PoolProvider)
-              }
-            })(),
-            (async () => {
-              try {
-                const subgraphProvider = await V2AWSSubgraphProvider.EagerBuild(
-                  POOL_CACHE_BUCKET_2!,
-                  POOL_CACHE_KEY!,
-                  chainId
-                )
-                return subgraphProvider
-              } catch (err) {
-                return new StaticV2SubgraphProvider(chainId)
-              }
-            })(),
-          ]
-        )
-
         const tokenProvider = new CachingTokenProviderWithFallback(
           chainId,
           tokenCache,
@@ -326,6 +253,34 @@ export abstract class InjectorSOR<Router, QueryParams> extends Injector<
             break
         }
 
+        const noCacheV3PoolProvider = new V3PoolProvider(chainId, multicall2Provider)
+        const inMemoryCachingV3PoolProvider = new CachingV3PoolProvider(
+          chainId,
+          noCacheV3PoolProvider,
+          new NodeJSCache(new NodeCache({ stdTTL: 180, useClones: false }))
+        )
+        const dynamoCachingV3PoolProvider = new DynamoDBCachingV3PoolProvider(
+          chainId,
+          noCacheV3PoolProvider,
+          'V3PoolsCachingDB'
+        )
+
+        const v3PoolProvider = new TrafficSwitchV3PoolProvider({
+          currentPoolProvider: inMemoryCachingV3PoolProvider,
+          targetPoolProvider: dynamoCachingV3PoolProvider,
+          sourceOfTruthPoolProvider: noCacheV3PoolProvider,
+        })
+
+        const nonCachingv2PoolProvider = new V2PoolProvider(chainId, multicall2Provider)
+        const cachingV2PoolProvider = new CachingV2PoolProvider(
+          chainId,
+          nonCachingv2PoolProvider,
+          // make TTL lower than average of L2 chain block confirmation time,
+          // so that we know the latency improvement is the bottom line not top line
+          new NodeJSCache(new NodeCache({ stdTTL: 1, useClones: false }))
+        )
+        const v2PoolProvider = new V2DebugCachingPoolProvider(cachingV2PoolProvider, nonCachingv2PoolProvider)
+
         const tenderlySimulator = new TenderlySimulator(
           chainId,
           'http://api.tenderly.co',
@@ -342,12 +297,40 @@ export abstract class InjectorSOR<Router, QueryParams> extends Injector<
 
         const simulator = new FallbackTenderlySimulator(chainId, provider, tenderlySimulator, ethEstimateGasSimulator)
 
+        const [v3SubgraphProvider, v2SubgraphProvider] = await Promise.all([
+          (async () => {
+            try {
+              const subgraphProvider = await V3AWSSubgraphProvider.EagerBuild(
+                POOL_CACHE_BUCKET_2!,
+                POOL_CACHE_KEY!,
+                chainId
+              )
+              return subgraphProvider
+            } catch (err) {
+              log.error({ err }, 'AWS Subgraph Provider unavailable, defaulting to Static Subgraph Provider')
+              return new StaticV3SubgraphProvider(chainId, v3PoolProvider)
+            }
+          })(),
+          (async () => {
+            try {
+              const subgraphProvider = await V2AWSSubgraphProvider.EagerBuild(
+                POOL_CACHE_BUCKET_2!,
+                POOL_CACHE_KEY!,
+                chainId
+              )
+              return subgraphProvider
+            } catch (err) {
+              return new StaticV2SubgraphProvider(chainId)
+            }
+          })(),
+        ])
+
         let routeCachingProvider: IRouteCachingProvider | undefined = undefined
         if (CACHED_ROUTES_TABLE_NAME && CACHED_ROUTES_TABLE_NAME !== '') {
           routeCachingProvider = new DynamoRouteCachingProvider({
-            routesTableName: ROUTES_TABLE_NAME!,
-            routesCachingRequestFlagTableName: ROUTES_CACHING_REQUEST_FLAG_TABLE_NAME!,
+            cachedRoutesTableName: CACHED_ROUTES_TABLE_NAME,
             cachingQuoteLambdaName: AWS_LAMBDA_FUNCTION_NAME!,
+            cachingRequestFlagTableName: CACHING_REQUEST_FLAG_TABLE_NAME!,
           })
         }
 
@@ -355,8 +338,16 @@ export abstract class InjectorSOR<Router, QueryParams> extends Injector<
           chainId,
           dependencies: {
             provider,
-            tokenListProvider,
-            blockedTokenListProvider,
+            tokenListProvider: await AWSTokenListProvider.fromTokenListS3Bucket(
+              chainId,
+              TOKEN_LIST_CACHE_BUCKET!,
+              DEFAULT_TOKEN_LIST
+            ),
+            blockedTokenListProvider: await CachingTokenListProvider.fromTokenList(
+              chainId,
+              UNSUPPORTED_TOKEN_LIST as TokenList,
+              blockedTokenCache
+            ),
             multicallProvider: multicall2Provider,
             tokenProvider,
             tokenProviderFromTokenList: tokenListProvider,
@@ -377,8 +368,6 @@ export abstract class InjectorSOR<Router, QueryParams> extends Injector<
             v2SubgraphProvider,
             simulator,
             routeCachingProvider,
-            tokenValidatorProvider,
-            tokenPropertiesProvider,
           },
         }
       })

@@ -59,6 +59,7 @@ export const QuoteQueryParamsJoi = Joi.object({
   enableUniversalRouter: Joi.boolean().optional().default(false),
   quoteSpeed: Joi.string().valid('fast', 'standard').optional().default('standard'),
   intent: Joi.string().valid('quote', 'swap', 'caching').optional().default('quote'),
+  cannedRoutingConfig: Joi.string().optional(),
 }).and('recipient', 'slippageTolerance', 'deadline')
 
 export type QuoteQueryParams = {
@@ -86,4 +87,5 @@ export type QuoteQueryParams = {
   enableUniversalRouter?: boolean
   quoteSpeed?: string
   intent?: string
+  cannedRoutingConfig?: string
 }
